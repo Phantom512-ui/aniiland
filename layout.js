@@ -1,5 +1,5 @@
 const STORE='aniimo-homeland-layout-v122';
-const PLOT_W=15,PLOT_H=20,MAP_COLS=4,MAP_ROWS=4,SCALE=18,STEP=.25,AUTO_STEP=.5;
+const PLOT_W=20,PLOT_H=15,MAP_COLS=4,MAP_ROWS=4,SCALE=18,DRAG_STEP=1/16,AUTO_STEP=.5;
 const PLOTS={1:[2,3],2:[1,3],3:[2,2],4:[1,2],5:[3,3],6:[3,2],7:[1,1],8:[2,1],9:[3,1],10:[0,3],11:[0,2],12:[0,1],13:[0,0],14:[1,0],15:[2,0],16:[3,0]};
 const MAP_ORDER=[13,14,15,16,12,7,8,9,11,4,3,6,10,2,1,5];
 const climateValue={Warm:1,Scorching:2,Cool:-1,Freeze:-2,Adequate:0};
@@ -17,10 +17,21 @@ const colorFor=i=>climateNames.includes(i.name)?climateColors[i.environment]||'#
 const slotSize=i=>i.name==='Farmland'?2:i.name==='Woodland'?4:Math.max(i.w,i.h)>=4.5?5:Math.max(i.w,i.h);
 
 function insideUnlocked(rect,unlocked){
- for(let y=rect.y+STEP/2;y<rect.y+rect.h;y+=STEP)for(let x=rect.x+STEP/2;x<rect.x+rect.w;x+=STEP){
-  if(!unlocked.some(id=>{const p=plotRect(id);return x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h}))return false;
+ // Exact rectangle-in-owned-land check. Plot coordinates are in placement squares;
+ // this avoids rounding a facility to a coarse 1/4-square sampling grid.
+ const plots=unlocked.map(plotRect).filter(p=>overlaps(rect,p));
+ const xs=[rect.x,rect.x+rect.w],ys=[rect.y,rect.y+rect.h];
+ for(const p of plots){
+  xs.push(Math.max(rect.x,p.x),Math.min(rect.x+rect.w,p.x+p.w));
+  ys.push(Math.max(rect.y,p.y),Math.min(rect.y+rect.h,p.y+p.h));
  }
- return true;
+ const sx=[...new Set(xs)].sort((a,b)=>a-b),sy=[...new Set(ys)].sort((a,b)=>a-b);
+ for(let xi=0;xi<sx.length-1;xi++)for(let yi=0;yi<sy.length-1;yi++){
+  if(sx[xi+1]<=sx[xi]||sy[yi+1]<=sy[yi])continue;
+  const x=(sx[xi]+sx[xi+1])/2,y=(sy[yi]+sy[yi+1])/2;
+  if(!plots.some(p=>x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h))return false;
+ }
+ return plots.length>0;
 }
 function valid(item,items,unlocked,gap=0){
  if(!rectangles(item).every(r=>insideUnlocked(r,unlocked)))return false;
@@ -117,12 +128,12 @@ function draw(ctx,state,status=''){
  bindDrag(ctx,state,canvas);
 }
 function bindDrag(ctx,state,canvas){
- canvas.querySelectorAll('.placed').forEach(el=>el.onpointerdown=e=>{e.preventDefault();const id=el.dataset.id,item=state.items[id],start={x:item.x,y:item.y,px:e.clientX,py:e.clientY};el.setPointerCapture(e.pointerId);el.onpointermove=ev=>{item.x=Math.max(0,Math.round((start.x+(ev.clientX-start.px)/SCALE)/STEP)*STEP);item.y=Math.max(0,Math.round((start.y+(ev.clientY-start.py)/SCALE)/STEP)*STEP);el.style.left=`${item.x*SCALE}px`;el.style.top=`${item.y*SCALE}px`};el.onpointerup=()=>{const others=Object.values(state.items);if(!valid(item,others,state.unlocked||[],0)){item.x=start.x;item.y=start.y;draw(ctx,state,'That position overlaps another facility, an incubator access strip, or locked land.')}else{save(state);draw(ctx,state)}}});
+ canvas.querySelectorAll('.placed').forEach(el=>el.onpointerdown=e=>{e.preventDefault();const id=el.dataset.id,item=state.items[id],start={x:item.x,y:item.y,px:e.clientX,py:e.clientY};el.setPointerCapture(e.pointerId);el.onpointermove=ev=>{item.x=Math.max(0,Math.round((start.x+(ev.clientX-start.px)/SCALE)/DRAG_STEP)*DRAG_STEP);item.y=Math.max(0,Math.round((start.y+(ev.clientY-start.py)/SCALE)/DRAG_STEP)*DRAG_STEP);el.style.left=`${item.x*SCALE}px`;el.style.top=`${item.y*SCALE}px`};el.onpointerup=()=>{const others=Object.values(state.items);if(!valid(item,others,state.unlocked||[],0)){item.x=start.x;item.y=start.y;draw(ctx,state,'That position overlaps another facility, an incubator access strip, or locked land.')}else{save(state);draw(ctx,state)}}});
 }
 export function renderLayoutPlanner(container,ctx){
  const state=load();state.unlocked??=['1'];state.items??={};state.storage??=ctx.level>=8;state.incubators??=false;state.spacing??=.5;
  state.unlocked=state.unlocked.map(String).filter(id=>PLOTS[id]&&+id<=Math.min(ctx.level,16));if(!state.unlocked.length&&ctx.level>=1)state.unlocked=['1'];
- container.innerHTML=ctx.title('Floor planner','Select the plots you own, then auto-place or fine-tune the layout.')+`<div id="layout-root"><div class="layout-controls"><div><h3>Homeland plots</h3><div class="plot-picker"></div></div><div class="layout-actions"><label class="check"><input id="layout-storage" type="checkbox" ${state.storage?'checked':''}>Include 3 storage units</label><label class="check"><input id="layout-incubators" type="checkbox" ${state.incubators?'checked':''}>Include ${ctx.level+1} egg incubators + access</label><label for="layout-spacing">Space between normal buildings</label><select id="layout-spacing"><option value=".25" ${state.spacing===.25?'selected':''}>Compact · ¼ square</option><option value=".5" ${state.spacing===.5?'selected':''}>Comfortable · ½ square</option><option value="1" ${state.spacing===1?'selected':''}>Wide · 1 square</option></select><button class="primary" id="auto-layout">Auto-place this production plan</button><button class="secondary" id="clear-layout">Clear facility positions</button></div></div><div class="note"><b>Climate-safe placement:</b> farms and woodlands are now anchored to the exact coverage pattern selected by the optimizer. A facility only needs a small overlap with the colored 9×9 range to receive the full effect.</div><div class="layout-workspace"><div class="layout-scroll"><div class="layout-canvas"></div></div><aside class="layout-legend" aria-label="Facility color legend"></aside></div><div class="layout-status"></div><p class="hint">Blocks are color-coded; hover a block for its exact name, footprint, level and climate status. The editor snaps to ¼-square tiles. Incubators reserve one square of access space in front.</p></div>`;
+ container.innerHTML=ctx.title('Floor planner','Each plot is 20×15 squares. Each square is 4×4 tiles, and each tile is 4×4 smallest tiles.')+`<div id="layout-root"><div class="layout-controls"><div><h3>Homeland plots</h3><div class="plot-picker"></div></div><div class="layout-actions"><label class="check"><input id="layout-storage" type="checkbox" ${state.storage?'checked':''}>Include 3 storage units</label><label class="check"><input id="layout-incubators" type="checkbox" ${state.incubators?'checked':''}>Include ${ctx.level+1} egg incubators + access</label><label for="layout-spacing">Space between normal buildings</label><select id="layout-spacing"><option value=".25" ${state.spacing===.25?'selected':''}>Compact · ¼ square</option><option value=".5" ${state.spacing===.5?'selected':''}>Comfortable · ½ square</option><option value="1" ${state.spacing===1?'selected':''}>Wide · 1 square</option></select><button class="primary" id="auto-layout">Auto-place this production plan</button><button class="secondary" id="clear-layout">Clear facility positions</button></div></div><div class="note"><b>Exact Homeland scale:</b> 1 plot = 20×15 squares · 1 square = 4×4 tiles · 1 tile = 4×4 smallest tiles. Climate devices are 2×2 squares with a 9×9-square range, and any positive overlap is enough to apply the full effect.</div><div class="layout-workspace"><div class="layout-scroll"><div class="layout-canvas"></div></div><aside class="layout-legend" aria-label="Facility color legend"></aside></div><div class="layout-status"></div><p class="hint">Blocks are color-coded; hover a block for its exact name, footprint, level and climate status. The grid shows placement squares with 4×4 tile subdivisions. Dragging snaps to the smallest tile (1/16 square). Incubators reserve one square of access space in front.</p></div>`;
  const root=container.querySelector('#layout-root');
  root.onclick=e=>{const p=e.target.closest('[data-plot]');if(p&&!p.disabled){const id=p.dataset.plot;state.unlocked=state.unlocked.includes(id)?state.unlocked.filter(x=>x!==id):[...state.unlocked,id];save(state);draw(ctx,state);return}if(e.target.closest('#auto-layout')){const r=autoPlace(ctx,state),missing=[...new Set(r.missing.map(x=>x.label))].join(', ');draw(ctx,state,r.missing.length?`Could not fit ${r.missing.length} facilities (${missing}) with the selected spacing. Mark more plots as owned or reduce spacing.`:`Placed everything; ${r.moved} new or invalid facilities moved · all climate placements covered.`)}if(e.target.closest('#clear-layout')){state.items={};save(state);draw(ctx,state,'Facility positions cleared; owned plots were kept.')}};
  root.onchange=e=>{if(e.target.id==='layout-storage')state.storage=e.target.checked;if(e.target.id==='layout-incubators')state.incubators=e.target.checked;if(e.target.id==='layout-spacing')state.spacing=Number(e.target.value);save(state);draw(ctx,state)};

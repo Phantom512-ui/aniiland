@@ -16,7 +16,7 @@ export function cycle(item,settings){
 
 export function eligible(data,settings){
   const mods=data.modules;
-  return data.items.filter(i=>{
+  let items=data.items.filter(i=>{
     const f=settings.facilities[i.facility];
     if(i.byproductOnly||!f||f.count<1||i.facilityLevel>f.level)return false;
     if(i.module){const[k,n]=i.module.split(':');if(mods[k][settings.level-1]<+n)return false}
@@ -24,9 +24,22 @@ export function eligible(data,settings){
     if(['quick_wool','quick_scales'].includes(i.id)&&!settings.unverified)return false;
     if(data.special.some(s=>s.name===i.id)&&!settings.special.includes(i.id))return false;
     if(!settings.climate&&i.environment)return false;
+    if(settings.lightClimate===false&&i.environment==='Adequate')return false;
     if(settings.worker!=='minimum'&&i.minAbility>+settings.worker)return false;
     return i.seconds>0||i.workload>0;
   });
+
+  // Woodland and Mine are RV-progression gatherers. Always run their newest eligible tier so
+  // Wood Blocks / Mineral Sand keep pace with the RV instead of being traded away for short-term
+  // coin profit. Every Woodland recipe in a tier has the same Wood Block yield in the current data;
+  // Mine has one recipe per tier, so this also means "newest Mine recipe" exactly.
+  for(const facility of ['Woodland','Mine']){
+    const available=items.filter(i=>i.facility===facility);
+    if(!available.length)continue;
+    const newest=Math.max(...available.map(i=>i.facilityLevel));
+    items=items.filter(i=>i.facility!==facility||i.facilityLevel===newest);
+  }
+  return items;
 }
 
 const expression=terms=>terms
