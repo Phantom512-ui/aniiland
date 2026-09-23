@@ -4,14 +4,18 @@ export function speed(level,required,gathering,bonus=false){
   const above=Math.max(0,level-required);
   return (gathering?1+above*(required===1?.5:.4):above===0?1:2+above)*(bonus?1.2:1);
 }
+const baseWorkRate=required=>1+.25*(Math.max(1,required)-1);
+const noPersonalitySpeed=(level,required)=>1+.4*Math.max(0,Math.min(4,level)-required);
 
-// Crops and trees keep their fixed grow time. Planting/tending/harvesting are separate
-// Aniimo jobs and are budgeted below.
+// Current Aniimax timing: gathering facilities get a recipe-level base workload rate
+// (1.00/1.25/1.50 workload/s for Lv.1/2/3 requirements). Dance Pad Polisher and
+// Aniipod Maker use that same base rate but their own +40%-per-level efficiency curve.
 export function cycle(item,settings){
   if(item.seconds)return item.seconds;
   const level=settings.worker==='minimum'?item.minAbility:Number(settings.worker);
-  const bonus=settings.bonus&&!['Dance Pad Polisher','Aniipod Maker'].includes(item.facility);
-  return item.workload/speed(level,item.minAbility,!Object.keys(item.ingredients).length,bonus);
+  const gathering=!Object.keys(item.ingredients).length;
+  if(['Dance Pad Polisher','Aniipod Maker'].includes(item.facility))return item.workload/(noPersonalitySpeed(level,item.minAbility)*baseWorkRate(item.minAbility));
+  return item.workload/(speed(level,item.minAbility,gathering,settings.bonus)* (gathering?baseWorkRate(item.minAbility):1));
 }
 
 export function eligible(data,settings){
@@ -33,11 +37,15 @@ export function eligible(data,settings){
   // Wood Blocks / Mineral Sand keep pace with the RV instead of being traded away for short-term
   // coin profit. Every Woodland recipe in a tier has the same Wood Block yield in the current data;
   // Mine has one recipe per tier, so this also means "newest Mine recipe" exactly.
+  // Woodland always stays on its newest tier. Mine does too, except the Aniipod preset
+  // may keep the one lower-tier ingredient needed by the best available Aniipod recipe.
+  const podRecipe=settings.strategy==='xp_aniipod'?items.filter(i=>i.facility==='Aniipod Maker').sort((a,b)=>b.facilityLevel-a.facilityLevel)[0]:null;
+  const podMineProduct=podRecipe?Object.keys(podRecipe.ingredients)[0]:null;
   for(const facility of ['Woodland','Mine']){
     const available=items.filter(i=>i.facility===facility);
     if(!available.length)continue;
     const newest=Math.max(...available.map(i=>i.facilityLevel));
-    items=items.filter(i=>i.facility!==facility||i.facilityLevel===newest);
+    items=items.filter(i=>i.facility!==facility||i.facilityLevel===newest||(facility==='Mine'&&podMineProduct&&i.product===podMineProduct));
   }
   return items;
 }
@@ -74,6 +82,7 @@ export function buildModel(data,settings){
     bounds.push(`0 <= z${n} <= ${settings.facilities[i.facility].count}`);
     add([[1,`q${n}`],[-3600/cycle(i,settings),`z${n}`]],'<=',0);
     if(i.cost)objectives.push([-i.cost,`q${n}`]);
+    if(settings.strategy!=='upgrade'&&i.facility==='Woodland')objectives.push([1e8,`z${n}`]);
   });
 
   const foodProducts=new Map();
@@ -98,13 +107,17 @@ export function buildModel(data,settings){
     add(terms,'>=',0);
   });
 
-  // These presets guarantee a small set-and-forget side stream, then maximize the remaining cash.
-  const sideTargets=[];
-  if(['xp','xp_aniipod'].includes(settings.strategy))sideTargets.push('Dance Pad Polisher');
-  if(settings.strategy==='xp_aniipod')sideTargets.push('Aniipod Maker');
-  for(const facility of sideTargets){
-    const candidates=items.map((i,n)=>[i,n]).filter(([i])=>i.facility===facility).sort((a,b)=>b[0].facilityLevel-a[0].facilityLevel);
-    if(candidates.length){const[i,n]=candidates[0];add([[1,`q${n}`]],'>=',.1*3600/cycle(i,settings))}
+  // Priority order for normal plans: keep Woodland progression at its maximum feasible
+  // occupancy, then maximize the selected EXP/Aniipod stream, then use everything left for coins.
+  // Large separated coefficients emulate lexicographic priorities without the old arbitrary 10% floor.
+  if(['xp','xp_aniipod'].includes(settings.strategy)){
+    const growth=items.map((i,n)=>[i,n]).filter(([i])=>i.facility==='Dance Pad Polisher');
+    const maxXp=Math.max(0,...growth.map(([i])=>3600/cycle(i,settings)*i.yield*(i.price||0)));
+    if(maxXp>0)for(const[i,n]of growth)objectives.push([1e6*i.yield*(i.price||0)/maxXp,`q${n}`]);
+  }
+  if(settings.strategy==='xp_aniipod'){
+    const pods=items.map((i,n)=>[i,n]).filter(([i])=>i.facility==='Aniipod Maker').sort((a,b)=>b[0].facilityLevel-a[0].facilityLevel);
+    if(pods.length){const[i,n]=pods[0];objectives.push([1e6*cycle(i,settings)/3600,`q${n}`])}
   }
 
   // A normal machine stays assigned to one recipe. Only the non-sale Bench/Kiln progression
@@ -112,7 +125,8 @@ export function buildModel(data,settings){
   facilities.forEach(([name,f],facilityIndex)=>{
     const subset=items.map((i,j)=>[i,j]).filter(([i])=>i.facility===name);
     if(subset[0][0].seconds){
-      add(subset.map(([,j])=>[1,`z${j}`]),'<=',f.count);
+      const plotTerms=subset.map(([,j])=>[1,`z${j}`]);
+      add(plotTerms,'<=',f.count);
       return;
     }
     const regular=subset.filter(([i])=>i.currency!=='none');
@@ -120,7 +134,14 @@ export function buildModel(data,settings){
     const capacity=[];
     for(const[i,j]of regular){
       integers.push(`u${j}`);
-      bounds.push(`0 <= u${j} <= ${f.count}`);
+      let unitCap=f.count;
+      if(name==='Mine'&&settings.strategy==='xp_aniipod'){
+        const pod=items.filter(x=>x.facility==='Aniipod Maker').sort((a,b)=>b.facilityLevel-a.facilityLevel)[0];
+        const need=pod?Object.keys(pod.ingredients)[0]:null;
+        const newest=Math.max(...subset.map(([x])=>x.facilityLevel));
+        if(need&&i.product===need&&i.facilityLevel<newest)unitCap=Math.min(1,unitCap);
+      }
+      bounds.push(`0 <= u${j} <= ${unitCap}`);
       add([[cycle(i,settings),`q${j}`],[-3600,`u${j}`]],'<=',0);
       capacity.push([1,`u${j}`]);
     }
@@ -131,6 +152,7 @@ export function buildModel(data,settings){
       capacity.push([1,`m${facilityIndex}`]);
     }
     add(capacity,'<=',f.count);
+    if(name==='Mine')add(capacity,'>=',f.count); // every Mine stays active; Aniipod mode may redirect one
   });
 
   // Workers can move between jobs of the same ability while processors wait for ingredients.

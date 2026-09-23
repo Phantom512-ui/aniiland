@@ -5697,7 +5697,7 @@
     },
     {
       "id": "chestnut_puree",
-      "name": "Chestnut Pur\u00e9e",
+      "name": "Chestnut Purée",
       "facility": "Simmering Pot",
       "price": 980.0,
       "currency": "coins",
@@ -6010,7 +6010,8 @@
       "energy": 0,
       "checked": [],
       "unlock": 3,
-      "noScreenshot": true
+      "noScreenshot": true,
+      "icon": "assets/icons/aniipod.png"
     },
     {
       "id": "aniipod_pro",
@@ -6039,7 +6040,8 @@
       "energy": 0,
       "checked": [],
       "unlock": 6,
-      "noScreenshot": true
+      "noScreenshot": true,
+      "icon": "assets/icons/aniipod_pro.png"
     },
     {
       "id": "aniipod_mega",
@@ -6068,7 +6070,8 @@
       "energy": 0,
       "checked": [],
       "unlock": 9,
-      "noScreenshot": true
+      "noScreenshot": true,
+      "icon": "assets/icons/aniipod_mega.png"
     },
     {
       "id": "soy_sauce_fried_rice",
