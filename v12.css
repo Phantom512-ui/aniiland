@@ -89,3 +89,38 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .compact-flow td.profit .coin-icon,.compact-flow td.num .coin-icon{display:inline-block!important;margin-right:.24em!important;vertical-align:-.2em!important}
 .compact-flow .flow-total td{display:table-cell!important}
 .compact-flow .flow-total td:last-child{text-align:right!important}
+
+
+/* v1.3.2 polish pass */
+.personality-inline{display:inline-flex;align-items:center;justify-content:flex-end;gap:8px;white-space:nowrap;color:#d9c1f5;font-weight:700}
+.personality-inline.no-icon{color:#b8c8d3;font-weight:600}
+.personality-icon{width:20px;height:20px;object-fit:contain;image-rendering:pixelated;flex:none}
+.personality-fallback{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 4px;border-radius:999px;background:#25485a;color:#fff;font-weight:900;font-size:12px;line-height:1;flex:none}
+.worker-job{display:block!important;padding:9px 0 11px;border-bottom:2px solid rgba(255,255,255,.08)}
+.worker-job-main{display:flex;align-items:baseline;gap:8px;min-width:0}
+.worker-job-count{font-size:19px;font-weight:900;color:#fff;line-height:1;flex:none}
+.worker-job-role{margin:0!important;color:#edf5fb!important;font-size:15px!important;font-weight:700;line-height:1.25;min-width:0}
+.worker-job-personality{margin-top:6px;color:#b8c8d3;font-size:13.5px;line-height:1.2;text-align:right;padding-right:2px;font-weight:600}
+.metric-money{display:inline-flex;align-items:center;justify-content:flex-end;gap:6px;white-space:nowrap}
+.metric-money .coin-icon{flex:none}
+.level-guide-table{table-layout:fixed;width:100%}
+.level-guide-table th:nth-child(1),.level-guide-table td:nth-child(1){width:10%}
+.level-guide-table th:nth-child(2),.level-guide-table td:nth-child(2){width:32%}
+.level-guide-table th:nth-child(3),.level-guide-table td:nth-child(3){width:26%}
+.level-guide-table th:nth-child(4),.level-guide-table td:nth-child(4){width:17%}
+.level-guide-table th:nth-child(5),.level-guide-table td:nth-child(5){width:15%}
+.level-guide-table td.num,.level-guide-table th.num{text-align:right}
+.level-change-value{display:inline-block;min-width:92px;text-align:right;font-weight:700}
+.level-change-value.positive{color:#dfe9ff}.level-change-value.negative{color:#dfe9ff}.level-change-value.neutral{color:var(--muted)}
+.goal-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+@media(max-width:620px){.goal-grid{grid-template-columns:1fr!important}}
+.layout-zoom-controls{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center;margin:12px 0 2px}
+.layout-zoom-controls .secondary{margin:0}
+.layout-zoom-value{justify-self:end;color:var(--muted);font-weight:700;font-size:12px;min-width:48px;text-align:right}
+.layout-canvas-stage{position:relative;width:1440px;height:1080px}
+.layout-canvas{transform-origin:top left}
+.section-count{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 10px;margin-left:8px;border-radius:999px;background:#152734;border:1px solid var(--line);font-size:18px}
+@media(min-width:1500px){.worker-job-role{font-size:15.5px!important}.worker-job-personality{font-size:14px}.flow-card h3{font-size:18px}.compact-flow table{font-size:14px}}
+@media(max-width:900px){.worker-job-personality{text-align:left}.personality-inline{justify-content:flex-start}}
+
+.production-card>h3{padding:16px 18px 15px}.product-row img{width:68px;height:68px}.product-row b{font-size:15px}.product-row p,.product-row .qty{font-size:13px}
