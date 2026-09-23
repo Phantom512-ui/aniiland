@@ -23,7 +23,8 @@ export function eligible(data,settings){
   let items=data.items.filter(i=>{
     const f=settings.facilities[i.facility];
     if(i.byproductOnly||!f||f.count<1||i.facilityLevel>f.level)return false;
-    if(i.module){const[k,n]=i.module.split(':');if(mods[k][settings.level-1]<+n)return false}
+    if(i.module){const[k,n]=i.module.split(':');const owned=settings.moduleLevels?.[k]??mods[k]?.[settings.level-1]??0;if(owned<+n)return false}
+    if(settings.avoidedRecipes?.includes(i.id))return false;
     if(i.event&&!settings.events)return false;
     if(['quick_wool','quick_scales'].includes(i.id)&&!settings.unverified)return false;
     if(data.special.some(s=>s.name===i.id)&&!settings.special.includes(i.id))return false;
