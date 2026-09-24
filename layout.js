@@ -15,6 +15,40 @@ const plotRect=id=>{const[c,r]=PLOTS[+id];return{x:c*PLOT_W,y:r*PLOT_H,w:PLOT_W,
 const inflate=(r,g)=>({x:r.x-g,y:r.y-g,w:r.w+2*g,h:r.h+2*g});
 const colorFor=i=>climateNames.includes(i.name)?climateColors[i.environment]||'#f0c661':i.environment?climateColors[i.environment]:(facilityColors[i.name]||`hsl(${[...i.name].reduce((a,c)=>a+c.charCodeAt(0)*7,0)%360} 48% 55%)`);
 const slotSize=i=>i.name==='Farmland'?2:i.name==='Woodland'?4:Math.max(i.w,i.h)>=4.5?5:Math.max(i.w,i.h);
+const storageUnitCount=level=>level>=10?4:level>=8?3:level>=4?2:level>=2?1:0;
+const eggIncubatorCount=level=>Math.min(level+1,10);
+const layoutFacilityIconMap={
+ 'Farmland':[[3,'assets/facilities/farm123.png'],[99,'assets/facilities/farm4567.png']],
+ 'Woodland':[[2,'assets/facilities/woodland12.png'],[99,'assets/facilities/woodland3456.png']],
+ 'Mine':[[3,'assets/facilities/mine123.png'],[99,'assets/facilities/mine456.png']],
+ 'Well':[[99,'assets/facilities/well.png']],
+ 'Tidewhisper Sandcastle':[[99,'assets/facilities/sandcastle.png']],
+ 'Dewy House':[[99,'assets/facilities/dewyhouse.png']],
+ 'Nimbus Bed':[[99,'assets/facilities/nimbusbed.png']],
+ 'Starfall Hammock':[[99,'assets/facilities/starfallhammock.png']],
+ 'Floral Windmill':[[99,'assets/facilities/floralwindmill.png']],
+ 'Heat Furnace':[[99,'assets/facilities/heater.png']],
+ 'Cooling Unit':[[99,'assets/facilities/cooler.png']],
+ 'Sunlamp':[[99,'assets/facilities/sunlamp.png']],
+ 'Carousel Mill':[[3,'assets/facilities/carouselmill123.png'],[99,'assets/facilities/carouselmill456.png']],
+ 'Crafting Table':[[4,'assets/facilities/craftingtable1234.png'],[99,'assets/facilities/craftingtable5678.png']],
+ 'Claw Game Cooker':[[4,'assets/facilities/clawgamecooker1234.png'],[99,'assets/facilities/clawgamecooker567.png']],
+ 'Jukebox Dryer':[[3,'assets/facilities/jukeboxdryer123.png'],[99,'assets/facilities/jukeboxdryer456.png']],
+ 'Simmering Pot':[[99,'assets/facilities/simmeringpot.png']],
+ 'Phonolfactory Table':[[2,'assets/facilities/phonolfactorytable12.png'],[99,'assets/facilities/phonolfactorytable3456.png']],
+ 'Bouncy Brew Keg':[[2,'assets/facilities/bouncybrewkeg12.png'],[99,'assets/facilities/bouncybrewkeg345.png']],
+ 'Blazing Stove':[[99,'assets/facilities/blazingstove.png']],
+ 'Pickling Jar':[[99,'assets/facilities/picklingjar.png']],
+ 'Joy Wheel Loom':[[1,'assets/facilities/joywheelloom1.png'],[99,'assets/facilities/joywheelloom234.png']],
+ 'Dance Pad Polisher':[[99,'assets/facilities/dancepadpolisher.png']],
+ 'Aniipod Maker':[[99,'assets/facilities/aniipodmaker.png']],
+ 'Woodworking Bench':[[99,'assets/facilities/woodworkingbench.png']],
+ 'Chimney Kiln':[[99,'assets/facilities/chimneykiln.png']],
+ 'Storage Unit':[[99,'assets/facilities/storageunit.png']],
+ 'Egg Incubator':[[99,'assets/facilities/eggincubator.png']]
+};
+const facilityIconPath=(name,level=1)=>{const rows=layoutFacilityIconMap[name];if(!rows)return'';const hit=rows.find(([max])=>level<=max)||rows[rows.length-1];return hit?.[1]||''};
+
 
 function insideUnlocked(rect,unlocked){
  // Exact rectangle-in-owned-land check. Plot coordinates are in placement squares;
@@ -42,21 +76,24 @@ function desired(ctx,state){
  for(const row of ctx.plan?.rows||[]){
   if(row.plots==null)continue;
   const product=ctx.data.items.find(x=>x.id===row.id);
-  (labels[row.facility]??=[]).push(...Array.from({length:row.plots},()=>({label:product?.name||row.id,environment:product?.environment||''})));
+  (labels[row.facility]??=[]).push(...Array.from({length:row.plots},()=>({label:product?.name||row.id,environment:product?.environment||'',facilityLevel:product?.facilityLevel||1})));
  }
  const climateModes=Object.fromEntries((ctx.plan?.climate||[]).map(x=>[x.building,x.mode]));
  const out=[];
  for(const[name,f]of Object.entries(ctx.config)){
   const size=ctx.data.facilitySizes[name];if(!size||!f.count)continue;
   if(climateNames.includes(name)&&!climateModes[name])continue;
+  const levelSlots=(Array.isArray(f.levels)&&f.levels.length?f.levels.flatMap(g=>Array.from({length:g.count},()=>g.level)):Array.from({length:f.count},()=>f.level||1)).sort((a,b)=>b-a);
+  const products=[...(labels[name]||[])].sort((a,b)=>(b.facilityLevel||1)-(a.facilityLevel||1));
   for(let i=0;i<f.count;i++){
-   const product=labels[name]?.[i],environment=product?.environment||climateModes[name]||'';
+   const level=levelSlots[i]||1,pi=products.findIndex(p=>(p.facilityLevel||1)<=level),product=pi>=0?products.splice(pi,1)[0]:null,environment=product?.environment||climateModes[name]||'';
    const group=environment?`climate:${environment}`:(['Farmland','Woodland','Mine','Well'].includes(name)?'raw':climateNames.includes(name)?'climate:unused':'processing');
-   out.push({id:`${name}:${i}`,name,label:product?.label||name,w:size[0],h:size[1],level:f.level,environment,group});
+   out.push({id:`${name}:${i}`,name,label:product?.label||name,w:size[0],h:size[1],level,environment,group});
   }
  }
- if(state.storage)for(let i=0;i<3;i++)out.push({id:`Storage Unit:${i}`,name:'Storage Unit',label:'Storage',w:2,h:2,level:1,group:'storage'});
- if(state.incubators)for(let i=0;i<ctx.level+1;i++)out.push({id:`Egg Incubator:${i}`,name:'Egg Incubator',label:`Incubator ${i+1}`,w:2,h:2,level:1,group:'incubator'});
+ const storageCount=storageUnitCount(ctx.level),incubatorCount=eggIncubatorCount(ctx.level);
+ if(state.storage)for(let i=0;i<storageCount;i++)out.push({id:`Storage Unit:${i}`,name:'Storage Unit',label:'Storage',w:2,h:2,level:1,group:'storage'});
+ if(state.incubators)for(let i=0;i<incubatorCount;i++)out.push({id:`Egg Incubator:${i}`,name:'Egg Incubator',label:`Incubator ${i+1}`,w:2,h:2,level:1,group:'incubator'});
  return out;
 }
 function autoPlace(ctx,state){
@@ -121,10 +158,10 @@ function draw(ctx,state,status=''){
  canvas.innerHTML=MAP_ORDER.map(id=>{const[c,r]=PLOTS[id],active=unlocked.includes(String(id)),available=id<=limit;return `<div class="land-plot ${active?'unlocked':''} ${available?'available':'locked'}" style="left:${c*PLOT_W*SCALE}px;top:${r*PLOT_H*SCALE}px;width:${PLOT_W*SCALE}px;height:${PLOT_H*SCALE}px"><span>Plot ${id}</span><small>${active?'OWNED':available?'AVAILABLE':`RV ${id}`}</small></div>`}).join('')+items.map(i=>{
   const env=envFor(i,items,ctx),climate=climateNames.includes(i.name),a=access(i);
   const description=`${i.label} · ${i.w}×${i.h}${i.level?` · Lv.${i.level}`:''}${env.need?` · ${env.need} ${env.ok?'covered':'not covered'}`:''}`;
-  return `${climate?`<div class="climate-range ${i.name.replaceAll(' ','-').toLowerCase()}" style="left:${(i.x-3.5)*SCALE}px;top:${(i.y-3.5)*SCALE}px;width:${9*SCALE}px;height:${9*SCALE}px"></div>`:''}<div class="placed ${climate?'climate-device':''} ${env.need&&!env.ok?'bad-env':''}" data-id="${i.id}" title="${description}" aria-label="${description}" style="--block-color:${colorFor(i)};left:${i.x*SCALE}px;top:${i.y*SCALE}px;width:${i.w*SCALE}px;height:${i.h*SCALE}px"><span class="sr-only">${description}</span></div>${a?`<div class="access-strip" style="left:${a.x*SCALE}px;top:${a.y*SCALE}px;width:${a.w*SCALE}px;height:${a.h*SCALE}px"></div>`:''}`;
+  return `${climate?`<div class="climate-range ${i.name.replaceAll(' ','-').toLowerCase()}" style="left:${(i.x-3.5)*SCALE}px;top:${(i.y-3.5)*SCALE}px;width:${9*SCALE}px;height:${9*SCALE}px"></div>`:''}<div class="placed ${climate?'climate-device':''} ${env.need&&!env.ok?'bad-env':''} ${state.iconVisual!==false?'icon-view':''}" data-id="${i.id}" title="${description}" aria-label="${description}" style="--block-color:${colorFor(i)};left:${i.x*SCALE}px;top:${i.y*SCALE}px;width:${i.w*SCALE}px;height:${i.h*SCALE}px">${state.iconVisual!==false&&facilityIconPath(i.name,i.level)?`<img class="placed-icon" src="${facilityIconPath(i.name,i.level)}" alt="">`:''}<span class="sr-only">${description}</span></div>${a?`<div class="access-strip" style="left:${a.x*SCALE}px;top:${a.y*SCALE}px;width:${a.w*SCALE}px;height:${a.h*SCALE}px"></div>`:''}`;
  }).join('');
- const entries=new Map();for(const i of items){const key=i.environment&&!climateNames.includes(i.name)?`${i.label}|${i.name}|${i.environment}`:i.name;const e=entries.get(key)||{label:i.label===i.name?i.name:`${i.label} · ${i.name}`,detail:`${i.w}×${i.h}${i.environment?` · ${i.environment}`:''}`,color:colorFor(i),count:0};e.count++;entries.set(key,e)}
- root.querySelector('.layout-legend').innerHTML=[...entries.values()].map(e=>`<div><i style="background:${e.color}"></i><span><b>${e.label}</b><small>${e.count} placed · ${e.detail}</small></span></div>`).join('')||'<p class="muted">Auto-place facilities to build the legend.</p>';
+ const entries=new Map();for(const i of items){const key=i.environment&&!climateNames.includes(i.name)?`${i.label}|${i.name}|${i.environment}`:i.name;const e=entries.get(key)||{label:i.label===i.name?i.name:`${i.label} · ${i.name}`,detail:`${i.w}×${i.h}${i.environment?` · ${i.environment}`:''}`,color:colorFor(i),count:0,level:i.level||1};e.count++;entries.set(key,e)}
+ root.querySelector('.layout-legend').innerHTML=[...entries.entries()].map(([k,e])=>`<div>${state.iconVisual!==false&&facilityIconPath(k.split('|')[1]||k,e.level||1)?`<img class="layout-legend-icon" src="${facilityIconPath(k.split('|')[1]||k,e.level||1)}" alt="">`:`<i style="background:${e.color}"></i>`}<span><b>${e.label}</b><small>${e.count} placed · ${e.detail}</small></span></div>`).join('')||'<p class="muted">Auto-place facilities to build the legend.</p>';
  const uncovered=items.filter(i=>i.environment&&!climateNames.includes(i.name)&&!envFor(i,items,ctx).ok).length;
  root.querySelector('.layout-status').innerHTML=status||`${items.length} facilities placed · ${unlocked.length} of ${limit} available plots owned${uncovered?` · ${uncovered} climate placements need attention`:' · all climate placements covered'}`;
  bindDrag(ctx,state,canvas);
@@ -135,12 +172,12 @@ function bindDrag(ctx,state,canvas){
  canvas.querySelectorAll('.placed').forEach(el=>el.onpointerdown=e=>{e.preventDefault();const id=el.dataset.id,item=state.items[id],start={x:item.x,y:item.y,px:e.clientX,py:e.clientY};el.setPointerCapture(e.pointerId);el.onpointermove=ev=>{item.x=Math.max(0,Math.round((start.x+(ev.clientX-start.px)/SCALE)/DRAG_STEP)*DRAG_STEP);item.y=Math.max(0,Math.round((start.y+(ev.clientY-start.py)/SCALE)/DRAG_STEP)*DRAG_STEP);el.style.left=`${item.x*SCALE}px`;el.style.top=`${item.y*SCALE}px`};el.onpointerup=()=>{const others=Object.values(state.items);if(!valid(item,others,state.unlocked||[],0)){item.x=start.x;item.y=start.y;draw(ctx,state,'That position overlaps another facility, an incubator access strip, or locked land.')}else{save(state);draw(ctx,state)}}});
 }
 export function renderLayoutPlanner(container,ctx){
- const state=load();state.unlocked??=['1'];state.items??={};state.storage??=ctx.level>=8;state.incubators??=false;state.spacing??=.5;state.zoom??=.85;
+ const state=load();state.unlocked??=['1'];state.items??={};state.storage??=ctx.level>=8;state.incubators??=false;state.iconVisual??=true;state.spacing??=.5;state.zoom??=.85;
  state.unlocked=state.unlocked.map(String).filter(id=>PLOTS[id]&&+id<=Math.min(ctx.level,16));if(!state.unlocked.length&&ctx.level>=1)state.unlocked=['1'];
- container.innerHTML=ctx.title('Floor planner','Each plot is 20×15 squares. Each square is 4×4 tiles, and each tile is 4×4 smallest tiles.')+`<div id="layout-root"><div class="layout-controls"><div><h3>Homeland plots</h3><div class="plot-picker"></div></div><div class="layout-actions"><label class="check"><input id="layout-storage" type="checkbox" ${state.storage?'checked':''}>Include 3 storage units</label><label class="check"><input id="layout-incubators" type="checkbox" ${state.incubators?'checked':''}>Include ${ctx.level+1} egg incubators + access</label><label for="layout-spacing">Space between normal buildings</label><select id="layout-spacing"><option value=".25" ${state.spacing===.25?'selected':''}>Compact · ¼ square</option><option value=".5" ${state.spacing===.5?'selected':''}>Comfortable · ½ square</option><option value="1" ${state.spacing===1?'selected':''}>Wide · 1 square</option></select><div class="layout-zoom-controls"><button type="button" class="secondary" id="layout-zoom-out">−</button><button type="button" class="secondary" id="layout-zoom-fit">Fit</button><button type="button" class="secondary" id="layout-zoom-in">+</button><span class="layout-zoom-value">100%</span></div><button class="primary" id="auto-layout">Auto-place this production plan</button><button class="secondary" id="clear-layout">Clear facility positions</button></div></div><div class="note"><b>Exact Homeland scale:</b> 1 plot = 20×15 squares · 1 square = 4×4 tiles · 1 tile = 4×4 smallest tiles. Climate devices are 2×2 squares with a 9×9-square range, and any positive overlap is enough to apply the full effect.</div><div class="layout-workspace"><div class="layout-scroll"><div class="layout-canvas-stage"><div class="layout-canvas"></div></div></div><aside class="layout-legend" aria-label="Facility color legend"></aside></div><div class="layout-status"></div><p class="hint">Blocks are color-coded; hover a block for its exact name, footprint, level and climate status. The grid shows placement squares with 4×4 tile subdivisions. Dragging snaps to the smallest tile (1/16 square). Incubators reserve one square of access space in front.</p></div>`;
+ container.innerHTML=ctx.title('Floor planner','Each plot is 20×15 squares. Each square is 4×4 tiles, and each tile is 4×4 smallest tiles.')+`<div id="layout-root"><div class="layout-controls"><div><h3>Homeland plots</h3><div class="plot-picker"></div></div><div class="layout-actions"><label class="check"><input id="layout-storage" type="checkbox" ${state.storage?'checked':''}>Include ${storageUnitCount(ctx.level)} storage units</label><label class="check"><input id="layout-incubators" type="checkbox" ${state.incubators?'checked':''}>Include ${eggIncubatorCount(ctx.level)} egg incubators + access</label><label class="check"><input id="layout-icon-visual" type="checkbox" ${state.iconVisual!==false?'checked':''}>Use facility icons</label><label for="layout-spacing">Space between normal buildings</label><select id="layout-spacing"><option value=".25" ${state.spacing===.25?'selected':''}>Compact · ¼ square</option><option value=".5" ${state.spacing===.5?'selected':''}>Comfortable · ½ square</option><option value="1" ${state.spacing===1?'selected':''}>Wide · 1 square</option></select><div class="layout-zoom-controls"><button type="button" class="secondary" id="layout-zoom-out">−</button><button type="button" class="secondary" id="layout-zoom-fit">Fit</button><button type="button" class="secondary" id="layout-zoom-in">+</button><span class="layout-zoom-value">100%</span></div><button class="primary" id="auto-layout">Auto-place this production plan</button><button class="secondary" id="clear-layout">Clear facility positions</button></div></div><div class="note"><b>Exact Homeland scale:</b> 1 plot = 20×15 squares · 1 square = 4×4 tiles · 1 tile = 4×4 smallest tiles. Climate devices are 2×2 squares with a 9×9-square range, and any positive overlap is enough to apply the full effect.</div><div class="layout-workspace"><div class="layout-scroll"><div class="layout-canvas-stage"><div class="layout-canvas"></div></div></div><aside class="layout-legend" aria-label="Facility color legend"></aside></div><div class="layout-status"></div><p class="hint">Blocks are color-coded; hover a block for its exact name, footprint, level and climate status. The grid shows placement squares with 4×4 tile subdivisions. Dragging snaps to the smallest tile (1/16 square). Incubators reserve one square of access space in front.</p></div>`;
  const root=container.querySelector('#layout-root');
  root.onclick=e=>{const p=e.target.closest('[data-plot]');if(p&&!p.disabled){const id=p.dataset.plot;state.unlocked=state.unlocked.includes(id)?state.unlocked.filter(x=>x!==id):[...state.unlocked,id];save(state);draw(ctx,state);return}if(e.target.closest('#layout-zoom-in')){state.zoom=Math.min(1.8,(Number(state.zoom)||1)+.1);applyZoom(root,state);return}if(e.target.closest('#layout-zoom-out')){state.zoom=Math.max(.45,(Number(state.zoom)||1)-.1);applyZoom(root,state);return}if(e.target.closest('#layout-zoom-fit')){fitZoom(root,state);return}if(e.target.closest('#auto-layout')){const r=autoPlace(ctx,state),missing=[...new Set(r.missing.map(x=>x.label))].join(', ');draw(ctx,state,r.missing.length?`Could not fit ${r.missing.length} facilities (${missing}) with the selected spacing. Mark more plots as owned or reduce spacing.`:`Placed everything; ${r.moved} new or invalid facilities moved · all climate placements covered.`)}if(e.target.closest('#clear-layout')){state.items={};save(state);draw(ctx,state,'Facility positions cleared; owned plots were kept.')}};
- root.onchange=e=>{if(e.target.id==='layout-storage')state.storage=e.target.checked;if(e.target.id==='layout-incubators')state.incubators=e.target.checked;if(e.target.id==='layout-spacing')state.spacing=Number(e.target.value);save(state);draw(ctx,state)};
+ root.onchange=e=>{if(e.target.id==='layout-storage')state.storage=e.target.checked;if(e.target.id==='layout-incubators')state.incubators=e.target.checked;if(e.target.id==='layout-icon-visual')state.iconVisual=e.target.checked;if(e.target.id==='layout-spacing')state.spacing=Number(e.target.value);save(state);draw(ctx,state)};
  draw(ctx,state);
  setTimeout(()=>fitZoom(root,state),0);
 }

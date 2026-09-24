@@ -7,6 +7,17 @@ export function speed(level,required,gathering,bonus=false){
 const baseWorkRate=required=>1+.25*(Math.max(1,required)-1);
 const noPersonalitySpeed=(level,required)=>1+.4*Math.max(0,Math.min(4,level)-required);
 
+const facilityGroups=(settings,name)=>{
+  const f=settings.facilities?.[name];
+  if(!f)return [];
+  if(Array.isArray(f.levels))return f.levels.map(g=>({count:Math.max(0,Number(g.count)||0),level:Math.max(1,Math.floor(Number(g.level)||1))})).filter(g=>g.count>0);
+  return f.count>0?[{count:Number(f.count)||0,level:Math.max(1,Math.floor(Number(f.level)||1))}]:[];
+};
+const facilityTotal=(settings,name)=>facilityGroups(settings,name).reduce((n,g)=>n+g.count,0);
+const facilityAtLeast=(settings,name,minLevel)=>facilityGroups(settings,name).filter(g=>g.level>=minLevel).reduce((n,g)=>n+g.count,0);
+const facilityExactLevels=(settings,name)=>new Set(facilityGroups(settings,name).map(g=>g.level));
+const facilityUsesMixedLevels=(settings,name)=>Array.isArray(settings.facilities?.[name]?.levels);
+
 // Current Aniimax timing: gathering facilities get a recipe-level base workload rate
 // (1.00/1.25/1.50 workload/s for Lv.1/2/3 requirements). Dance Pad Polisher and
 // Aniipod Maker use that same base rate but their own +40%-per-level efficiency curve.
@@ -22,7 +33,7 @@ export function eligible(data,settings){
   const mods=data.modules;
   let items=data.items.filter(i=>{
     const f=settings.facilities[i.facility];
-    if(i.byproductOnly||!f||f.count<1||i.facilityLevel>f.level)return false;
+    if(i.byproductOnly||!f||facilityAtLeast(settings,i.facility,i.facilityLevel)<1)return false;
     if(i.module){const[k,n]=i.module.split(':');const owned=settings.moduleLevels?.[k]??mods[k]?.[settings.level-1]??0;if(owned<+n)return false}
     if(settings.avoidedRecipes?.includes(i.id))return false;
     if(i.event&&!settings.events)return false;
@@ -45,8 +56,13 @@ export function eligible(data,settings){
   for(const facility of ['Woodland','Mine']){
     const available=items.filter(i=>i.facility===facility);
     if(!available.length)continue;
-    const newest=Math.max(...available.map(i=>i.facilityLevel));
-    items=items.filter(i=>i.facility!==facility||i.facilityLevel===newest||(facility==='Mine'&&podMineProduct&&i.product===podMineProduct));
+    if(facilityUsesMixedLevels(settings,facility)){
+      const exact=facilityExactLevels(settings,facility);
+      items=items.filter(i=>i.facility!==facility||exact.has(i.facilityLevel)||(facility==='Mine'&&podMineProduct&&i.product===podMineProduct));
+    }else{
+      const newest=Math.max(...available.map(i=>i.facilityLevel));
+      items=items.filter(i=>i.facility!==facility||i.facilityLevel===newest||(facility==='Mine'&&podMineProduct&&i.product===podMineProduct));
+    }
   }
   return items;
 }
@@ -72,6 +88,7 @@ export function buildModel(data,settings){
   const products=[...new Set([...items.map(i=>i.product),'wood_block','mineral_sand'])];
   const objectives=[],constraints=[],bounds=['dummy = 0'],integers=[];
   const facilities=Object.entries(settings.facilities)
+    .map(([name,f])=>[name,{...f,count:facilityTotal(settings,name)}])
     .filter(([name,f])=>f.count>0&&items.some(i=>i.facility===name));
   let serial=0;
   const add=(terms,sign,rhs)=>constraints.push(` c${serial++}: ${expression(terms)} ${sign} ${rhs}`);
@@ -80,7 +97,7 @@ export function buildModel(data,settings){
   items.forEach((i,n)=>{
     if(!i.seconds)return;
     integers.push(`z${n}`);
-    bounds.push(`0 <= z${n} <= ${settings.facilities[i.facility].count}`);
+    bounds.push(`0 <= z${n} <= ${facilityAtLeast(settings,i.facility,i.facilityLevel)}`);
     add([[1,`q${n}`],[-3600/cycle(i,settings),`z${n}`]],'<=',0);
     if(i.cost)objectives.push([-i.cost,`q${n}`]);
     if(settings.strategy!=='upgrade'&&i.facility==='Woodland')objectives.push([1e8,`z${n}`]);
@@ -125,22 +142,27 @@ export function buildModel(data,settings){
   // chains take turns on a machine.
   facilities.forEach(([name,f],facilityIndex)=>{
     const subset=items.map((i,j)=>[i,j]).filter(([i])=>i.facility===name);
+    const thresholds=[...new Set(subset.map(([i])=>i.facilityLevel))].sort((a,b)=>a-b);
     if(subset[0][0].seconds){
-      const plotTerms=subset.map(([,j])=>[1,`z${j}`]);
-      add(plotTerms,'<=',f.count);
+      for(const threshold of thresholds){
+        const plotTerms=subset.filter(([i])=>i.facilityLevel>=threshold).map(([,j])=>[1,`z${j}`]);
+        add(plotTerms,'<=',facilityAtLeast(settings,name,threshold));
+      }
       return;
     }
     const regular=subset.filter(([i])=>i.currency!=='none');
     const shared=subset.filter(([i])=>i.currency==='none');
     const capacity=[];
+    const explicitLevels=facilityExactLevels(settings,name);
     for(const[i,j]of regular){
       integers.push(`u${j}`);
-      let unitCap=f.count;
+      let unitCap=facilityAtLeast(settings,name,i.facilityLevel);
       if(name==='Mine'&&settings.strategy==='xp_aniipod'){
         const pod=items.filter(x=>x.facility==='Aniipod Maker').sort((a,b)=>b.facilityLevel-a.facilityLevel)[0];
         const need=pod?Object.keys(pod.ingredients)[0]:null;
         const newest=Math.max(...subset.map(([x])=>x.facilityLevel));
-        if(need&&i.product===need&&i.facilityLevel<newest)unitCap=Math.min(1,unitCap);
+        const explicitTier=facilityUsesMixedLevels(settings,name)&&explicitLevels.has(i.facilityLevel);
+        if(!explicitTier&&need&&i.product===need&&i.facilityLevel<newest)unitCap=Math.min(1,unitCap);
       }
       bounds.push(`0 <= u${j} <= ${unitCap}`);
       add([[cycle(i,settings),`q${j}`],[-3600,`u${j}`]],'<=',0);
@@ -153,7 +175,15 @@ export function buildModel(data,settings){
       capacity.push([1,`m${facilityIndex}`]);
     }
     add(capacity,'<=',f.count);
-    if(name==='Mine')add(capacity,'>=',f.count); // every Mine stays active; Aniipod mode may redirect one
+    for(const threshold of thresholds){
+      if(threshold<=1)continue;
+      const tierTerms=[
+        ...regular.filter(([i])=>i.facilityLevel>=threshold).map(([,j])=>[1,`u${j}`]),
+        ...shared.filter(([i])=>i.facilityLevel>=threshold).map(([i,j])=>[cycle(i,settings)/3600,`q${j}`])
+      ];
+      if(tierTerms.length)add(tierTerms,'<=',facilityAtLeast(settings,name,threshold));
+    }
+    if(name==='Mine')add(capacity,'>=',f.count); // every Mine stays active; mixed levels keep each tier on its newest usable recipe
   });
 
   // Workers can move between jobs of the same ability while processors wait for ingredients.
@@ -309,6 +339,14 @@ export function decode(model,result){
       ?rs.reduce((a,r)=>a+r.plots,0)
       :rs.filter(r=>!r.shared).reduce((a,r)=>a+r.units,0)+Math.ceil(rs.filter(r=>r.shared).reduce((a,r)=>a+r.machineHours,0)-1e-7);
     if(used>f.count+1e-5)throw Error(`Facility capacity exceeded: ${name}`);
+    const thresholds=[...new Set(items.filter(i=>i.facility===name).map(i=>i.facilityLevel))].filter(x=>x>1);
+    for(const threshold of thresholds){
+      const tierRows=rs.filter(r=>(items.find(i=>i.id===r.id)?.facilityLevel||1)>=threshold);
+      const tierUsed=tierRows[0]?.plots!==null
+        ?tierRows.reduce((a,r)=>a+r.plots,0)
+        :tierRows.filter(r=>!r.shared).reduce((a,r)=>a+r.units,0)+tierRows.filter(r=>r.shared).reduce((a,r)=>a+r.machineHours,0);
+      if(tierUsed>facilityAtLeast(settings,name,threshold)+1e-5)throw Error(`Facility level capacity exceeded: ${name} Lv.${threshold}+`);
+    }
   }
   if(Object.values(staff).reduce((a,b)=>a+b,0)>(settings.level===1?0:aniimoCap))throw Error('Aniimo cap exceeded');
 
