@@ -101,7 +101,7 @@ function autoPlace(ctx,state){
  const placed=[];let moved=0;const missing=[],gap=Number(state.spacing??.5);
  // Climate clusters are rebuilt from the exact solver coverage layout. Other valid
  // positions remain stable when the RV level or production plan changes.
- for(const d of wants.filter(x=>!x.environment&&!climateNames.includes(x.name))){const old=state.items?.[d.id];if(!old)continue;const item={...d,x:old.x,y:old.y};if(valid(item,placed,unlocked,gap))placed.push(item)}
+ for(const d of wants.filter(x=>!x.environment&&!climateNames.includes(x.name))){if(d.name==='Storage Unit')continue;const old=state.items?.[d.id];if(!old)continue;const item={...d,x:old.x,y:old.y};if(valid(item,placed,unlocked,gap))placed.push(item)}
  const failed=new Set(),maxX=MAP_COLS*PLOT_W,maxY=MAP_ROWS*PLOT_H;
  const climateChoices=[...(ctx.plan?.climate||[])].sort((a,b)=>{
   const area=choice=>wants.filter(x=>x.environment===choice.mode&&!climateNames.includes(x.name)).reduce((n,x)=>n+x.w*x.h,0);
@@ -127,8 +127,29 @@ function autoPlace(ctx,state){
   }
   if(cluster){placed.push(...cluster);moved+=cluster.length}else{failed.add(device.id);deps.forEach(x=>failed.add(x.id))}
  }
+ // Spread Storage Units around the owned Homeland rather than packing them side-by-side.
+ const storageItems=wants.filter(x=>x.name==='Storage Unit'&&!placed.some(p=>p.id===x.id)&&!failed.has(x.id));
+ const placedStorage=[];
+ const ownedPlots=unlocked.map(id=>plotRect(id));
+ const ownedCx=ownedPlots.length?ownedPlots.reduce((n,p)=>n+p.x+p.w/2,0)/ownedPlots.length:maxX/2;
+ const ownedCy=ownedPlots.length?ownedPlots.reduce((n,p)=>n+p.y+p.h/2,0)/ownedPlots.length:maxY/2;
+ for(const item of storageItems){
+  const candidates=[];
+  for(const p of ownedPlots){
+   const xs=[p.x+1,p.x+p.w-item.w-1,p.x+(p.w-item.w)/2],ys=[p.y+1,p.y+p.h-item.h-1,p.y+(p.h-item.h)/2];
+   for(const x of xs)for(const y of ys){const test={...item,x:Math.round(x/AUTO_STEP)*AUTO_STEP,y:Math.round(y/AUTO_STEP)*AUTO_STEP};if(valid(test,placed,unlocked,gap))candidates.push(test)}
+  }
+  let best=null,bestScore=-Infinity;
+  for(const test of candidates){
+   const cx=test.x+test.w/2,cy=test.y+test.h/2;
+   const spread=placedStorage.length?Math.min(...placedStorage.map(s=>Math.hypot(cx-(s.x+s.w/2),cy-(s.y+s.h/2)))):-Math.hypot(cx-ownedCx,cy-ownedCy);
+   if(spread>bestScore){best=test;bestScore=spread}
+  }
+  if(best){placed.push(best);placedStorage.push(best);moved++}
+  else missing.push(item);
+ }
  const zoneOrder=['climate:Scorching','climate:Warm','climate:Cool','climate:Freeze','climate:Adequate','raw','processing','storage','incubator','climate:unused'];
- const pending=wants.filter(x=>!placed.some(p=>p.id===x.id)&&!failed.has(x.id)).sort((a,b)=>zoneOrder.indexOf(a.group)-zoneOrder.indexOf(b.group)||b.w*b.h-a.w*a.h);
+ const pending=wants.filter(x=>x.name!=='Storage Unit'&&!placed.some(p=>p.id===x.id)&&!failed.has(x.id)).sort((a,b)=>zoneOrder.indexOf(a.group)-zoneOrder.indexOf(b.group)||b.w*b.h-a.w*a.h);
  for(const item of pending){
   let found=false;
   for(let y=0;y<=maxY-item.h-(item.name==='Egg Incubator'?1:0)&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-item.w;x+=AUTO_STEP){

@@ -527,3 +527,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .site-footer a{color:#cfe4f1;text-decoration:none}
 .site-footer .made-by{color:#6C3BAA;font-weight:800}
 @media(max-width:900px){.site-footer{padding:12px 16px 24px;font-size:12px}.worker-ability b{font-size:20px}.worker-job-role{font-size:15px!important}.worker-card .worker-job-trait,.worker-card .worker-job-family{text-align:left}}
+
+/* v1.5.3 footer + Aniimo card fixes */
+.site-footer{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:5px!important;text-align:left!important;padding-right:170px!important}
+.site-footer>span{display:block!important}
+.worker-extra-note{display:inline!important;margin-left:8px!important;color:#9eb3c3!important;font-size:11px!important;font-weight:650!important;white-space:nowrap}
+.watering-support-job .worker-job-role{color:#82c9ff!important}
+@media(max-width:900px){.site-footer{padding-right:18px!important}.worker-extra-note{display:block!important;margin:4px 0 0!important;white-space:normal}}
