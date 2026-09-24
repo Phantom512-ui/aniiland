@@ -12,9 +12,9 @@
 // its +20% speed bonus (omitted if not known), shown in the plan's Aniimo recommendations.
 // `unlocks` maps each facility level to the RV (Homeland) level that unlocks it. `counts[i]` is how
 // many of the facility you can place at RV level i + 1; an RV level past the end of the list keeps
-// the last count (the environment buildings' later counts aren't known yet). Simple mode uses both
-// (see `simpleSetup`). Farmland, Woodland and Mine counts come from the game; every other facility
-// is placed once, confirmed up to RV level 8.
+// the last count. Simple mode uses both (see `simpleSetup`). Counts follow the current Aniimax
+// release table: confirmed in game through RV level 11; past that, Farmland, Woodland and Mine
+// continue their listed pattern while the other facilities keep their RV 11 count.
 //
 // Facilities marked "Not yet verified in game" in their tooltip haven't had their numbers
 // confirmed in game yet.
@@ -106,13 +106,13 @@ export const FACILITIES = [
     {
         name: 'Claw Game Cooker', slug: 'claw-game-cooker', defaultCount: 1, category: 'Materials Processing', hasWorker: true, ability: 'Fire', personality: 'Practical',
         unlocks: { 1: 4, 2: 5, 3: 7, 4: 9, 5: 12, 6: 16, 7: 19 },
-        counts: [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        counts: [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2],
         tooltip: "Lv.1: bread, premium bread&#10;Lv.2: roasted soybeans&#10;Lv.3: maple candy roasted potatoes, apple tart, rose shortbread&#10;Lv.4: lavender cookies, apple candy&#10;Lv.5: grape candy, caramel nut chips&#10;Lv.6: maple candy star, coconut cookie&#10;Lv.7: flower bread, berry chocolate coconut pudding, premium berry chocolate coconut pudding&#10;Some recipes need ingredients from facilities not yet in the calculator"
     },
     {
         name: 'Jukebox Dryer', slug: 'jukebox-dryer', defaultCount: 1, category: 'Materials Processing', hasWorker: true, ability: 'Dark', personality: 'Nimble',
         unlocks: { 1: 4, 2: 5, 3: 7, 4: 10, 5: 12, 6: 14, 7: 18 },
-        counts: [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        counts: [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2],
         tooltip: "Lv.1: potato chips&#10;Lv.2: dried lemon slices&#10;Lv.3: dried cherry blossom, dried bean curd&#10;Lv.4: dried apple slices, dried strawberries&#10;Lv.5: nuts, dried ginseng&#10;Lv.6: dried grapes, shredded coconut&#10;Lv.7: dried cranberries, dried flowers"
     },
     {
@@ -253,7 +253,7 @@ function atHomeLevel(list, homeLevel) {
 export const ANIIMO_MAX = [null, 8, 11, 14, 17, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 43, 44, 45];
 
 // Highest RV level whose building counts have been confirmed in game.
-export const COUNTS_CONFIRMED_UP_TO = 8;
+export const COUNTS_CONFIRMED_UP_TO = 11;
 
 // Everything a player at `homeLevel` could have: each facility at its highest unlocked level, as
 // many as that RV level allows (see `counts`), and every module at its cap for that RV level. Returns the same shapes simple
