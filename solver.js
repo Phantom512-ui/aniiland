@@ -22,7 +22,10 @@ const facilityUsesMixedLevels=(settings,name)=>Array.isArray(settings.facilities
 // (1.00/1.25/1.50 workload/s for Lv.1/2/3 requirements). Dance Pad Polisher and
 // Aniipod Maker use that same base rate but their own +40%-per-level efficiency curve.
 export function cycle(item,settings){
-  if(item.seconds)return item.seconds;
+  if(item.seconds){
+    const watered=item.facility==='Farmland'||item.facility==='Woodland'||String(item.facility||'').startsWith('Harvest Moon ·');
+    return item.seconds*(watered?0.75:1);
+  }
   const level=settings.worker==='minimum'?item.minAbility:Number(settings.worker);
   const gathering=!Object.keys(item.ingredients).length;
   if(['Dance Pad Polisher','Aniipod Maker'].includes(item.facility))return item.workload/(noPersonalitySpeed(level,item.minAbility)*baseWorkRate(item.minAbility));
@@ -36,7 +39,7 @@ export function eligible(data,settings){
     if(i.byproductOnly||!f||facilityAtLeast(settings,i.facility,i.facilityLevel)<1)return false;
     if(i.module){const[k,n]=i.module.split(':');const owned=settings.moduleLevels?.[k]??mods[k]?.[settings.level-1]??0;if(owned<+n)return false}
     if(settings.avoidedRecipes?.includes(i.id))return false;
-    if(i.event&&!settings.events)return false;
+    if(i.event&&(!settings.events||settings.disableEventProduction))return false;
     if(['quick_wool','quick_scales'].includes(i.id)&&!settings.unverified)return false;
     if(data.special.some(s=>s.name===i.id)&&!settings.special.includes(i.id))return false;
     if(!settings.climate&&i.environment)return false;
@@ -86,7 +89,7 @@ export function buildModel(data,settings){
   }
 
   const products=[...new Set([...items.map(i=>i.product),'wood_block','mineral_sand'])];
-  const objectives=[],constraints=[],bounds=['dummy = 0'],integers=[];
+  const objectives=[],coinTerms=[],constraints=[],bounds=['dummy = 0'],integers=[];
   const facilities=Object.entries(settings.facilities)
     .map(([name,f])=>[name,{...f,count:facilityTotal(settings,name)}])
     .filter(([name,f])=>f.count>0&&items.some(i=>i.facility===name));
@@ -99,7 +102,7 @@ export function buildModel(data,settings){
     integers.push(`z${n}`);
     bounds.push(`0 <= z${n} <= ${facilityAtLeast(settings,i.facility,i.facilityLevel)}`);
     add([[1,`q${n}`],[-3600/cycle(i,settings),`z${n}`]],'<=',0);
-    if(i.cost)objectives.push([-i.cost,`q${n}`]);
+    if(i.cost){objectives.push([-i.cost,`q${n}`]);coinTerms.push([-i.cost,`q${n}`])}
     if(settings.strategy!=='upgrade'&&i.facility==='Woodland')objectives.push([1e8,`z${n}`]);
   });
 
@@ -112,7 +115,8 @@ export function buildModel(data,settings){
   products.forEach((p,n)=>{
     const item=items.find(i=>i.product===p);
     const price=item?.currency==='coins'?item.price:0;
-    if(price>0)objectives.push([price,`s${n}`]); else bounds.push(`s${n} = 0`);
+    const eventRaw=settings.eventNoRawSale&&['moondew_radish','waxing_moon_pepper'].includes(p);
+    if(price>0&&!eventRaw){objectives.push([price,`s${n}`]);coinTerms.push([price,`s${n}`])}else bounds.push(`s${n} = 0`);
     const terms=[[-1,`s${n}`]];
     if(foodProducts.has(p)){bounds.push(`f${n} >= 0`);terms.push([-1,`f${n}`])}
     if(upgradeItems[p]){bounds.push(`r${n} >= 0`);terms.push([-1,`r${n}`])}
@@ -122,8 +126,10 @@ export function buildModel(data,settings){
       if(p==='mineral_sand'&&i.facility==='Mine')coef+=i.byproduct;
       if(coef)terms.push([coef,`q${j}`]);
     });
-    add(terms,'>=',0);
+    add(terms,eventRaw?'=':'>=',0);
   });
+
+  if(Number.isFinite(Number(settings.minCoinRate)))add(coinTerms,'>=',Math.max(0,Number(settings.minCoinRate)));
 
   // Priority order for normal plans: keep Woodland progression at its maximum feasible
   // occupancy, then maximize the selected EXP/Aniipod stream, then use everything left for coins.
@@ -279,6 +285,17 @@ export function buildModel(data,settings){
     add(cash,'>=',0);
     objectives.length=0;
     objectives.push([1000000,'g_upgrade']);
+  }
+
+  // Event Mode is intentionally demand-capped: raw festival crops cannot be sold and their
+  // material balances are exact. Within the 15% Home Coin floor set by the UI, prefer using
+  // the reserved event farms for event recipes. Normal progression/upgrade priorities remain higher.
+  if(settings.eventPriority){
+    const eventWeight=100000;
+    items.forEach((i,n)=>{
+      const rawUse=(i.ingredients?.moondew_radish||0)+(i.ingredients?.waxing_moon_pepper||0);
+      if(rawUse>0)objectives.push([eventWeight*rawUse,`q${n}`]);
+    });
   }
 
   const lp=`Maximize\n profit: ${expression(objectives)}\nSubject To\n${constraints.join('\n')}\nBounds\n ${bounds.join('\n ')}\n${integers.length?'Generals\n '+integers.join(' '):''}\nEnd`;
