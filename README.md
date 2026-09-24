@@ -23,7 +23,7 @@ No build step is required for running the site locally. Just download the repo, 
 python -m http.server 8080
 ```
 
-And connect `http://localhost:8080` in your browser.
+And connect to `http://localhost:8080` in your browser.
 
 Opening `index.html` may work in some browsers, but may lack parts of functionality.
 
