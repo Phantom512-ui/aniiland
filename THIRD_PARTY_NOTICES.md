@@ -34,3 +34,9 @@ Mobalytics Aniimo Homeland guide:
 https://mobalytics.gg/gamebase/guides/aniimo-homeland-ability-best-aniimos
 
 Mobalytics content is not licensed under Aniiland's MIT license.
+
+
+## Project Links
+
+- Live site: https://aniiland.wintira.win/
+- Repository: https://github.com/Phantom512-ui/aniiland
