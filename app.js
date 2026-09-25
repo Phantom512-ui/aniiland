@@ -3,7 +3,7 @@ import {renderLayoutPlanner} from './layout.js';
 document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="v12.css">');
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const data=await fetch('./data.json').then(r=>r.json());
-const APP_VERSION='1.5.8';
+const APP_VERSION='1.5.9';
 document.querySelector('.version').textContent=APP_VERSION;
 const byId=new Map(data.items.map(i=>[i.id,i]));const fmt=(n,d=0)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
