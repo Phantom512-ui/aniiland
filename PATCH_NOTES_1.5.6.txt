@@ -1,0 +1,15 @@
+Aniiland v1.5.6
+================
+
+- Stable cross-version user-state storage. Existing v1.4.x/v1.5.x UI state is migrated into a non-versioned key.
+- Accepted production plans are now persisted separately so future site patches do not silently replace a user's active plan.
+- On a future planner/math update, the saved plan is compared with the current solver. A replacement prompt appears only when the current setup improves by at least 5%.
+- The prompt identifies a newly-selected recipe when applicable and shows the calculated efficiency gain. The old plan remains active until the user accepts it.
+- Deliberately changing RV level or another planner input opts into current math and recalculates normally.
+- Added a subtle collapsible right-side Production Plan section tree. It appears after navigating to another RV level and hides outside the Production Plan.
+- Climate Placement and Floor Planner now explicitly explain that only crops/facilities with temperature/light requirements need climate-range placement; all others may be placed freely.
+- Floor Planner now warns when its placed facility/recipe set no longer matches the active Production Plan. The warning updates live after Auto-place, clearing, or layout-option changes.
+- Floor Planner storage key is now stable across versions and migrates the previous layout key.
+- RV upgrade material recipes are explicitly labeled inside Crafting Allocation.
+- Multiple Woodworking Benches / Chimney Kilns now receive named per-machine assignments (Bench 1, Bench 2, Kiln 1, etc.), including rotation when there are more active upgrade tiers than available machines.
+- RV upgrade materials remain excluded from Products to Sell.

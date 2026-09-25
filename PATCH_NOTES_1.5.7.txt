@@ -1,0 +1,9 @@
+Aniiland v1.5.7
+=================
+
+- Restyled the right-side Production Plan quick-link tree with royal-purple accents.
+- The collapsed quick-link handle now remains farther into the page and is easier to reopen.
+- Enlarged and strengthened the Floor Planner out-of-sync notice (larger heading and body text).
+- Floor Planner now marks itself stale immediately when a production-affecting setting changes.
+- While Floor Planner is open, changes to goal, worker mode, personality, climate/light, Harvest Moon mode/unlocks, premium/avoided recipes, modules, facility setup, and Custom Setup trigger a fresh solve and update the mismatch notice without switching tabs.
+- RV changes retain the existing live behavior.
