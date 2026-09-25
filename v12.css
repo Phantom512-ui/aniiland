@@ -563,3 +563,26 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 /* v1.5.7 visual follow-up */
 .plan-quick-nav-inner{box-sizing:border-box}
 .layout-plan-mismatch{font-size:15px;line-height:1.58}.layout-plan-mismatch b{font-size:17px}
+
+
+/* v1.5.8 — module/recipe-lock controls in Grow & Gather */
+.product-row .grow-recipe-availability{
+  justify-content:flex-start!important;
+  align-items:center!important;
+  margin:7px 0 1px!important;
+  gap:6px!important;
+}
+.product-row .grow-recipe-availability>span,
+.product-row .grow-recipe-availability .recipe-premium-tag{
+  font-size:10px!important;
+  padding:3px 7px!important;
+  line-height:1.15!important;
+}
+.product-row .grow-recipe-availability .recipe-lock-btn{
+  font-size:10px!important;
+  padding:3px 7px!important;
+  line-height:1.2!important;
+}
+@media(max-width:740px){
+  .product-row .grow-recipe-availability{align-items:flex-start!important}
+}

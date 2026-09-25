@@ -3,7 +3,7 @@ import {renderLayoutPlanner} from './layout.js';
 document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="v12.css">');
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const data=await fetch('./data.json').then(r=>r.json());
-const APP_VERSION='1.5.7';
+const APP_VERSION='1.5.8';
 document.querySelector('.version').textContent=APP_VERSION;
 const byId=new Map(data.items.map(i=>[i.id,i]));const fmt=(n,d=0)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -330,6 +330,11 @@ function workerJobDetails(r,ability){
  return out;
 }
 
+function growGatherAvailabilityNote(item){
+ if(item?.module)return `<div class="recipe-module-note grow-recipe-availability"><span>${esc(moduleRequirementLabel(item))}</span><button type="button" class="recipe-lock-btn" data-lock-recipe="${esc(item.id)}">Recipe locked in game?</button></div>`;
+ if(isPremiumRecipe(item))return `<div class="recipe-module-note grow-recipe-availability"><span class="recipe-premium-tag">Premium Recipe</span><button type="button" class="recipe-lock-btn" data-lock-recipe="${esc(item.id)}">Recipe locked in game?</button></div>`;
+ return '';
+}
 function craftingAvailabilityNote(item){
  if(item?.currency==='none')return `<div class="recipe-module-note"><span class="recipe-upgrade-tag">RV Upgrade Material</span></div>`;
  if(item?.module)return `<div class="recipe-module-note"><span>${esc(moduleRequirementLabel(item))}</span><button type="button" class="recipe-lock-btn" data-lock-recipe="${esc(item.id)}">Recipe locked in game?</button></div>`;
@@ -583,7 +588,7 @@ function renderPlanV12(){
  const r=last,period=planPeriod(r),hours=period.hours,staff=Object.values(r.staff).reduce((a,b)=>a+b,0),growers=r.rows.filter(x=>x.plots!==null),processing=r.rows.filter(x=>x.plots===null),consumed={},orderAnalysis=orders.length?mergeOrderPlans():null,orderBorrowed=orderAnalysis?.borrowed||new Map();
  for(const row of r.rows)for(const[id,n]of Object.entries(byId.get(row.id).ingredients))consumed[id]=(consumed[id]||0)+row.batches*n;
  const groups=[...new Set(growers.map(x=>x.facility).concat(processing.filter(x=>!Object.keys(byId.get(x.id).ingredients).length).map(x=>x.facility)))];
- const cards=groups.map(f=>`<article class="production-card"><h3><span class="facility-card-title">${facilityIconHtml(f,config[f]?.level||1)}<span>${esc(f)}</span></span><small>${eventFacilityLabel(f)}</small></h3>${r.rows.filter(x=>x.facility===f).map(row=>{const i=byId.get(row.id),sale=r.sales.find(s=>s.id===i.product),borrow=Math.min(donorCapacity(row),orderBorrowed.get(row.id)||0),left=Math.max(0,donorCapacity(row)-borrow),assignment=row.plots!==null?`${row.plots}${borrow?`(${left})`:''} plots · ${fmt(row.batches*hours,1)} harvests`:`${row.units??1}${borrow?`(${left})`:''} assigned · ${fmt(row.machineHours*100)}% busy`;return `<div class="product-row ${borrow?'order-borrowed-row':''}">${icon(i)}<div><b>${itemButton(row.id)}</b><p>${assignment}${borrow?` <span class="order-borrow-note">· ${borrow} temporarily on order</span>`:''}</p><span class="qty">${fmt(row.produced*hours,1)} produced / ${period.label}</span>${productionFamilyNote(i)}<p>${consumed[i.product]?`${fmt(consumed[i.product]*hours,1)} → crafting`:''}${sale?`${consumed[i.product]?' · ':''}${fmt(sale.quantity*hours,1)} → sell`:''}</p></div></div>`}).join('')}</article>`).join('');
+ const cards=groups.map(f=>`<article class="production-card"><h3><span class="facility-card-title">${facilityIconHtml(f,config[f]?.level||1)}<span>${esc(f)}</span></span><small>${eventFacilityLabel(f)}</small></h3>${r.rows.filter(x=>x.facility===f).map(row=>{const i=byId.get(row.id),sale=r.sales.find(s=>s.id===i.product),borrow=Math.min(donorCapacity(row),orderBorrowed.get(row.id)||0),left=Math.max(0,donorCapacity(row)-borrow),assignment=row.plots!==null?`${row.plots}${borrow?`(${left})`:''} plots · ${fmt(row.batches*hours,1)} harvests`:`${row.units??1}${borrow?`(${left})`:''} assigned · ${fmt(row.machineHours*100)}% busy`;return `<div class="product-row ${borrow?'order-borrowed-row':''}">${icon(i)}<div><b>${itemButton(row.id)}</b><p>${assignment}${borrow?` <span class="order-borrow-note">· ${borrow} temporarily on order</span>`:''}</p><span class="qty">${fmt(row.produced*hours,1)} produced / ${period.label}</span>${productionFamilyNote(i)}${growGatherAvailabilityNote(i)}<p>${consumed[i.product]?`${fmt(consumed[i.product]*hours,1)} → crafting`:''}${sale?`${consumed[i.product]?' · ':''}${fmt(sale.quantity*hours,1)} → sell`:''}</p></div></div>`}).join('')}</article>`).join('');
  const craft=processing.filter(x=>Object.keys(byId.get(x.id).ingredients).length),craftAllocation=sharedCraftAllocation(r,craft),flows=practicalFlows(r,hours),timing=period.timing||upgradeTiming(r),target=timing?.target;
  const upgrade=level===20?'<div class="note">RV 20 is the current maximum.</div>':`<div class="upgrade-card"><div class="upgrade-summary"><span>NEXT RV</span><strong>${level} → ${level+1}</strong><small>Ready when the slowest requirement finishes: <b>${duration(timing?.total)}</b></small></div><div class="upgrade-parts"><span class="upgrade-part">${coinIcon()}<span><b>${fmt(target.coins)} Home Coins</b><small>Ready in ${duration(timing.coinEta)} · 30% coin reserve included</small></span></span>${timing.materials.map(({id,amount,eta})=>{const item=byId.get(id);return `<span class="upgrade-part">${icon(item)}<span><b>${fmt(amount)} ${itemButton(id)}</b><small>Ready in ${duration(eta)}</small></span></span>`}).join('')}</div></div>`;
  const foodEnergy=r.food.reduce((a,x)=>a+x.quantity*x.energy,0),projectedNet=flows.gross-flows.seedCost,periodHeader=period.label==='1h'?'1h':period.label;
