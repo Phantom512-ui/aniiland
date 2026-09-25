@@ -35,6 +35,51 @@
   if(level)new MutationObserver(updateSummary).observe(level,{childList:true,subtree:true,characterData:true});
   if(goals)new MutationObserver(updateSummary).observe(goals,{attributes:true,subtree:true,attributeFilter:['class']});
   document.querySelector('#strategy')?.addEventListener('change',updateSummary);
+
+
+  // Mobile Production Plan quick tree: reuse the desktop navigator, but make it
+  // feel like a compact phone drawer. The app creates it lazily after RV changes.
+  let quickNavRaf=0;
+  const updateQuickNavActive=()=>{
+    if(!mq.matches)return;
+    const nav=document.querySelector('#plan-quick-nav');
+    if(!nav||nav.hidden)return;
+    const buttons=[...nav.querySelectorAll('[data-plan-nav-target]')];
+    if(!buttons.length)return;
+    const probe=Math.max(88,Math.min(window.innerHeight*.34,230));
+    let active=buttons[0];
+    for(const btn of buttons){
+      const target=document.getElementById(btn.dataset.planNavTarget);
+      if(!target)continue;
+      const r=target.getBoundingClientRect();
+      if(r.top<=probe)active=btn;
+      else break;
+    }
+    buttons.forEach(btn=>btn.classList.toggle('active',btn===active));
+  };
+  const queueQuickNavActive=()=>{
+    if(quickNavRaf)return;
+    quickNavRaf=requestAnimationFrame(()=>{quickNavRaf=0;updateQuickNavActive()});
+  };
+  window.addEventListener('scroll',queueQuickNavActive,{passive:true});
+  window.addEventListener('resize',queueQuickNavActive,{passive:true});
+  document.addEventListener('click',e=>{
+    if(!mq.matches)return;
+    const jump=e.target.closest('[data-plan-nav-target]');
+    if(jump){
+      // Let the main app start the smooth scroll first, then tuck the drawer away.
+      requestAnimationFrame(()=>{
+        const nav=document.querySelector('#plan-quick-nav');
+        nav?.classList.add('collapsed');
+        try{localStorage.setItem('aniiland-quick-nav-collapsed','true')}catch{}
+        setTimeout(updateQuickNavActive,260);
+      });
+    }
+  });
+  const content=document.querySelector('#content');
+  if(content)new MutationObserver(queueQuickNavActive).observe(content,{childList:true,subtree:true});
+  new MutationObserver(queueQuickNavActive).observe(document.body,{childList:true});
+
   mq.addEventListener?.('change',syncMode);
   window.addEventListener('orientationchange',()=>setTimeout(syncMode,80));
   syncMode();

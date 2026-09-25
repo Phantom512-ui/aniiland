@@ -764,3 +764,27 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
   .metrics{grid-template-columns:1fr!important}
   .metric:first-child{grid-column:auto!important}
 }
+
+
+/* v1.6.0 — mobile production quick tree + tap identification in Floor Planner */
+.layout-selection-info{display:none}
+@media (max-width:760px), (max-width:960px) and (pointer:coarse){
+  .plan-quick-nav:not([hidden]){display:flex!important;right:0!important;top:52%!important;bottom:auto!important;transform:translateY(-50%)!important;z-index:1150!important;filter:drop-shadow(0 14px 26px #000b)!important}
+  .plan-quick-nav-inner{width:min(72vw,240px)!important;max-height:58dvh!important;padding:11px 11px 12px!important;border-radius:14px 0 0 14px!important}
+  .plan-quick-nav-head{padding-bottom:9px!important;margin-bottom:4px!important}
+  .plan-quick-nav-toggle{width:44px!important;height:92px!important;min-height:92px!important;border-radius:14px 0 0 14px!important}
+  .plan-quick-nav-links button{min-height:42px!important;padding:8px 7px 8px 3px!important;font-size:12px!important}
+  .plan-quick-nav-links button.active{background:linear-gradient(90deg,#7851a944,#7851a912)!important;color:#fff!important}
+  .plan-quick-nav-links button.active i{background:#b88ce8!important;border-color:#d3b3f3!important;box-shadow:0 0 0 3px #7851a933!important}
+  .plan-quick-nav.collapsed{transform:translate(min(72vw,240px),-50%)!important}
+  .plan-quick-nav.collapsed .plan-quick-nav-toggle{transform:none!important}
+  .plan-quick-nav.collapsed .plan-quick-nav-toggle-icon{transform:rotate(180deg)!important}
+
+  .layout-selection-info:not([hidden]){display:flex!important;position:fixed;left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:1100;pointer-events:none;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid #a77bd2;background:linear-gradient(145deg,#2a1d38f2,#151f2af2);border-radius:12px;box-shadow:0 12px 32px #000a,0 0 0 1px #7851a922;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .layout-selection-info>span{font-size:8px;font-weight:900;letter-spacing:.16em;color:#b995df}
+  .layout-selection-info>b{font-size:14px;line-height:1.2;color:#f6eeff}
+  .layout-selection-info>small{font-size:10.5px;line-height:1.35;color:#cbbfd7}
+  .layout-canvas .placed.layout-selected{opacity:1!important;filter:brightness(1.16)!important;z-index:12!important;box-shadow:0 0 0 4px #c9a4ef,0 4px 14px #000c!important}
+  .layout-legend .layout-legend-row{border:1px solid transparent;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
+  .layout-legend .layout-legend-row.layout-selected{border-color:#a77bd2!important;background:linear-gradient(90deg,#7851a93d,#101e29)!important;box-shadow:inset 3px 0 0 #9e72cb}
+}

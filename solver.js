@@ -144,6 +144,23 @@ export function buildModel(data,settings){
     if(pods.length){const[i,n]=pods[0];objectives.push([1e6*cycle(i,settings)/3600,`q${n}`])}
   }
 
+  // RV material processing is a permanent background job in every planning goal.
+  // Target the highest Bench/Kiln tier the current setup can actually use. Producing that
+  // tier necessarily pulls its lower tiers through the material-balance constraints, so at
+  // RV 10+ (for example) one machine can keep making Rough Lumber / Coarse Sifted Ore while
+  // another advances Standard Planks / Sintered Ore Brick. With fewer machines than chain
+  // stages, the shared-machine allocator rotates the later stages instead of hiding them.
+  // Normalize by machine count so Woodworking Bench and Chimney Kiln get comparable priority.
+  for(const facility of ['Woodworking Bench','Chimney Kiln']){
+    const progression=items.map((i,n)=>[i,n])
+      .filter(([i])=>i.facility===facility&&i.currency==='none')
+      .sort((a,b)=>b[0].facilityLevel-a[0].facilityLevel);
+    if(!progression.length)continue;
+    const [target,n]=progression[0];
+    const machines=Math.max(1,facilityTotal(settings,facility));
+    objectives.push([1e8*cycle(target,settings)/(3600*machines),`q${n}`]);
+  }
+
   // A normal machine stays assigned to one recipe. Only the non-sale Bench/Kiln progression
   // chains take turns on a machine.
   facilities.forEach(([name,f],facilityIndex)=>{

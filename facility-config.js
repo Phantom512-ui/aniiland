@@ -166,14 +166,14 @@ export const FACILITIES = [
     {
         name: 'Woodworking Bench', slug: 'woodworking-bench', defaultCount: 0, category: 'Materials Processing', hasWorker: true, ability: 'Artisanship', personality: 'Energetic',
         unlocks: { 1: 6, 2: 10, 3: 14, 4: 18 },
-        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 2],
-        tooltip: "Lv.1: rough lumber&#10;Lv.2: standard planks&#10;Lv.3: laminated beams&#10;Lv.4: densified timber component&#10;Turns Wood Blocks into RV level-up materials."
+        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4],
+        tooltip: "Lv.1: rough lumber&#10;Lv.2: standard planks&#10;Lv.3: laminated beams&#10;Lv.4: densified timber component&#10;Turns Wood Blocks into RV level-up materials.&#10;Count assumption: 1 / 2 / 3 / 4 benches at RV 6 / 10 / 14 / 18 (unverified)."
     },
     {
         name: 'Chimney Kiln', slug: 'chimney-kiln', defaultCount: 0, category: 'Materials Processing', hasWorker: true, ability: 'Fire', personality: 'Practical',
         unlocks: { 1: 6, 2: 10, 3: 14, 4: 18 },
-        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 2],
-        tooltip: "Lv.1: coarse-sifted ore&#10;Lv.2: sintered ore brick&#10;Lv.3: refined ore&#10;Lv.4: microcrystalline ore plate&#10;Turns Mineral Sand into RV level-up materials."
+        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4],
+        tooltip: "Lv.1: coarse-sifted ore&#10;Lv.2: sintered ore brick&#10;Lv.3: refined ore&#10;Lv.4: microcrystalline ore plate&#10;Turns Mineral Sand into RV level-up materials.&#10;Count assumption: 1 / 2 / 3 / 4 kilns at RV 6 / 10 / 14 / 18 (unverified)."
     },
 ];
 
