@@ -80,6 +80,20 @@
   if(content)new MutationObserver(queueQuickNavActive).observe(content,{childList:true,subtree:true});
   new MutationObserver(queueQuickNavActive).observe(document.body,{childList:true});
 
+
+  // In the mobile Event Center, switching a tab scrolls the large activation/header area away
+  // so the selected tab gets the full phone screen instead of being squeezed into the bottom.
+  document.addEventListener('click',e=>{
+    if(!mq.matches)return;
+    const tab=e.target.closest('[data-event-tab]');
+    if(!tab)return;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const scroller=document.querySelector('#event-center-content');
+      const tabs=document.querySelector('#event-center-content .event-tabs');
+      if(scroller&&tabs)scroller.scrollTo({top:Math.max(0,tabs.offsetTop-2),behavior:'smooth'});
+    }));
+  });
+
   mq.addEventListener?.('change',syncMode);
   window.addEventListener('orientationchange',()=>setTimeout(syncMode,80));
   syncMode();
