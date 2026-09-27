@@ -43,7 +43,7 @@
     {
       title:'Choose your planning goal',
       getEls(){return [$('#strategy-grid'),$('.goal-shared-note')].filter(Boolean)},
-      copy:'<p><b>Most Coins</b> spends your spare Homeland capacity on coin profit. <b>Simplest RV Upgrade</b> keeps the plan focused on the cleanest path to the next RV.</p><p><b>Coins &amp; AniiEXP</b> uses spare capacity for Growth items, and <b>Coins &amp; AniiEXP &amp; Aniipods</b> adds Aniipod production too. All four still reach the next RV in the same ETA inside the same setup.</p>'
+      copy:'<p><b>Most Coins</b> spends your spare Homeland capacity on coin profit. <b>Simplest RV Upgrade</b> keeps the plan focused on the cleanest path to the next RV.</p><p><b>Coins &amp; AniiEXP</b> uses spare capacity for Growth items, and <b>Coins &amp; AniiEXP &amp; Aniipods</b> adds Aniipod production too. The three general production goals keep the normal RV-upgrade timing. Simplest RV Upgrade is more aggressive: it keeps both upgrade-material chains running and builds extra Home Coins for the next level.</p>'
     },
     {
       title:'Choose worker strength and plan length',
