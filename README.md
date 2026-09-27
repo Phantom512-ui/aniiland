@@ -27,6 +27,8 @@ And connect to `http://localhost:8080` in your browser.
 
 Opening `index.html` may work in some browsers, but may lack parts of functionality.
 
+I was jumping between bundling the code or splitting it between functions so some of the files are outdated and won't be updated, i will clear the unused files... later when I'm less sleep deprived, for now if anyone wants to run it locally it will work but any modifications have to be to the correct used files.
+
 ## Data and methodology
 
 Aniiland uses multiple sources, with in-game screenshots taking priority where the project has directly verified a value:
@@ -51,6 +53,5 @@ Aniimax is MIT-licensed and Aniiland retains its license notice in `ANIIMAX-LICE
 Aniiland is an unofficial fan/community project. It is **not affiliated with, endorsed by, sponsored by, or officially connected to Aniimo or its developers/publishers**. Game names, trademarks, and game-derived artwork belong to their respective owners.
 
 
-## Contributing
 
 Issues, feedback and pull requests are welcome. When correcting gameplay data, I prefer in-game screenshots/evidence/clips. For Harvest Moon data, I would appreciate any information about Harvest moon points as that's the least explained/explored thing currently. 
