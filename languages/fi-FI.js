@@ -324,7 +324,8 @@ window.AniilandLocales["fi-FI"]={
     "options_on": "vaihtoehdot päällä",
     "crop_work": "Viljelytyö",
     "powered_facilities": "Sähkökäyttöiset tilat",
-    "family": "Perhe"
+    "family": "Perhe",
+    "power_preview_hint": "Laitosten on oltava E-Modessa (virtakuvake), jotta ne voivat käyttää sähköä. Laitokset kuluttavat sähköä, kun ne ovat Crackle-pylvään/generaattorin kantaman sisällä, E-Modessa JA resepti on valittu, vaikka ne eivät parhaillaan valmistaisi mitään."
   },
   "feature": {
     "setup": "Yksinkertainen asennus käyttää normaaleja RV-oletusasetuksia. Mukautetun asennuksen avulla voit yhdistää tilat ja asuntoautojen komponentit, jotka todella omistat.",

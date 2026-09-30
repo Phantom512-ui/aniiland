@@ -324,7 +324,8 @@ window.AniilandLocales["de-DE"]={
     "options_on": "Optionen auf",
     "crop_work": "Erntearbeit",
     "powered_facilities": "Angetriebene Anlagen",
-    "family": "Familie"
+    "family": "Familie",
+    "power_preview_hint": "Die Einrichtungen müssen sich im E-Mode (Stromsymbol) befinden, um Strom zu nutzen. Sie verbrauchen Strom, wenn sie sich in Reichweite eines Crackle-Masts/Generators befinden, im E-Mode sind UND ein Rezept ausgewählt ist, selbst wenn sie gerade nichts herstellen."
   },
   "feature": {
     "setup": "Das einfache Setup verwendet die normalen RV-Standardeinstellungen. Mit der benutzerdefinierten Einrichtung können Sie die Einrichtungen und Wohnmobilkomponenten anpassen, die Sie tatsächlich besitzen.",

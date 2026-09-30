@@ -324,7 +324,8 @@ window.AniilandLocales["ms-MY"]={
     "options_on": "pilihan pada",
     "crop_work": "Kerja tanaman",
     "powered_facilities": "Kemudahan berkuasa",
-    "family": "Keluarga"
+    "family": "Keluarga",
+    "power_preview_hint": "Fasiliti mesti berada dalam E-Mode (ikon kuasa) untuk menggunakan elektrik. Fasiliti menggunakan kuasa apabila berada dalam julat tiang/penjana Crackle, dalam E-Mode DAN resipi dipilih, walaupun ketika itu ia tidak sedang menghasilkan apa-apa."
   },
   "feature": {
     "setup": "Persediaan Mudah menggunakan lalai RV biasa. Persediaan Tersuai membolehkan anda memadankan kemudahan dan Komponen RV yang sebenarnya anda miliki.",

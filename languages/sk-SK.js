@@ -324,7 +324,8 @@ window.AniilandLocales["sk-SK"]={
     "options_on": "možnosti zapnuté",
     "crop_work": "Obrábacie práce",
     "powered_facilities": "Poháňané zariadenia",
-    "family": "Rodina"
+    "family": "Rodina",
+    "power_preview_hint": "Zariadenia musia byť v E-Mode (ikona napájania), aby mohli používať elektrinu. Spotrebúvajú energiu, keď sú v dosahu stĺpa/generátora Crackle, sú v E-Mode A majú vybraný recept, aj keď práve nič nevyrábajú."
   },
   "feature": {
     "setup": "Jednoduché nastavenie používa normálne predvolené hodnoty RV. Vlastné nastavenie vám umožní prispôsobiť zariadenia a komponenty RV, ktoré skutočne vlastníte.",

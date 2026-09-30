@@ -324,7 +324,8 @@ window.AniilandLocales["sl-SI"]={
     "options_on": "možnosti vklopljene",
     "crop_work": "Delo na posevkih",
     "powered_facilities": "Električni objekti",
-    "family": "Družina"
+    "family": "Družina",
+    "power_preview_hint": "Objekti morajo biti v E-Mode (ikona napajanja), da lahko uporabljajo elektriko. Elektriko porabljajo, ko so v dosegu stebra/generatorja Crackle, so v E-Mode IN imajo izbran recept, tudi če trenutno ničesar ne izdelujejo."
   },
   "feature": {
     "setup": "Simple Setup uporablja običajne privzete nastavitve za avtodome. Nastavitev po meri vam omogoča, da se ujemate z napravami in komponentami avtodomov, ki jih dejansko imate.",

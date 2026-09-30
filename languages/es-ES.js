@@ -324,7 +324,8 @@ window.AniilandLocales["es-ES"]={
     "options_on": "opciones en",
     "crop_work": "Trabajo de cultivo",
     "powered_facilities": "Instalaciones alimentadas",
-    "family": "Familia"
+    "family": "Familia",
+    "power_preview_hint": "Las instalaciones deben estar en E-Mode (icono de energía) para usar electricidad. Consumen energía cuando están dentro del alcance de un poste/generador Crackle, están en E-Mode Y tienen una receta seleccionada, incluso si en ese momento no están fabricando nada."
   },
   "feature": {
     "setup": "La configuración simple utiliza los valores predeterminados normales de RV. La configuración personalizada le permite combinar las instalaciones y los componentes de RV que realmente posee.",

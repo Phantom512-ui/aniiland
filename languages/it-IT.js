@@ -324,7 +324,8 @@ window.AniilandLocales["it-IT"]={
     "options_on": "opzioni attive",
     "crop_work": "Lavoro di raccolto",
     "powered_facilities": "Strutture alimentate",
-    "family": "Famiglia"
+    "family": "Famiglia",
+    "power_preview_hint": "Le strutture devono essere in E-Mode (icona alimentazione) per usare l’elettricità. Consumano energia quando si trovano nel raggio di un palo/generatore Crackle, sono in E-Mode E hanno una ricetta selezionata, anche se al momento non stanno producendo nulla."
   },
   "feature": {
     "setup": "L'impostazione semplice utilizza le normali impostazioni predefinite del camper. L'impostazione personalizzata ti consente di abbinare le strutture e i componenti camper che possiedi effettivamente.",

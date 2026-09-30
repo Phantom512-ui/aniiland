@@ -324,7 +324,8 @@ window.AniilandLocales["pl-PL"]={
     "options_on": "opcje włączone",
     "crop_work": "Praca przy uprawie",
     "powered_facilities": "Urządzenia zasilane",
-    "family": "Rodzina"
+    "family": "Rodzina",
+    "power_preview_hint": "Obiekty muszą być w E-Mode (ikona zasilania), aby korzystać z prądu. Pobierają prąd, gdy znajdują się w zasięgu słupa/generatora Crackle, są w E-Mode ORAZ mają wybraną recepturę, nawet jeśli obecnie niczego nie produkują."
   },
   "feature": {
     "setup": "Prosta konfiguracja wykorzystuje normalne ustawienia domyślne RV. Konfiguracja niestandardowa umożliwia dopasowanie wyposażenia i komponentów pojazdu kempingowego, które faktycznie posiadasz.",

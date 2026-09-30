@@ -324,7 +324,8 @@ window.AniilandLocales["ko-KR"]={
     "options_on": "옵션",
     "crop_work": "작물작업",
     "powered_facilities": "전력 시설",
-    "family": "가족"
+    "family": "가족",
+    "power_preview_hint": "시설은 전기를 사용하려면 E-Mode(전원 아이콘) 상태여야 합니다. 시설이 Crackle 폴/발전기의 범위 안에 있고, E-Mode 상태이며, 레시피가 선택되어 있으면 현재 아무것도 제작하지 않아도 전력을 소비합니다."
   },
   "feature": {
     "setup": "단순 설정에서는 일반 RV 기본값을 사용합니다. 사용자 정의 설정을 사용하면 실제로 소유한 시설과 RV 구성 요소를 일치시킬 수 있습니다.",

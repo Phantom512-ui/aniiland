@@ -324,7 +324,8 @@ window.AniilandLocales["hr-HR"]={
     "options_on": "opcije uključene",
     "crop_work": "Rad na usjevima",
     "powered_facilities": "Objekti s pogonom",
-    "family": "Obitelj"
+    "family": "Obitelj",
+    "power_preview_hint": "Objekti moraju biti u E-Modeu (ikona napajanja) kako bi koristili električnu energiju. Objekti troše energiju kada su u dometu Crackle stupa/generatora, u E-Modeu I imaju odabran recept, čak i ako trenutno ništa ne izrađuju."
   },
   "feature": {
     "setup": "Jednostavna instalacija koristi normalne RV zadane postavke. Prilagođeno postavljanje omogućuje vam da uskladite objekte i RV komponente koje zapravo posjedujete.",

@@ -324,7 +324,8 @@ window.AniilandLocales["da-DK"]={
     "options_on": "muligheder på",
     "crop_work": "Afgrødearbejde",
     "powered_facilities": "Eldrevne faciliteter",
-    "family": "Familie"
+    "family": "Familie",
+    "power_preview_hint": "Faciliteterne skal være i E-Mode (strømikon) for at bruge elektricitet. De bruger strøm, når de er inden for rækkevidde af en Crackle-pæl/generator, er i E-Mode OG har en valgt opskrift, selv hvis de ikke fremstiller noget lige nu."
   },
   "feature": {
     "setup": "Simple Setup bruger de normale RV standarder. Custom Setup lader dig matche de faciliteter og RV-komponenter, du faktisk ejer.",

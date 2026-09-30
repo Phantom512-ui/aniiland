@@ -8768,3 +8768,93 @@ th {
   }
 }
 
+
+/* Floor Planner quantity controls */
+.layout-quantity-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-bottom:10px
+}
+
+.layout-quantity-control {
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#111f2a
+}
+
+.layout-quantity-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px
+}
+
+.layout-quantity-head label {
+  margin:0!important;
+  color:var(--text);
+  font-size:12px;
+  font-weight:800
+}
+
+.layout-quantity-max {
+  flex:0 0 auto;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:700
+}
+
+.layout-quantity-control select {
+  margin:0!important;
+  min-height:38px;
+  width:100%;
+  font-weight:800
+}
+
+.layout-quantity-control small {
+  display:block;
+  margin-top:6px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.35
+}
+
+.layout-quantity-control .layout-quantity-warning {
+  color:#f2b4a9;
+  font-weight:800
+}
+
+@media (max-width:760px), (max-width:960px) and (pointer:coarse) {
+  .layout-quantity-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px
+  }
+
+  .layout-quantity-control {
+    padding:9px
+  }
+
+  .layout-quantity-head {
+    align-items:flex-start
+  }
+
+  .layout-quantity-head label {
+    font-size:11px
+  }
+
+  .layout-quantity-max {
+    font-size:9px
+  }
+
+  .layout-quantity-control select {
+    min-height:40px
+  }
+}
+
+@media (max-width:420px) {
+  .layout-quantity-grid {
+    grid-template-columns:1fr
+  }
+}

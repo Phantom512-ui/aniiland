@@ -324,7 +324,8 @@ window.AniilandLocales["et-EE"]={
     "options_on": "valikud sisse lülitatud",
     "crop_work": "Viljatöö",
     "powered_facilities": "Elektrilised rajatised",
-    "family": "Perekond"
+    "family": "Perekond",
+    "power_preview_hint": "Rajatised peavad elektri kasutamiseks olema E-Mode’is (toiteikoon). Rajatised tarbivad elektrit, kui need on Crackle posti/generaatori levialas, E-Mode’is JA retsept on valitud, isegi kui nad parasjagu midagi ei valmista."
   },
   "feature": {
     "setup": "Lihtne häälestus kasutab tavalisi RV vaikesätteid. Kohandatud seadistus võimaldab teil sobitada rajatisi ja haagismaja komponente, mis teile tegelikult kuuluvad.",

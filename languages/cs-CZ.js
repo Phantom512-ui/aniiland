@@ -324,7 +324,8 @@ window.AniilandLocales["cs-CZ"]={
     "options_on": "možnosti zapnuty",
     "crop_work": "Plodinové práce",
     "powered_facilities": "Zařízení s pohonem",
-    "family": "Rodina"
+    "family": "Rodina",
+    "power_preview_hint": "Zařízení musí být v E-Mode (ikona napájení), aby mohla používat elektřinu. Spotřebovávají energii, když jsou v dosahu sloupu/generátoru Crackle, jsou v E-Mode A mají vybraný recept, i když právě nic nevyrábějí."
   },
   "feature": {
     "setup": "Jednoduché nastavení používá normální výchozí hodnoty RV. Vlastní nastavení vám umožní sladit zařízení a komponenty RV, které skutečně vlastníte.",

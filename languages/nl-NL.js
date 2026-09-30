@@ -324,7 +324,8 @@ window.AniilandLocales["nl-NL"]={
     "options_on": "opties aan",
     "crop_work": "Gewas werk",
     "powered_facilities": "Aangedreven faciliteiten",
-    "family": "Familie"
+    "family": "Familie",
+    "power_preview_hint": "Faciliteiten moeten in E-Mode (stroompictogram) staan om elektriciteit te gebruiken. Ze verbruiken stroom wanneer ze binnen het bereik van een Crackle-paal/generator staan, in E-Mode staan EN een recept is geselecteerd, zelfs als ze op dat moment niets maken."
   },
   "feature": {
     "setup": "Simple Setup gebruikt de normale RV-standaardinstellingen. Met Aangepaste instellingen kunt u de faciliteiten en campercomponenten die u daadwerkelijk bezit, afstemmen.",

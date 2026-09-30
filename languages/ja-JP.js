@@ -324,7 +324,8 @@ window.AniilandLocales["ja-JP"]={
     "options_on": "オプションがオン",
     "crop_work": "農作業",
     "powered_facilities": "電源設備",
-    "family": "家族"
+    "family": "家族",
+    "power_preview_hint": "施設は電気を使用するためにE-Mode（電源アイコン）になっている必要があります。Crackleポール／ジェネレーターの範囲内にあり、E-Modeで、かつレシピが選択されている施設は、現在何も生産していなくても電力を消費します。"
   },
   "feature": {
     "setup": "Simple Setup では、通常の RV デフォルトが使用されます。カスタム セットアップを使用すると、実際に所有する施設と RV コンポーネントを一致させることができます。",

@@ -324,7 +324,8 @@ window.AniilandLocales["hu-HU"]={
     "options_on": "opciók bekapcsolva",
     "crop_work": "Mezőgazdasági munka",
     "powered_facilities": "Elektromos létesítmények",
-    "family": "Család"
+    "family": "Család",
+    "power_preview_hint": "A létesítményeknek E-Mode-ban (tápellátás ikon) kell lenniük az áram használatához. A létesítmények akkor fogyasztanak áramot, ha egy Crackle oszlop/generátor hatótávolságán belül vannak, E-Mode-ban vannak ÉS recept van kiválasztva, még akkor is, ha éppen nem készítenek semmit."
   },
   "feature": {
     "setup": "Az Egyszerű beállítás a normál RV alapértelmezéseket használja. Az Egyéni beállítás lehetővé teszi a ténylegesen birtokolt létesítmények és lakóautó-komponensek összehangolását.",

@@ -324,7 +324,8 @@ window.AniilandLocales["fil-PH"]={
     "options_on": "mga opsyon sa",
     "crop_work": "Trabaho sa pag-crop",
     "powered_facilities": "Mga pasilidad na pinapagana",
-    "family": "Pamilya"
+    "family": "Pamilya",
+    "power_preview_hint": "Ang mga pasilidad ay kailangang nasa E-Mode (Power icon) para gumamit ng kuryente. Kumokonsumo ng kuryente ang mga pasilidad kapag nasa saklaw sila ng Crackle pole/generator, nasa E-Mode AT may napiling recipe, kahit wala silang kasalukuyang ginagawa."
   },
   "feature": {
     "setup": "Ginagamit ng Simple Setup ang mga normal na default ng RV. Hinahayaan ka ng Custom na Setup na itugma ang mga pasilidad at RV Components na aktwal mong pagmamay-ari.",

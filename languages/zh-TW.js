@@ -324,7 +324,8 @@ window.AniilandLocales["zh-TW"]={
     "options_on": "選項上",
     "crop_work": "農作物工作",
     "powered_facilities": "供電設施",
-    "family": "家庭"
+    "family": "家庭",
+    "power_preview_hint": "設施必須處於 E-Mode（電源圖示）才能使用電力。設施位於 Crackle 電桿／發電機的範圍內、處於 E-Mode 且已選擇配方時就會耗電，即使目前沒有進行任何製作。"
   },
   "feature": {
     "setup": "簡單設定使用正常的 RV 預設值。自定義設定可讓您匹配您實際擁有的設施和房車元件。",

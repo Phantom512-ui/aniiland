@@ -324,7 +324,8 @@ window.AniilandLocales["sv-SE"]={
     "options_on": "alternativ på",
     "crop_work": "Beskärningsarbete",
     "powered_facilities": "Motordrivna anläggningar",
-    "family": "Familj"
+    "family": "Familj",
+    "power_preview_hint": "Anläggningar måste vara i E-Mode (strömikon) för att använda elektricitet. De förbrukar ström när de är inom räckvidden för en Crackle-stolpe/generator, är i E-Mode OCH har ett recept valt, även om de inte tillverkar något just nu."
   },
   "feature": {
     "setup": "Simple Setup använder de normala RV-standardinställningarna. Custom Setup låter dig matcha de faciliteter och RV-komponenter du faktiskt äger.",

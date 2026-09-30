@@ -324,7 +324,8 @@ window.AniilandLocales["sr-RS"]={
     "options_on": "опције укључене",
     "crop_work": "Рад на усеву",
     "powered_facilities": "Електрични објекти",
-    "family": "Породица"
+    "family": "Породица",
+    "power_preview_hint": "Objekti moraju biti u E-Mode-u (ikona napajanja) da bi koristili električnu energiju. Troše energiju kada su u dometu Crackle stuba/generatora, u E-Mode-u SU I kada je recept izabran, čak i ako trenutno ništa ne proizvode."
   },
   "feature": {
     "setup": "Једноставно подешавање користи нормалне подразумеване вредности за РВ. Прилагођено подешавање вам омогућава да ускладите објекте и РВ компоненте које заиста поседујете.",

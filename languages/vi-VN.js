@@ -324,7 +324,8 @@ window.AniilandLocales["vi-VN"]={
     "options_on": "tùy chọn trên",
     "crop_work": "Cắt xén công việc",
     "powered_facilities": "Cơ sở hỗ trợ",
-    "family": "Gia đình"
+    "family": "Gia đình",
+    "power_preview_hint": "Cơ sở phải ở E-Mode (biểu tượng nguồn) để sử dụng điện. Cơ sở sẽ tiêu thụ điện khi nằm trong phạm vi của cột/máy phát Crackle, đang ở E-Mode VÀ đã chọn công thức, ngay cả khi hiện tại không chế tạo gì."
   },
   "feature": {
     "setup": "Thiết lập Đơn giản sử dụng các giá trị mặc định RV thông thường. Thiết lập Tùy chỉnh cho phép bạn kết hợp các cơ sở và Thành phần RV mà bạn thực sự sở hữu.",

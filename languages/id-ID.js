@@ -324,7 +324,8 @@ window.AniilandLocales["id-ID"]={
     "options_on": "pilihan aktif",
     "crop_work": "Pekerjaan tanaman",
     "powered_facilities": "Fasilitas bertenaga",
-    "family": "Keluarga"
+    "family": "Keluarga",
+    "power_preview_hint": "Fasilitas harus berada dalam E-Mode (ikon daya) untuk menggunakan listrik. Fasilitas mengonsumsi daya saat berada dalam jangkauan tiang/generator Crackle, dalam E-Mode DAN resep dipilih, meskipun saat itu mereka tidak sedang membuat apa pun."
   },
   "feature": {
     "setup": "Pengaturan Sederhana menggunakan default RV normal. Pengaturan Khusus memungkinkan Anda mencocokkan fasilitas dan Komponen RV yang sebenarnya Anda miliki.",

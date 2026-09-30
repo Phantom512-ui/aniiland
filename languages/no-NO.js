@@ -324,7 +324,8 @@ window.AniilandLocales["no-NO"]={
     "options_on": "alternativer på",
     "crop_work": "Beskjæringsarbeid",
     "powered_facilities": "Elektriske anlegg",
-    "family": "Familie"
+    "family": "Familie",
+    "power_preview_hint": "Fasilitetene må være i E-Mode (strømikon) for å bruke elektrisitet. De bruker strøm når de er innenfor rekkevidden til en Crackle-stolpe/generator, er i E-Mode OG har en valgt oppskrift, selv om de ikke lager noe akkurat nå."
   },
   "feature": {
     "setup": "Enkelt oppsett bruker de vanlige standardinnstillingene for bobiler. Custom Setup lar deg matche fasilitetene og RV-komponentene du faktisk eier.",

@@ -324,7 +324,8 @@ window.AniilandLocales["ro-RO"]={
     "options_on": "opțiuni activate",
     "crop_work": "Munca de recoltare",
     "powered_facilities": "Facilități alimentate",
-    "family": "Familial"
+    "family": "Familial",
+    "power_preview_hint": "Facilitățile trebuie să fie în E-Mode (pictograma de alimentare) pentru a folosi electricitate. Acestea consumă energie atunci când se află în raza unui stâlp/generator Crackle, sunt în E-Mode ȘI au o rețetă selectată, chiar dacă în acel moment nu produc nimic."
   },
   "feature": {
     "setup": "Configurarea simplă utilizează valorile implicite normale ale RV. Configurarea personalizată vă permite să potriviți facilitățile și componentele RV pe care le dețineți efectiv.",

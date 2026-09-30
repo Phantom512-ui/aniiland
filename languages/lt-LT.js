@@ -324,7 +324,8 @@ window.AniilandLocales["lt-LT"]={
     "options_on": "parinktys įjungtos",
     "crop_work": "Augalininkystės darbai",
     "powered_facilities": "Elektriniai įrenginiai",
-    "family": "Šeima"
+    "family": "Šeima",
+    "power_preview_hint": "Kad galėtų naudoti elektrą, objektai turi būti E-Mode (maitinimo piktogramos) režime. Objektai naudoja elektrą, kai yra Crackle stulpo/generatoriaus veikimo zonoje, veikia E-Mode režimu IR yra pasirinktas receptas, net jei tuo metu nieko negamina."
   },
   "feature": {
     "setup": "Paprastoji sąranka naudoja įprastus RV numatytuosius nustatymus. Pasirinktinė sąranka leidžia suderinti įrangą ir RV komponentus, kuriuos iš tikrųjų turite.",

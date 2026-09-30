@@ -324,7 +324,8 @@ window.AniilandLocales["tr-TR"]={
     "options_on": "seçenekler açık",
     "crop_work": "Mahsul işi",
     "powered_facilities": "Elektrikli tesisler",
-    "family": "Aile"
+    "family": "Aile",
+    "power_preview_hint": "Tesislerin elektrik kullanabilmesi için E-Mode’da (güç simgesi) olması gerekir. Tesisler bir Crackle direğinin/jeneratörünün menzilindeyse, E-Mode’daysa VE bir tarif seçilmişse, o anda hiçbir şey üretmiyor olsalar bile güç tüketirler."
   },
   "feature": {
     "setup": "Basit Kurulum normal RV varsayılanlarını kullanır. Özel Kurulum, gerçekte sahip olduğunuz tesisleri ve RV Bileşenlerini eşleştirmenizi sağlar.",
