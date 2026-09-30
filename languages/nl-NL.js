@@ -224,7 +224,8 @@ window.AniilandLocales["nl-NL"]={
     "Trait": "Karaktereigenschap",
     "Any": "Elk",
     "options on": "opties aan",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Verplaats uw Aniiland-installatie tussen desktop/mobiel of deel deze met iemand anders. Inclusief plannerinstellingen, aangepaste configuratie, ontgrendelingen/uitsluitingen van recepten, voortgang van het evenement, actieve bestellingen en de huidige indeling van de vloerplanner. RV-upgradebronnen blijven lokaal en worden nooit gedeeld."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Verplaats uw Aniiland-installatie tussen desktop/mobiel of deel deze met iemand anders. Inclusief plannerinstellingen, aangepaste configuratie, ontgrendelingen/uitsluitingen van recepten, voortgang van het evenement, actieve bestellingen en de huidige indeling van de vloerplanner. RV-upgradebronnen blijven lokaal en worden nooit gedeeld.",
+  "Efficiency helper": "Efficiëntiehulp"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["nl-NL"]={
     "guide_step_market": "Koop GAME032TOKEN tot GAME071TOKEN wordt ontgrendeld.",
     "guide_step_laurel": "Koop GAME071TOKEN tot GAME056TOKEN wordt ontgrendeld.",
     "guide_step_flicker": "Koop dan GAME066TOKEN. Het ontgrendelingsrecept heet GAME054TOKEN, terwijl het item GAME014TOKEN GAME066TOKEN heet.",
+    "guide_step_osmanthus": "Zodra Osmanthus Rain is ontgrendeld, kun je het of GAME066TOKEN kopen, omdat beide dezelfde waarde hebben.",
     "limit_reached": "Aankooplimiet bereikt?",
     "limit_reset": "Ga naar de GAME036TOKEN, open het tweede tabblad en verkoop de versieringen terug voor Bud Tickets. Hiermee wordt de aankooplimiet opnieuw ingesteld.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → kies een item → GAME014TOKEN",

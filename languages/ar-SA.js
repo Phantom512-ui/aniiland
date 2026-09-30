@@ -224,7 +224,8 @@ window.AniilandLocales["ar-SA"]={
     "Trait": "سمة",
     "Any": "أي",
     "options on": "الخيارات على",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "انقل إعداد Aniiland الخاص بك بين سطح المكتب/الهاتف المحمول أو شاركه مع شخص آخر. يتضمن إعدادات المخطط، والإعداد المخصص، وفتح/استثناءات الوصفة، وتقدم الحدث، والأوامر النشطة، وتخطيط مخطط الأرضية الحالي. تظل موارد ترقية RV محلية ولا تتم مشاركتها أبدًا."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "انقل إعداد Aniiland الخاص بك بين سطح المكتب/الهاتف المحمول أو شاركه مع شخص آخر. يتضمن إعدادات المخطط، والإعداد المخصص، وفتح/استثناءات الوصفة، وتقدم الحدث، والأوامر النشطة، وتخطيط مخطط الأرضية الحالي. تظل موارد ترقية RV محلية ولا تتم مشاركتها أبدًا.",
+  "Efficiency helper": "مساعد الكفاءة"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["ar-SA"]={
     "guide_step_market": "قم بشراء GAME032TOKEN حتى يتم فتح GAME071TOKEN.",
     "guide_step_laurel": "قم بشراء GAME071TOKEN حتى يتم فتح GAME056TOKEN.",
     "guide_step_flicker": "ثم اشتري GAME066TOKEN. وصفة فتح القفل الخاصة به تسمى GAME054TOKEN، بينما العنصر GAME014TOKEN يسمى GAME066TOKEN.",
+    "guide_step_osmanthus": "بمجرد فتح Osmanthus Rain، يمكنك شراءه أو GAME066TOKEN، فكلاهما له القيمة نفسها.",
     "limit_reached": "هل وصلت إلى حد الشراء؟",
     "limit_reset": "انتقل إلى GAME036TOKEN، وافتح علامة التبويب الثانية، وقم ببيع الزخارف مرة أخرى مقابل تذاكر Bud Tickets. يؤدي هذا إلى إعادة تعيين حد الشراء.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → اختر عنصرًا → GAME014TOKEN",

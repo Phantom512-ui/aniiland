@@ -224,7 +224,8 @@ window.AniilandLocales["el-GR"]={
     "Trait": "Χαρακτηριστικό",
     "Any": "Κάθε",
     "options on": "επιλογές σε",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Μετακινήστε τη ρύθμιση Aniiland μεταξύ επιτραπέζιου/κινητού ή μοιραστείτε τη με κάποιον άλλο. Περιλαμβάνει ρυθμίσεις σχεδιασμού, Προσαρμοσμένη ρύθμιση, ξεκλείδωμα/εξαιρέσεις συνταγών, πρόοδο συμβάντων, ενεργές παραγγελίες και την τρέχουσα διάταξη Planner Planner. Οι πόροι αναβάθμισης RV παραμένουν τοπικοί και δεν μοιράζονται ποτέ."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Μετακινήστε τη ρύθμιση Aniiland μεταξύ επιτραπέζιου/κινητού ή μοιραστείτε τη με κάποιον άλλο. Περιλαμβάνει ρυθμίσεις σχεδιασμού, Προσαρμοσμένη ρύθμιση, ξεκλείδωμα/εξαιρέσεις συνταγών, πρόοδο συμβάντων, ενεργές παραγγελίες και την τρέχουσα διάταξη Planner Planner. Οι πόροι αναβάθμισης RV παραμένουν τοπικοί και δεν μοιράζονται ποτέ.",
+  "Efficiency helper": "Βοηθός αποδοτικότητας"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["el-GR"]={
     "guide_step_market": "Αγοράστε GAME032TOKEN μέχρι να ξεκλειδωθεί το GAME071TOKEN.",
     "guide_step_laurel": "Αγοράστε GAME071TOKEN μέχρι να ξεκλειδωθεί το GAME056TOKEN.",
     "guide_step_flicker": "Στη συνέχεια, αγοράστε GAME066TOKEN. Η συνταγή ξεκλειδώματος ονομάζεται GAME054TOKEN, ενώ το στοιχείο GAME014TOKEN ονομάζεται GAME066TOKEN.",
+    "guide_step_osmanthus": "Μόλις ξεκλειδώσει το Osmanthus Rain, μπορείς να αγοράσεις αυτό ή το GAME066TOKEN, καθώς έχουν την ίδια αξία.",
     "limit_reached": "Φτάσατε το όριο αγοράς;",
     "limit_reset": "Μεταβείτε στο GAME036TOKEN, ανοίξτε τη δεύτερη καρτέλα και πουλήστε ξανά τα διακοσμητικά για Bud Tickets. Αυτό επαναφέρει το όριο αγοράς.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → επιλέξτε ένα στοιχείο → GAME014TOKEN",

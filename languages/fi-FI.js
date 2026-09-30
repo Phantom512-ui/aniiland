@@ -224,7 +224,8 @@ window.AniilandLocales["fi-FI"]={
     "Trait": "Piirre",
     "Any": "Mikä tahansa",
     "options on": "vaihtoehdot päällä",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Siirrä Aniiland-kokoonpanoasi työpöydän/mobiililaitteen välillä tai jaa se jonkun muun kanssa. Sisältää suunnittelijan asetukset, mukautetun asennuksen, reseptien lukituksen avaukset/poissulkemiset, tapahtuman edistymisen, aktiiviset tilaukset ja nykyisen Floor Planner -asettelun. Matkailuautojen päivitysresurssit pysyvät paikallisina, eikä niitä koskaan jaeta."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Siirrä Aniiland-kokoonpanoasi työpöydän/mobiililaitteen välillä tai jaa se jonkun muun kanssa. Sisältää suunnittelijan asetukset, mukautetun asennuksen, reseptien lukituksen avaukset/poissulkemiset, tapahtuman edistymisen, aktiiviset tilaukset ja nykyisen Floor Planner -asettelun. Matkailuautojen päivitysresurssit pysyvät paikallisina, eikä niitä koskaan jaeta.",
+  "Efficiency helper": "Tehokkuusavustaja"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["fi-FI"]={
     "guide_step_market": "Osta GAME032TOKEN, kunnes GAME071TOKEN avautuu.",
     "guide_step_laurel": "Osta GAME071TOKEN, kunnes GAME056TOKEN avautuu.",
     "guide_step_flicker": "Osta sitten GAME066TOKEN. Sen lukituksen avausresepti on nimeltään GAME054TOKEN, kun taas tuotteen GAME014TOKEN nimi on GAME066TOKEN.",
+    "guide_step_osmanthus": "Kun Osmanthus Rain avautuu, voit ostaa sen tai GAME066TOKENin, sillä niiden arvo on sama.",
     "limit_reached": "Saavutettiinko ostoraja?",
     "limit_reset": "Mene osoitteeseen GAME036TOKEN, avaa toinen välilehti ja myy koristeet takaisin Bud Ticketsille. Tämä nollaa ostorajan.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → valitse kohde → GAME014TOKEN",

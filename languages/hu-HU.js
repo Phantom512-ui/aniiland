@@ -224,7 +224,8 @@ window.AniilandLocales["hu-HU"]={
     "Trait": "Jellemvonás",
     "Any": "Bármilyen",
     "options on": "opciók bekapcsolva",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Helyezze át Aniiland beállításait az asztali számítógépek/mobilok között, vagy ossza meg másokkal. Tartalmazza a tervező beállításait, az egyéni beállításokat, a recept feloldásait/kizárásait, az események előrehaladását, az aktív rendeléseket és az aktuális Floor Planner elrendezést. A lakóautó-frissítési erőforrások helyi maradnak, és soha nem osztják meg őket."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Helyezze át Aniiland beállításait az asztali számítógépek/mobilok között, vagy ossza meg másokkal. Tartalmazza a tervező beállításait, az egyéni beállításokat, a recept feloldásait/kizárásait, az események előrehaladását, az aktív rendeléseket és az aktuális Floor Planner elrendezést. A lakóautó-frissítési erőforrások helyi maradnak, és soha nem osztják meg őket.",
+  "Efficiency helper": "Hatékonysági segítő"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["hu-HU"]={
     "guide_step_market": "Vásárolja meg a következőt: GAME032TOKEN, amíg a GAME071TOKEN fel nem oldja.",
     "guide_step_laurel": "Vásárolja meg a(z) GAME071TOKEN terméket, amíg a(z) GAME056TOKEN fel nem oldja.",
     "guide_step_flicker": "Ezután vásárolja meg a következőt: GAME066TOKEN. A feloldó recept neve GAME054TOKEN, míg a GAME014TOKEN elem neve GAME066TOKEN.",
+    "guide_step_osmanthus": "Amint feloldódik az Osmanthus Rain, megvásárolhatod azt vagy a GAME066TOKEN-t, mert ugyanaz az értékük.",
     "limit_reached": "Elérte a vásárlási limitet?",
     "limit_reset": "Menjen a GAME036TOKEN oldalra, nyissa meg a második lapot, és adja vissza a díszeket Bud Ticketsért. Ezzel visszaállítja a vásárlási korlátot.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → válasszon egy elemet → GAME014TOKEN",

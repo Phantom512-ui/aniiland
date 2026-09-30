@@ -224,7 +224,8 @@ window.AniilandLocales["fr-FR"]={
     "Trait": "Trait",
     "Any": "N'importe lequel",
     "options on": "options sur",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Déplacez votre configuration Aniiland entre ordinateur/mobile ou partagez-la avec quelqu'un d'autre. Comprend les paramètres du planificateur, la configuration personnalisée, les déverrouillages/exclusions de recettes, la progression de l'événement, les commandes actives et la disposition actuelle du planificateur d'étage. Les ressources de mise à niveau RV restent locales et ne sont jamais partagées."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Déplacez votre configuration Aniiland entre ordinateur/mobile ou partagez-la avec quelqu'un d'autre. Comprend les paramètres du planificateur, la configuration personnalisée, les déverrouillages/exclusions de recettes, la progression de l'événement, les commandes actives et la disposition actuelle du planificateur d'étage. Les ressources de mise à niveau RV restent locales et ne sont jamais partagées.",
+  "Efficiency helper": "Assistant d’efficacité"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -245,6 +246,7 @@ window.AniilandLocales["fr-FR"]={
     "guide_step_market": "Achetez GAME032TOKEN jusqu’au déblocage de GAME071TOKEN.",
     "guide_step_laurel": "Achetez GAME071TOKEN jusqu’au déblocage de GAME056TOKEN.",
     "guide_step_flicker": "Achetez ensuite GAME066TOKEN. Sa recette de déblocage s’appelle GAME054TOKEN, tandis que l’objet du GAME014TOKEN s’appelle GAME066TOKEN.",
+    "guide_step_osmanthus": "Une fois Osmanthus Rain débloqué, vous pouvez l’acheter ou acheter GAME066TOKEN, car les deux ont la même valeur.",
     "limit_reached": "Limite d’achat atteinte ?",
     "limit_reset": "Allez au GAME036TOKEN, ouvrez le deuxième onglet et revendez les décorations contre des Bud Tickets. Cela réinitialise la limite d’achat.",
     "furniture_path": "GAME014TOKEN : GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → choisissez un objet → GAME014TOKEN",

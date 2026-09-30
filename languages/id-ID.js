@@ -224,7 +224,8 @@ window.AniilandLocales["id-ID"]={
     "Trait": "Sifat",
     "Any": "Setiap",
     "options on": "pilihan aktif",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Pindahkan pengaturan Aniiland Anda antara desktop/seluler atau bagikan dengan orang lain. Termasuk pengaturan perencana, Pengaturan Kustom, pembukaan/pengecualian resep, kemajuan acara, pesanan aktif, dan tata letak Perencana Lantai saat ini. Sumber Daya Peningkatan RV tetap bersifat lokal dan tidak pernah dibagikan."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Pindahkan pengaturan Aniiland Anda antara desktop/seluler atau bagikan dengan orang lain. Termasuk pengaturan perencana, Pengaturan Kustom, pembukaan/pengecualian resep, kemajuan acara, pesanan aktif, dan tata letak Perencana Lantai saat ini. Sumber Daya Peningkatan RV tetap bersifat lokal dan tidak pernah dibagikan.",
+  "Efficiency helper": "Pembantu efisiensi"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -238,6 +239,7 @@ window.AniilandLocales["id-ID"]={
     "guide_step_market": "Beli GAME032TOKEN sampai GAME071TOKEN terbuka.",
     "guide_step_laurel": "Beli GAME071TOKEN sampai GAME056TOKEN terbuka.",
     "guide_step_flicker": "Setelah itu beli GAME066TOKEN. Resep pembukanya bernama GAME054TOKEN, sedangkan item GAME014TOKEN bernama GAME066TOKEN.",
+    "guide_step_osmanthus": "Setelah Osmanthus Rain terbuka, kamu bisa membeli Osmanthus Rain atau GAME066TOKEN karena keduanya memiliki nilai yang sama.",
     "limit_reached": "Batas pembelian tercapai?",
     "limit_reset": "Buka tab kedua di GAME036TOKEN lalu jual dekorasi untuk mendapatkan Bud Tickets dan mengatur ulang batas pembelian.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → pilih item → GAME014TOKEN",

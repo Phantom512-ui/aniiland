@@ -224,7 +224,8 @@ window.AniilandLocales["ru-RU"]={
     "Trait": "Черта",
     "Any": "Любой",
     "options on": "варианты на",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Перенесите настройку Aniiland между настольным компьютером и мобильным устройством или поделитесь ею с кем-то еще. Включает настройки планировщика, пользовательскую настройку, разблокировку/исключение рецептов, ход событий, активные заказы и текущий макет Планировщика этажей. Ресурсы обновления RV остаются локальными и никогда не передаются."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Перенесите настройку Aniiland между настольным компьютером и мобильным устройством или поделитесь ею с кем-то еще. Включает настройки планировщика, пользовательскую настройку, разблокировку/исключение рецептов, ход событий, активные заказы и текущий макет Планировщика этажей. Ресурсы обновления RV остаются локальными и никогда не передаются.",
+  "Efficiency helper": "Помощник эффективности"
   },
   "v2": {
     "guide": "Руководство",
@@ -245,6 +246,7 @@ window.AniilandLocales["ru-RU"]={
     "guide_step_market": "Покупайте GAME032TOKEN, пока не откроется GAME071TOKEN.",
     "guide_step_laurel": "Покупайте GAME071TOKEN, пока не откроется GAME056TOKEN.",
     "guide_step_flicker": "Затем покупайте GAME066TOKEN. Рецепт для его открытия называется GAME054TOKEN, а предмет в GAME014TOKEN называется GAME066TOKEN.",
+    "guide_step_osmanthus": "После разблокировки Osmanthus Rain можно покупать его или GAME066TOKEN, поскольку оба имеют одинаковую ценность.",
     "limit_reached": "Достигнут лимит покупок?",
     "limit_reset": "Перейдите в GAME036TOKEN, откройте вторую вкладку и продайте украшения обратно за Bud Tickets. Это сбросит лимит покупок.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → выберите предмет → GAME014TOKEN",

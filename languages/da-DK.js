@@ -224,7 +224,8 @@ window.AniilandLocales["da-DK"]={
     "Trait": "Træk",
     "Any": "Enhver",
     "options on": "muligheder på",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Flyt din Aniiland-opsætning mellem desktop/mobil eller del den med en anden. Inkluderer planlæggerindstillinger, brugerdefineret opsætning, oplåsninger/ekskluderinger af opskrifter, hændelsesforløb, aktive ordrer og det aktuelle planlægningslayout. RV Upgrade-ressourcer forbliver lokale og deles aldrig."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Flyt din Aniiland-opsætning mellem desktop/mobil eller del den med en anden. Inkluderer planlæggerindstillinger, brugerdefineret opsætning, oplåsninger/ekskluderinger af opskrifter, hændelsesforløb, aktive ordrer og det aktuelle planlægningslayout. RV Upgrade-ressourcer forbliver lokale og deles aldrig.",
+  "Efficiency helper": "Effektivitetshjælper"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["da-DK"]={
     "guide_step_market": "Køb GAME032TOKEN indtil GAME071TOKEN låses op.",
     "guide_step_laurel": "Køb GAME071TOKEN indtil GAME056TOKEN låses op.",
     "guide_step_flicker": "Køb derefter GAME066TOKEN. Dens oplåsningsopskrift hedder GAME054TOKEN, mens elementet GAME014TOKEN hedder GAME066TOKEN.",
+    "guide_step_osmanthus": "Når Osmanthus Rain låses op, kan du købe den eller GAME066TOKEN, da de har samme værdi.",
     "limit_reached": "Har du nået købsgrænsen?",
     "limit_reset": "Gå til GAME036TOKEN, åbn den anden fane, og sælg dekorationerne tilbage til Bud-billetter. Dette nulstiller købsgrænsen.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → vælg et element → GAME014TOKEN",

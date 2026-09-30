@@ -224,7 +224,8 @@ window.AniilandLocales["et-EE"]={
     "Trait": "Tunnus",
     "Any": "Ükskõik milline",
     "options on": "valikud sisse lülitatud",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Liigutage oma Aniilandi seadistust lauaarvuti/mobiili vahel või jagage seda kellegi teisega. Sisaldab planeerija sätteid, kohandatud seadistust, retsepti avamist/välistamist, sündmuste edenemist, aktiivseid tellimusi ja praegust korruseplaneerija paigutust. Haagissuvilate uuendamise ressursid jäävad kohalikeks ja neid ei jagata kunagi."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Liigutage oma Aniilandi seadistust lauaarvuti/mobiili vahel või jagage seda kellegi teisega. Sisaldab planeerija sätteid, kohandatud seadistust, retsepti avamist/välistamist, sündmuste edenemist, aktiivseid tellimusi ja praegust korruseplaneerija paigutust. Haagissuvilate uuendamise ressursid jäävad kohalikeks ja neid ei jagata kunagi.",
+  "Efficiency helper": "Tõhususe abiline"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["et-EE"]={
     "guide_step_market": "Ostke GAME032TOKEN, kuni GAME071TOKEN avatakse.",
     "guide_step_laurel": "Ostke GAME071TOKEN, kuni GAME056TOKEN avatakse.",
     "guide_step_flicker": "Seejärel ostke GAME066TOKEN. Selle avamise retsepti nimi on GAME054TOKEN, üksuse GAME014TOKEN nimi aga GAME066TOKEN.",
+    "guide_step_osmanthus": "Kui Osmanthus Rain avaneb, võid osta selle või GAME066TOKEN, sest mõlemal on sama väärtus.",
     "limit_reached": "Kas ostulimiit on täis?",
     "limit_reset": "Minge aadressile GAME036TOKEN, avage teine ​​vahekaart ja müüge dekoratsioonid Bud Ticketsi eest tagasi. See lähtestab ostulimiidi.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → vali üksus → GAME014TOKEN",

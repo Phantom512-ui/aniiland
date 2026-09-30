@@ -224,7 +224,8 @@ window.AniilandLocales["hr-HR"]={
     "Trait": "Osobina",
     "Any": "Bilo koje",
     "options on": "opcije uključene",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Premjestite svoje postavke Aniilanda između stolnog/mobilnog uređaja ili ih podijelite s nekim drugim. Uključuje postavke planera, prilagođene postavke, otključavanja/isključivanja recepata, napredak događaja, aktivne narudžbe i trenutni raspored tlocrta. Resursi za nadogradnju RV-a ostaju lokalni i nikada se ne dijele."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Premjestite svoje postavke Aniilanda između stolnog/mobilnog uređaja ili ih podijelite s nekim drugim. Uključuje postavke planera, prilagođene postavke, otključavanja/isključivanja recepata, napredak događaja, aktivne narudžbe i trenutni raspored tlocrta. Resursi za nadogradnju RV-a ostaju lokalni i nikada se ne dijele.",
+  "Efficiency helper": "Pomoćnik za učinkovitost"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["hr-HR"]={
     "guide_step_market": "Kupite GAME032TOKEN dok se GAME071TOKEN ne otključa.",
     "guide_step_laurel": "Kupite GAME071TOKEN dok se GAME056TOKEN ne otključa.",
     "guide_step_flicker": "Zatim kupite GAME066TOKEN. Njegov recept za otključavanje zove se GAME054TOKEN, dok se stavka GAME014TOKEN zove GAME066TOKEN.",
+    "guide_step_osmanthus": "Nakon što se Osmanthus Rain otključa, možete kupiti njega ili GAME066TOKEN jer imaju istu vrijednost.",
     "limit_reached": "Jeste li dosegli ograničenje kupnje?",
     "limit_reset": "Idite na GAME036TOKEN, otvorite drugu karticu i prodajte ukrase natrag za Bud Tickets. Time se poništava ograničenje kupnje.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → odaberite stavku → GAME014TOKEN",

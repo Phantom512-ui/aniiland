@@ -224,7 +224,8 @@ window.AniilandLocales["vi-VN"]={
     "Trait": "đặc điểm",
     "Any": "Bất kì",
     "options on": "tùy chọn trên",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Di chuyển thiết lập Aniiland của bạn giữa máy tính để bàn/thiết bị di động hoặc chia sẻ nó với người khác. Bao gồm cài đặt công cụ lập kế hoạch, Thiết lập tùy chỉnh, mở khóa/loại trừ công thức, tiến trình sự kiện, đơn hàng đang hoạt động và bố cục Công cụ lập kế hoạch tầng hiện tại. Tài nguyên nâng cấp RV luôn ở địa phương và không bao giờ được chia sẻ."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Di chuyển thiết lập Aniiland của bạn giữa máy tính để bàn/thiết bị di động hoặc chia sẻ nó với người khác. Bao gồm cài đặt công cụ lập kế hoạch, Thiết lập tùy chỉnh, mở khóa/loại trừ công thức, tiến trình sự kiện, đơn hàng đang hoạt động và bố cục Công cụ lập kế hoạch tầng hiện tại. Tài nguyên nâng cấp RV luôn ở địa phương và không bao giờ được chia sẻ.",
+  "Efficiency helper": "Trợ lý hiệu suất"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -238,6 +239,7 @@ window.AniilandLocales["vi-VN"]={
     "guide_step_market": "Mua GAME032TOKEN cho đến khi mở khóa GAME071TOKEN.",
     "guide_step_laurel": "Mua GAME071TOKEN cho đến khi mở khóa GAME056TOKEN.",
     "guide_step_flicker": "Sau đó mua GAME066TOKEN. Công thức mở khóa tên là GAME054TOKEN, còn vật phẩm trong GAME014TOKEN tên là GAME066TOKEN.",
+    "guide_step_osmanthus": "Khi Osmanthus Rain được mở khóa, bạn có thể mua nó hoặc GAME066TOKEN vì cả hai có cùng giá trị.",
     "limit_reached": "Đã đạt giới hạn mua?",
     "limit_reset": "Mở tab thứ hai trong GAME036TOKEN rồi bán đồ trang trí để nhận Bud Tickets và đặt lại giới hạn mua.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → chọn vật phẩm → GAME014TOKEN",

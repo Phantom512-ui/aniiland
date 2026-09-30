@@ -224,7 +224,8 @@ window.AniilandLocales["sl-SI"]={
     "Trait": "Lastnost",
     "Any": "katera koli",
     "options on": "možnosti vklopljene",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Premaknite svojo nastavitev Aniiland med namizjem/mobilno napravo ali jo delite z nekom drugim. Vključuje nastavitve načrtovalca, nastavitev po meri, odklepanja/izključitve receptov, napredek dogodkov, aktivna naročila in trenutno postavitev tlorisa. Viri za nadgradnjo avtodomov ostanejo lokalni in se nikoli ne delijo."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Premaknite svojo nastavitev Aniiland med namizjem/mobilno napravo ali jo delite z nekom drugim. Vključuje nastavitve načrtovalca, nastavitev po meri, odklepanja/izključitve receptov, napredek dogodkov, aktivna naročila in trenutno postavitev tlorisa. Viri za nadgradnjo avtodomov ostanejo lokalni in se nikoli ne delijo.",
+  "Efficiency helper": "Pomočnik za učinkovitost"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["sl-SI"]={
     "guide_step_market": "Kupite GAME032TOKEN, dokler se GAME071TOKEN ne odklene.",
     "guide_step_laurel": "Kupite GAME071TOKEN, dokler se GAME056TOKEN ne odklene.",
     "guide_step_flicker": "Potem kupi GAME066TOKEN. Njegov recept za odklepanje se imenuje GAME054TOKEN, medtem ko se predmet GAME014TOKEN imenuje GAME066TOKEN.",
+    "guide_step_osmanthus": "Ko se odklene Osmanthus Rain, ga lahko kupiš ali kupiš GAME066TOKEN, saj imata oba enako vrednost.",
     "limit_reached": "Ste dosegli omejitev nakupa?",
     "limit_reset": "Pojdite na GAME036TOKEN, odprite drugi zavihek in prodajte okraske nazaj za Bud Tickets. To ponastavi omejitev nakupa.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → izberite element → GAME014TOKEN",

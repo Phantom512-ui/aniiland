@@ -224,7 +224,8 @@ window.AniilandLocales["zh-TW"]={
     "Trait": "特徵",
     "Any": "任何",
     "options on": "選項上",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "在桌面/移動裝置之間移動您的 Aniiland 設定或與其他人共享。包括規劃器設定、自定義設定、配方解鎖/排除、事件進度、活動訂單和當前的 Floor Planner 佈局。 RV 升級資源保留在本地並且從不共享。"
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "在桌面/移動裝置之間移動您的 Aniiland 設定或與其他人共享。包括規劃器設定、自定義設定、配方解鎖/排除、事件進度、活動訂單和當前的 Floor Planner 佈局。 RV 升級資源保留在本地並且從不共享。",
+  "Efficiency helper": "效率助手"
   },
   "v2": {
     "guide": "指南",
@@ -245,6 +246,7 @@ window.AniilandLocales["zh-TW"]={
     "guide_step_market": "持續購買 GAME032TOKEN，直到解鎖 GAME071TOKEN。",
     "guide_step_laurel": "持續購買 GAME071TOKEN，直到解鎖 GAME056TOKEN。",
     "guide_step_flicker": "之後購買 GAME066TOKEN。它的解鎖配方名為 GAME054TOKEN，而 GAME014TOKEN 中的物品名為 GAME066TOKEN。",
+    "guide_step_osmanthus": "解鎖 Osmanthus Rain 後，你可以購買它或 GAME066TOKEN，因為兩者的價值相同。",
     "limit_reached": "達到購買上限？",
     "limit_reset": "前往 GAME036TOKEN，開啟第二個標籤頁，將裝飾賣回換取 Bud Tickets。這樣會重置購買上限。",
     "furniture_path": "GAME014TOKEN：GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → 選擇物品 → GAME014TOKEN",

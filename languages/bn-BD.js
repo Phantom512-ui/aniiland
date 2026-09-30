@@ -224,7 +224,8 @@ window.AniilandLocales["bn-BD"]={
     "Trait": "বৈশিষ্ট্য",
     "Any": "যে কোন",
     "options on": "বিকল্প চালু",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "আপনার অ্যানিল্যান্ড সেটআপ ডেস্কটপ/মোবাইলের মধ্যে সরান বা অন্য কারো সাথে শেয়ার করুন। প্ল্যানার সেটিংস, কাস্টম সেটআপ, রেসিপি আনলক/বর্জন, ইভেন্টের অগ্রগতি, সক্রিয় অর্ডার এবং বর্তমান ফ্লোর প্ল্যানার লেআউট অন্তর্ভুক্ত। আরভি আপগ্রেড সংস্থানগুলি স্থানীয় থাকে এবং কখনও ভাগ করা হয় না।"
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "আপনার অ্যানিল্যান্ড সেটআপ ডেস্কটপ/মোবাইলের মধ্যে সরান বা অন্য কারো সাথে শেয়ার করুন। প্ল্যানার সেটিংস, কাস্টম সেটআপ, রেসিপি আনলক/বর্জন, ইভেন্টের অগ্রগতি, সক্রিয় অর্ডার এবং বর্তমান ফ্লোর প্ল্যানার লেআউট অন্তর্ভুক্ত। আরভি আপগ্রেড সংস্থানগুলি স্থানীয় থাকে এবং কখনও ভাগ করা হয় না।",
+  "Efficiency helper": "দক্ষতা সহায়ক"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["bn-BD"]={
     "guide_step_market": "GAME071TOKEN আনলক না হওয়া পর্যন্ত GAME032TOKEN কিনুন।",
     "guide_step_laurel": "GAME056TOKEN আনলক না হওয়া পর্যন্ত GAME071TOKEN কিনুন।",
     "guide_step_flicker": "তারপর GAME066TOKEN কিনুন। এর আনলক রেসিপি বলা হয় GAME054TOKEN, যখন GAME014TOKEN আইটেমটিকে বলা হয় GAME066TOKEN।",
+    "guide_step_osmanthus": "Osmanthus Rain আনলক হলে, আপনি এটি বা GAME066TOKEN কিনতে পারেন, কারণ দুটিরই একই মান।",
     "limit_reached": "ক্রয় সীমা পৌঁছেছেন?",
     "limit_reset": "GAME036TOKEN-এ যান, দ্বিতীয় ট্যাব খুলুন এবং বাড টিকিটের জন্য সাজসজ্জা বিক্রি করুন। এটি ক্রয়ের সীমা রিসেট করে।",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → একটি আইটেম বেছে নিন → GAME014TOKEN",

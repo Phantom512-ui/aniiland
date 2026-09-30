@@ -224,7 +224,8 @@ window.AniilandLocales["th-TH"]={
     "Trait": "ลักษณะ",
     "Any": "ใดๆ",
     "options on": "ตัวเลือกบน",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "ย้ายการตั้งค่า Aniland ของคุณระหว่างเดสก์ท็อป/มือถือ หรือแชร์กับคนอื่น รวมถึงการตั้งค่าการวางแผน การตั้งค่าแบบกำหนดเอง การปลดล็อค/การแยกสูตร ความคืบหน้าของกิจกรรม คำสั่งซื้อที่ใช้งานอยู่ และเค้าโครง Floor Planner ปัจจุบัน ทรัพยากรการอัปเกรด RV อยู่ในพื้นที่และไม่มีการแชร์"
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "ย้ายการตั้งค่า Aniland ของคุณระหว่างเดสก์ท็อป/มือถือ หรือแชร์กับคนอื่น รวมถึงการตั้งค่าการวางแผน การตั้งค่าแบบกำหนดเอง การปลดล็อค/การแยกสูตร ความคืบหน้าของกิจกรรม คำสั่งซื้อที่ใช้งานอยู่ และเค้าโครง Floor Planner ปัจจุบัน ทรัพยากรการอัปเกรด RV อยู่ในพื้นที่และไม่มีการแชร์",
+  "Efficiency helper": "ผู้ช่วยด้านประสิทธิภาพ"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -238,6 +239,7 @@ window.AniilandLocales["th-TH"]={
     "guide_step_market": "ซื้อ GAME032TOKEN จนกว่า GAME071TOKEN จะปลดล็อก",
     "guide_step_laurel": "ซื้อ GAME071TOKEN จนกว่า GAME056TOKEN จะปลดล็อก",
     "guide_step_flicker": "จากนั้นซื้อ GAME066TOKEN สูตรปลดล็อกชื่อ GAME054TOKEN ส่วนไอเทมใน GAME014TOKEN ชื่อ GAME066TOKEN",
+    "guide_step_osmanthus": "เมื่อปลดล็อก Osmanthus Rain แล้ว คุณสามารถซื้อ Osmanthus Rain หรือ GAME066TOKEN ได้ เพราะทั้งสองมีมูลค่าเท่ากัน",
     "limit_reached": "ซื้อครบจำนวนจำกัดแล้วหรือยัง?",
     "limit_reset": "ไปที่ GAME036TOKEN เปิดแท็บที่สอง แล้วขายของตกแต่งแลก Bud Tickets เพื่อรีเซ็ตจำนวนจำกัด",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → เลือกไอเทม → GAME014TOKEN",

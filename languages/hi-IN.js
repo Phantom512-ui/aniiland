@@ -224,7 +224,8 @@ window.AniilandLocales["hi-IN"]={
     "Trait": "प्रवृत्ति",
     "Any": "कोई",
     "options on": "विकल्प चालू",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "अपने एनीलैंड सेटअप को डेस्कटॉप/मोबाइल के बीच ले जाएं या किसी और के साथ साझा करें। इसमें प्लानर सेटिंग्स, कस्टम सेटअप, रेसिपी अनलॉक/बहिष्करण, इवेंट प्रगति, सक्रिय ऑर्डर और वर्तमान फ़्लोर प्लानर लेआउट शामिल हैं। आरवी अपग्रेड संसाधन स्थानीय रहते हैं और कभी साझा नहीं किए जाते।"
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "अपने एनीलैंड सेटअप को डेस्कटॉप/मोबाइल के बीच ले जाएं या किसी और के साथ साझा करें। इसमें प्लानर सेटिंग्स, कस्टम सेटअप, रेसिपी अनलॉक/बहिष्करण, इवेंट प्रगति, सक्रिय ऑर्डर और वर्तमान फ़्लोर प्लानर लेआउट शामिल हैं। आरवी अपग्रेड संसाधन स्थानीय रहते हैं और कभी साझा नहीं किए जाते।",
+  "Efficiency helper": "दक्षता सहायक"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["hi-IN"]={
     "guide_step_market": "GAME071TOKEN अनलॉक होने तक GAME032TOKEN खरीदें।",
     "guide_step_laurel": "GAME056TOKEN अनलॉक होने तक GAME071TOKEN खरीदें।",
     "guide_step_flicker": "फिर खरीदें GAME066TOKEN. इसकी अनलॉक रेसिपी को GAME054TOKEN कहा जाता है, जबकि GAME014TOKEN आइटम को GAME066TOKEN कहा जाता है।",
+    "guide_step_osmanthus": "Osmanthus Rain अनलॉक होने के बाद, आप इसे या GAME066TOKEN खरीद सकते हैं, क्योंकि दोनों का मूल्य समान है।",
     "limit_reached": "खरीद सीमा तक पहुंच गए?",
     "limit_reset": "GAME036TOKEN पर जाएं, दूसरा टैब खोलें, और बड टिकटों के लिए सजावट वापस बेचें। इससे खरीदारी की सीमा रीसेट हो जाती है.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → एक आइटम चुनें → GAME014TOKEN",

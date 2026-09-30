@@ -224,7 +224,8 @@ window.AniilandLocales["ja-JP"]={
     "Trait": "特性",
     "Any": "どれでも",
     "options on": "オプションがオン",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Aniiland セットアップをデスクトップ/モバイル間で移動するか、他の人と共有します。プランナー設定、カスタム セットアップ、レシピのロック解除/除外、イベントの進行状況、アクティブな注文、および現在のフロア プランナー レイアウトが含まれます。 RV アップグレード リソースはローカルに留まり、共有されることはありません。"
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Aniiland セットアップをデスクトップ/モバイル間で移動するか、他の人と共有します。プランナー設定、カスタム セットアップ、レシピのロック解除/除外、イベントの進行状況、アクティブな注文、および現在のフロア プランナー レイアウトが含まれます。 RV アップグレード リソースはローカルに留まり、共有されることはありません。",
+  "Efficiency helper": "効率サポート"
   },
   "v2": {
     "guide": "ガイド",
@@ -245,6 +246,7 @@ window.AniilandLocales["ja-JP"]={
     "guide_step_market": "GAME071TOKEN が解放されるまで GAME032TOKEN を購入します。",
     "guide_step_laurel": "GAME056TOKEN が解放されるまで GAME071TOKEN を購入します。",
     "guide_step_flicker": "その後は GAME066TOKEN を購入します。解放レシピ名は GAME054TOKEN、GAME014TOKEN のアイテム名は GAME066TOKEN です。",
+    "guide_step_osmanthus": "Osmanthus Rain がアンロックされたら、Osmanthus Rain または GAME066TOKEN を購入できます。どちらも同じ価値です。",
     "limit_reached": "購入上限に達しましたか？",
     "limit_reset": "GAME036TOKEN の2番目のタブを開き、装飾品を Bud Tickets と交換して売却してください。購入上限がリセットされます。",
     "furniture_path": "GAME014TOKEN：GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → アイテムを選択 → GAME014TOKEN",

@@ -224,7 +224,8 @@ window.AniilandLocales["it-IT"]={
     "Trait": "Tratto",
     "Any": "Qualunque",
     "options on": "opzioni attive",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Sposta la configurazione di Aniiland tra desktop/mobile o condividila con qualcun altro. Include le impostazioni del pianificatore, l'impostazione personalizzata, gli sblocchi/esclusioni delle ricette, l'avanzamento dell'evento, gli ordini attivi e il layout corrente del pianificatore del piano. Le risorse per l'aggiornamento del camper rimangono locali e non vengono mai condivise."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Sposta la configurazione di Aniiland tra desktop/mobile o condividila con qualcun altro. Include le impostazioni del pianificatore, l'impostazione personalizzata, gli sblocchi/esclusioni delle ricette, l'avanzamento dell'evento, gli ordini attivi e il layout corrente del pianificatore del piano. Le risorse per l'aggiornamento del camper rimangono locali e non vengono mai condivise.",
+  "Efficiency helper": "Assistente all’efficienza"
   },
   "v2": {
     "guide": "Guida",
@@ -245,6 +246,7 @@ window.AniilandLocales["it-IT"]={
     "guide_step_market": "Compra GAME032TOKEN finché non sblocchi GAME071TOKEN.",
     "guide_step_laurel": "Compra GAME071TOKEN finché non sblocchi GAME056TOKEN.",
     "guide_step_flicker": "Poi compra GAME066TOKEN. La ricetta di sblocco si chiama GAME054TOKEN, mentre l’oggetto nel GAME014TOKEN si chiama GAME066TOKEN.",
+    "guide_step_osmanthus": "Quando Osmanthus Rain viene sbloccato, puoi acquistarlo oppure GAME066TOKEN, perché hanno lo stesso valore.",
     "limit_reached": "Hai raggiunto il limite di acquisto?",
     "limit_reset": "Vai al GAME036TOKEN, apri la seconda scheda e rivendi le decorazioni per Bud Tickets. Questo reimposta il limite di acquisto.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → scegli un oggetto → GAME014TOKEN",

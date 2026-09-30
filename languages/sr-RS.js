@@ -224,7 +224,8 @@ window.AniilandLocales["sr-RS"]={
     "Trait": "Особина",
     "Any": "Било који",
     "options on": "опције укључене",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Преместите Анииланд подешавање са десктопа на мобилни или га поделите са неким другим. Укључује подешавања планера, прилагођено подешавање, откључавања/изузимања рецепта, напредак догађаја, активне поруџбине и тренутни изглед планера спрата. Ресурси за надоградњу РВ остају локални и никада се не деле."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Преместите Анииланд подешавање са десктопа на мобилни или га поделите са неким другим. Укључује подешавања планера, прилагођено подешавање, откључавања/изузимања рецепта, напредак догађаја, активне поруџбине и тренутни изглед планера спрата. Ресурси за надоградњу РВ остају локални и никада се не деле.",
+  "Efficiency helper": "Помоћник за ефикасност"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["sr-RS"]={
     "guide_step_market": "Купите GAME032TOKEN док се GAME071TOKEN не откључа.",
     "guide_step_laurel": "Купите GAME071TOKEN док се GAME056TOKEN не откључа.",
     "guide_step_flicker": "Онда купите GAME066TOKEN. Његов рецепт за откључавање се зове GAME054TOKEN, док се GAME014TOKEN ставка зове GAME066TOKEN.",
+    "guide_step_osmanthus": "Када се Osmanthus Rain откључа, можете купити њега или GAME066TOKEN, јер оба имају исту вредност.",
     "limit_reached": "Достигли сте ограничење куповине?",
     "limit_reset": "Идите на GAME036TOKEN, отворите другу картицу и продајте украсе за Буд Тицкетс. Ово ресетује ограничење куповине.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → изаберите ставку → GAME014TOKEN",

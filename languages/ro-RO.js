@@ -224,7 +224,8 @@ window.AniilandLocales["ro-RO"]={
     "Trait": "Trăsătură",
     "Any": "Orice",
     "options on": "opțiuni activate",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Mutați configurația Aniiland între desktop/mobil sau partajați-o cu altcineva. Include setări pentru planificator, configurație personalizată, deblocări/excluderi de rețete, progresul evenimentului, comenzi active și aspectul actual al Planificatorului de etaj. Resursele de upgrade RV rămân locale și nu sunt niciodată partajate."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Mutați configurația Aniiland între desktop/mobil sau partajați-o cu altcineva. Include setări pentru planificator, configurație personalizată, deblocări/excluderi de rețete, progresul evenimentului, comenzi active și aspectul actual al Planificatorului de etaj. Resursele de upgrade RV rămân locale și nu sunt niciodată partajate.",
+  "Efficiency helper": "Ajutor de eficiență"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["ro-RO"]={
     "guide_step_market": "Cumpărați GAME032TOKEN până când GAME071TOKEN se deblochează.",
     "guide_step_laurel": "Cumpărați GAME071TOKEN până când GAME056TOKEN se deblochează.",
     "guide_step_flicker": "Apoi cumpărați GAME066TOKEN. Rețeta sa de deblocare se numește GAME054TOKEN, în timp ce articolul GAME014TOKEN se numește GAME066TOKEN.",
+    "guide_step_osmanthus": "După deblocarea Osmanthus Rain, îl poți cumpăra pe acesta sau GAME066TOKEN, deoarece ambele au aceeași valoare.",
     "limit_reached": "Ați atins limita de achiziție?",
     "limit_reset": "Accesați GAME036TOKEN, deschideți a doua filă și vindeți decorațiunile înapoi pentru biletele Bud. Aceasta resetează limita de achiziție.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → alegeți un articol → GAME014TOKEN",

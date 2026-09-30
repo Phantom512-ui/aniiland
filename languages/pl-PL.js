@@ -224,7 +224,8 @@ window.AniilandLocales["pl-PL"]={
     "Trait": "Cecha",
     "Any": "Każdy",
     "options on": "opcje włączone",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Przenieś swoją konfigurację Aniiland pomiędzy komputerem stacjonarnym/mobilnym lub udostępnij ją komuś innemu. Obejmuje ustawienia planisty, konfigurację niestandardową, odblokowanie/wykluczenie przepisów, postęp wydarzenia, aktywne zamówienia i bieżący układ Planera pięter. Zasoby ulepszeń pojazdów kempingowych pozostają lokalne i nigdy nie są udostępniane."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Przenieś swoją konfigurację Aniiland pomiędzy komputerem stacjonarnym/mobilnym lub udostępnij ją komuś innemu. Obejmuje ustawienia planisty, konfigurację niestandardową, odblokowanie/wykluczenie przepisów, postęp wydarzenia, aktywne zamówienia i bieżący układ Planera pięter. Zasoby ulepszeń pojazdów kempingowych pozostają lokalne i nigdy nie są udostępniane.",
+  "Efficiency helper": "Pomocnik efektywności"
   },
   "v2": {
     "guide": "Poradnik",
@@ -246,6 +247,7 @@ window.AniilandLocales["pl-PL"]={
     "guide_step_market": "Kupuj GAME032TOKEN, aż odblokuje się GAME071TOKEN.",
     "guide_step_laurel": "Kupuj GAME071TOKEN, aż odblokuje się GAME056TOKEN.",
     "guide_step_flicker": "Następnie kupuj GAME066TOKEN. Przepis odblokowujący nazywa się GAME054TOKEN, a przedmiot w GAME014TOKEN nazywa się GAME066TOKEN.",
+    "guide_step_osmanthus": "Gdy odblokuje się Osmanthus Rain, możesz kupić jego lub GAME066TOKEN, ponieważ oba mają taką samą wartość.",
     "limit_reached": "Osiągnięto limit zakupów?",
     "limit_reset": "Przejdź do GAME036TOKEN, otwórz drugą zakładkę i sprzedaj dekoracje za Bud Tickets. Spowoduje to zresetowanie limitu zakupu.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → wybierz przedmiot → GAME014TOKEN",

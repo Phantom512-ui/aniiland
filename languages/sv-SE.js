@@ -224,7 +224,8 @@ window.AniilandLocales["sv-SE"]={
     "Trait": "Drag",
     "Any": "Några",
     "options on": "alternativ på",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Flytta din Aniiland-installation mellan stationär/mobil eller dela den med någon annan. Inkluderar planerarinställningar, anpassade inställningar, receptupplåsningar/uteslutningar, händelseförlopp, aktiva beställningar och den aktuella planlösningen. RV Upgrade Resources förblir lokala och delas aldrig."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Flytta din Aniiland-installation mellan stationär/mobil eller dela den med någon annan. Inkluderar planerarinställningar, anpassade inställningar, receptupplåsningar/uteslutningar, händelseförlopp, aktiva beställningar och den aktuella planlösningen. RV Upgrade Resources förblir lokala och delas aldrig.",
+  "Efficiency helper": "Effektivitetshjälp"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["sv-SE"]={
     "guide_step_market": "Köp GAME032TOKEN tills GAME071TOKEN låses upp.",
     "guide_step_laurel": "Köp GAME071TOKEN tills GAME056TOKEN låses upp.",
     "guide_step_flicker": "Köp sedan GAME066TOKEN. Dess upplåsningsrecept heter GAME054TOKEN, medan objektet GAME014TOKEN heter GAME066TOKEN.",
+    "guide_step_osmanthus": "När Osmanthus Rain låses upp kan du köpa det eller GAME066TOKEN, eftersom båda har samma värde.",
     "limit_reached": "Har du nått köpgränsen?",
     "limit_reset": "Gå till GAME036TOKEN, öppna den andra fliken och sälj tillbaka dekorationerna för Bud-biljetter. Detta återställer köpgränsen.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → välj ett objekt → GAME014TOKEN",

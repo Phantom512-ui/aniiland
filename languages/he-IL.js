@@ -224,7 +224,8 @@ window.AniilandLocales["he-IL"]={
     "Trait": "תְכוּנָה",
     "Any": "כֹּל",
     "options on": "אפשרויות על",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "העבר את הגדרת ה-Aniiland שלך בין שולחן עבודה/נייד או שתף אותו עם מישהו אחר. כולל הגדרות מתכנן, הגדרה מותאמת אישית, ביטולי נעילות/אי הכללות של מתכונים, התקדמות האירוע, הזמנות פעילות ופריסה הנוכחית של מתכנן הרצפה. משאבי שדרוג קרוואנים נשארים מקומיים ולעולם אינם משותפים."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "העבר את הגדרת ה-Aniiland שלך בין שולחן עבודה/נייד או שתף אותו עם מישהו אחר. כולל הגדרות מתכנן, הגדרה מותאמת אישית, ביטולי נעילות/אי הכללות של מתכונים, התקדמות האירוע, הזמנות פעילות ופריסה הנוכחית של מתכנן הרצפה. משאבי שדרוג קרוואנים נשארים מקומיים ולעולם אינם משותפים.",
+  "Efficiency helper": "מסייע יעילות"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["he-IL"]={
     "guide_step_market": "קנה GAME032TOKEN עד לביטול הנעילה של GAME071TOKEN.",
     "guide_step_laurel": "קנה GAME071TOKEN עד לביטול הנעילה של GAME056TOKEN.",
     "guide_step_flicker": "לאחר מכן קנה GAME066TOKEN. המתכון לביטול הנעילה שלו נקרא GAME054TOKEN, בעוד שהפריט GAME014TOKEN נקרא GAME066TOKEN.",
+    "guide_step_osmanthus": "לאחר ש-Osmanthus Rain נפתח, אפשר לקנות אותו או את GAME066TOKEN, כי לשניהם אותו ערך.",
     "limit_reached": "הגעת למגבלת הרכישה?",
     "limit_reset": "עבור אל GAME036TOKEN, פתח את הכרטיסייה השנייה ומכור את הקישוטים בחזרה עבור Bud Tickets. זה מאפס את מגבלת הרכישה.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → בחר פריט → GAME014TOKEN",

@@ -224,7 +224,8 @@ window.AniilandLocales["lt-LT"]={
     "Trait": "Bruožas",
     "Any": "Bet koks",
     "options on": "parinktys įjungtos",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Perkelkite „Aniiland“ sąranką į stalinį / mobilųjį įrenginį arba bendrinkite jį su kuo nors kitu. Apima planuotojo nustatymus, tinkintą sąranką, receptų atrakinimą / išskyrimą, įvykių eigą, aktyvius užsakymus ir dabartinį grindų planavimo priemonės išdėstymą. RV atnaujinimo ištekliai išlieka vietiniai ir niekada nėra dalijami."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Perkelkite „Aniiland“ sąranką į stalinį / mobilųjį įrenginį arba bendrinkite jį su kuo nors kitu. Apima planuotojo nustatymus, tinkintą sąranką, receptų atrakinimą / išskyrimą, įvykių eigą, aktyvius užsakymus ir dabartinį grindų planavimo priemonės išdėstymą. RV atnaujinimo ištekliai išlieka vietiniai ir niekada nėra dalijami.",
+  "Efficiency helper": "Efektyvumo pagalbininkas"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["lt-LT"]={
     "guide_step_market": "Pirkite GAME032TOKEN, kol bus atrakinta GAME071TOKEN.",
     "guide_step_laurel": "Pirkite GAME071TOKEN, kol bus atrakinta GAME056TOKEN.",
     "guide_step_flicker": "Tada pirkite GAME066TOKEN. Jo atrakinimo receptas vadinamas GAME054TOKEN, o GAME014TOKEN elementas vadinamas GAME066TOKEN.",
+    "guide_step_osmanthus": "Kai atrakinamas Osmanthus Rain, galite pirkti jį arba GAME066TOKEN, nes jų vertė vienoda.",
     "limit_reached": "Pasiekėte pirkimo limitą?",
     "limit_reset": "Eikite į GAME036TOKEN, atidarykite antrą skirtuką ir parduokite dekoracijas už „Bud Tickets“. Taip iš naujo nustatomas pirkimo limitas.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → pasirinkite elementą → GAME014TOKEN",

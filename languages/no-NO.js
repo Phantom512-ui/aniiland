@@ -224,7 +224,8 @@ window.AniilandLocales["no-NO"]={
     "Trait": "Egenskap",
     "Any": "Noen",
     "options on": "alternativer på",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Flytt Aniiland-oppsettet ditt mellom skrivebord/mobil eller del det med noen andre. Inkluderer planleggerinnstillinger, tilpasset oppsett, opplåsninger/ekskluderinger av oppskrifter, hendelsesforløp, aktive bestillinger og gjeldende planleggingsoppsett. RV-oppgraderingsressurser forblir lokale og deles aldri."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Flytt Aniiland-oppsettet ditt mellom skrivebord/mobil eller del det med noen andre. Inkluderer planleggerinnstillinger, tilpasset oppsett, opplåsninger/ekskluderinger av oppskrifter, hendelsesforløp, aktive bestillinger og gjeldende planleggingsoppsett. RV-oppgraderingsressurser forblir lokale og deles aldri.",
+  "Efficiency helper": "Effektivitetshjelper"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["no-NO"]={
     "guide_step_market": "Kjøp GAME032TOKEN til GAME071TOKEN låses opp.",
     "guide_step_laurel": "Kjøp GAME071TOKEN til GAME056TOKEN låses opp.",
     "guide_step_flicker": "Kjøp deretter GAME066TOKEN. Opplåsingsoppskriften heter GAME054TOKEN, mens elementet GAME014TOKEN heter GAME066TOKEN.",
+    "guide_step_osmanthus": "Når Osmanthus Rain låses opp, kan du kjøpe det eller GAME066TOKEN, siden begge har samme verdi.",
     "limit_reached": "Har du nådd kjøpsgrensen?",
     "limit_reset": "Gå til GAME036TOKEN, åpne den andre fanen, og selg dekorasjonene tilbake for Bud-billetter. Dette tilbakestiller kjøpsgrensen.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → velg et element → GAME014TOKEN",

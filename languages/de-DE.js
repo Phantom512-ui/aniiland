@@ -224,7 +224,8 @@ window.AniilandLocales["de-DE"]={
     "Trait": "Eigenschaft",
     "Any": "Beliebig",
     "options on": "Optionen auf",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Verschieben Sie Ihr Aniiland-Setup zwischen Desktop/Mobilgerät oder teilen Sie es mit jemand anderem. Beinhaltet Planereinstellungen, benutzerdefinierte Einrichtung, Rezeptfreischaltungen/-ausschlüsse, Veranstaltungsfortschritt, aktive Bestellungen und das aktuelle Layout des Raumplaners. RV-Upgrade-Ressourcen bleiben lokal und werden niemals weitergegeben."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Verschieben Sie Ihr Aniiland-Setup zwischen Desktop/Mobilgerät oder teilen Sie es mit jemand anderem. Beinhaltet Planereinstellungen, benutzerdefinierte Einrichtung, Rezeptfreischaltungen/-ausschlüsse, Veranstaltungsfortschritt, aktive Bestellungen und das aktuelle Layout des Raumplaners. RV-Upgrade-Ressourcen bleiben lokal und werden niemals weitergegeben.",
+  "Efficiency helper": "Effizienzhelfer"
   },
   "v2": {
     "guide": "Leitfaden",
@@ -245,6 +246,7 @@ window.AniilandLocales["de-DE"]={
     "guide_step_market": "Kaufe GAME032TOKEN, bis GAME071TOKEN freigeschaltet wird.",
     "guide_step_laurel": "Kaufe GAME071TOKEN, bis GAME056TOKEN freigeschaltet wird.",
     "guide_step_flicker": "Kaufe danach GAME066TOKEN. Das Freischaltrezept heißt GAME054TOKEN, während der Gegenstand im GAME014TOKEN GAME066TOKEN heißt.",
+    "guide_step_osmanthus": "Sobald Osmanthus Rain freigeschaltet ist, kannst du es oder GAME066TOKEN kaufen, da beide denselben Wert haben.",
     "limit_reached": "Kauflimit erreicht?",
     "limit_reset": "Gehe zum GAME036TOKEN, öffne den zweiten Tab und verkaufe die Dekorationen für Bud Tickets zurück. Dadurch wird das Kauflimit zurückgesetzt.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → Gegenstand auswählen → GAME014TOKEN",

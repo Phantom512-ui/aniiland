@@ -224,7 +224,8 @@ window.AniilandLocales["bg-BG"]={
     "Trait": "Черта",
     "Any": "Всякакви",
     "options on": "включени опции",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Преместете вашата настройка на Aniiland между настолен/мобилен телефон или я споделете с някой друг. Включва настройки за планиране, персонализирана настройка, отключване/изключване на рецепти, напредък на събитието, активни поръчки и текущото оформление на етажния планер. Ресурсите за надграждане на RV остават локални и никога не се споделят."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Преместете вашата настройка на Aniiland между настолен/мобилен телефон или я споделете с някой друг. Включва настройки за планиране, персонализирана настройка, отключване/изключване на рецепти, напредък на събитието, активни поръчки и текущото оформление на етажния планер. Ресурсите за надграждане на RV остават локални и никога не се споделят.",
+  "Efficiency helper": "Помощник за ефективност"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["bg-BG"]={
     "guide_step_market": "Купете GAME032TOKEN до отключване на GAME071TOKEN.",
     "guide_step_laurel": "Купете GAME071TOKEN до отключване на GAME056TOKEN.",
     "guide_step_flicker": "След това купете GAME066TOKEN. Неговата рецепта за отключване се нарича GAME054TOKEN, докато елементът GAME014TOKEN се нарича GAME066TOKEN.",
+    "guide_step_osmanthus": "След като Osmanthus Rain се отключи, можете да купите него или GAME066TOKEN, тъй като и двете имат еднаква стойност.",
     "limit_reached": "Достигнахте лимита за покупки?",
     "limit_reset": "Отидете до GAME036TOKEN, отворете втория раздел и продайте декорациите обратно за Bud Tickets. Това нулира лимита за покупки.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → изберете елемент → GAME014TOKEN",

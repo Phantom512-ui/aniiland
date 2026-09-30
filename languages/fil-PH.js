@@ -224,7 +224,8 @@ window.AniilandLocales["fil-PH"]={
     "Trait": "ugali",
     "Any": "Anuman",
     "options on": "mga opsyon sa",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Ilipat ang iyong Aniiland setup sa pagitan ng desktop/mobile o ibahagi ito sa ibang tao. Kasama ang mga setting ng planner, Custom na Setup, mga pag-unlock/pagbubukod ng recipe, pag-usad ng kaganapan, mga aktibong order, at ang kasalukuyang layout ng Floor Planner. Ang RV Upgrade Resources ay mananatiling lokal at hindi kailanman ibinabahagi."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Ilipat ang iyong Aniiland setup sa pagitan ng desktop/mobile o ibahagi ito sa ibang tao. Kasama ang mga setting ng planner, Custom na Setup, mga pag-unlock/pagbubukod ng recipe, pag-usad ng kaganapan, mga aktibong order, at ang kasalukuyang layout ng Floor Planner. Ang RV Upgrade Resources ay mananatiling lokal at hindi kailanman ibinabahagi.",
+  "Efficiency helper": "Katulong sa kahusayan"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["fil-PH"]={
     "guide_step_market": "Bumili ng GAME032TOKEN hanggang GAME071TOKEN ma-unlock.",
     "guide_step_laurel": "Bumili ng GAME071TOKEN hanggang GAME056TOKEN ma-unlock.",
     "guide_step_flicker": "Pagkatapos ay bumili ng GAME066TOKEN. Ang recipe ng pag-unlock nito ay tinatawag na GAME054TOKEN, habang ang item na GAME014TOKEN ay tinatawag na GAME066TOKEN.",
+    "guide_step_osmanthus": "Kapag na-unlock ang Osmanthus Rain, maaari mong bilhin ito o ang GAME066TOKEN dahil pareho ang halaga ng mga ito.",
     "limit_reached": "Naabot na ang limitasyon sa pagbili?",
     "limit_reset": "Pumunta sa GAME036TOKEN, buksan ang pangalawang tab, at ibenta muli ang mga dekorasyon para sa Bud Tickets. Nire-reset nito ang limitasyon sa pagbili.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → pumili ng item → GAME014TOKEN",

@@ -224,7 +224,8 @@ window.AniilandLocales["ms-MY"]={
     "Trait": "sifat",
     "Any": "mana-mana",
     "options on": "pilihan pada",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Alihkan persediaan Aniiland anda antara desktop/mudah alih atau kongsikannya dengan orang lain. Termasuk tetapan perancang, Persediaan Tersuai, buka kunci/pengecualian resipi, kemajuan acara, pesanan aktif dan reka letak Perancang Lantai semasa. Sumber Peningkatan RV kekal setempat dan tidak pernah dikongsi."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Alihkan persediaan Aniiland anda antara desktop/mudah alih atau kongsikannya dengan orang lain. Termasuk tetapan perancang, Persediaan Tersuai, buka kunci/pengecualian resipi, kemajuan acara, pesanan aktif dan reka letak Perancang Lantai semasa. Sumber Peningkatan RV kekal setempat dan tidak pernah dikongsi.",
+  "Efficiency helper": "Pembantu kecekapan"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["ms-MY"]={
     "guide_step_market": "Beli GAME032TOKEN sehingga GAME071TOKEN dibuka.",
     "guide_step_laurel": "Beli GAME071TOKEN sehingga GAME056TOKEN dibuka.",
     "guide_step_flicker": "Kemudian beli GAME066TOKEN. Resipi buka kuncinya dipanggil GAME054TOKEN, manakala item GAME014TOKEN dipanggil GAME066TOKEN.",
+    "guide_step_osmanthus": "Apabila Osmanthus Rain dibuka, anda boleh membeli Osmanthus Rain atau GAME066TOKEN kerana kedua-duanya mempunyai nilai yang sama.",
     "limit_reached": "Mencapai had pembelian?",
     "limit_reset": "Pergi ke GAME036TOKEN, buka tab kedua dan jual semula hiasan itu untuk Tiket Bud. Ini menetapkan semula had pembelian.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → pilih item → GAME014TOKEN",

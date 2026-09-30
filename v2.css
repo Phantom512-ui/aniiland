@@ -920,22 +920,30 @@
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:36px;
+  width:auto;
+  min-width:150px;
   height:36px;
-  flex:0 0 36px;
+  flex:0 0 auto;
+  gap:7px;
+  padding:0 11px;
   margin-left:8px;
   border:1px solid rgba(255,255,255,.14);
   border-radius:9px;
   background:#ff5e5b;
   box-shadow:0 4px 12px rgba(0,0,0,.18);
+  color:#fff;
+  font:700 12px/1 Manrope,sans-serif;
+  white-space:nowrap;
+  text-decoration:none;
   transition:transform .15s ease,filter .15s ease;
 }
 .kofi-button:hover { transform:translateY(-1px); filter:brightness(1.06); }
-.kofi-button svg { width:23px; height:23px; fill:#fff; display:block; }
+.kofi-button svg { width:23px; height:23px; fill:#dfc9ff; display:block; flex:0 0 23px; }
+.kofi-button span { display:block; }
 
 @media (max-width:760px) {
-  .kofi-button { width:32px; height:32px; flex-basis:32px; margin-left:4px; }
-  .kofi-button svg { width:20px; height:20px; }
+  .kofi-button { min-width:145px; height:32px; flex-basis:auto; margin-left:4px; gap:6px; padding:0 9px; font-size:11px; }
+  .kofi-button svg { width:20px; height:20px; flex-basis:20px; }
 }
 
 .event-recipe-warning-dialog {

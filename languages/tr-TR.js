@@ -224,7 +224,8 @@ window.AniilandLocales["tr-TR"]={
     "Trait": "Karakter",
     "Any": "Herhangi",
     "options on": "seçenekler açık",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Aniiland kurulumunuzu masaüstü/mobil arasında taşıyın veya başka biriyle paylaşın. Planlayıcı ayarlarını, Özel Kurulumu, tarifin kilidini açma/hariç tutmaları, etkinlik ilerlemesini, etkin siparişleri ve mevcut Kat Planlayıcı düzenini içerir. RV Yükseltme Kaynakları yerel kalır ve asla paylaşılmaz."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Aniiland kurulumunuzu masaüstü/mobil arasında taşıyın veya başka biriyle paylaşın. Planlayıcı ayarlarını, Özel Kurulumu, tarifin kilidini açma/hariç tutmaları, etkinlik ilerlemesini, etkin siparişleri ve mevcut Kat Planlayıcı düzenini içerir. RV Yükseltme Kaynakları yerel kalır ve asla paylaşılmaz.",
+  "Efficiency helper": "Verimlilik yardımcısı"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["tr-TR"]={
     "guide_step_market": "GAME071TOKEN'in kilidi açılana kadar GAME032TOKEN'yi satın alın.",
     "guide_step_laurel": "GAME056TOKEN kilidi açılana kadar GAME071TOKEN satın alın.",
     "guide_step_flicker": "Daha sonra GAME066TOKEN satın alın. Kilit açma tarifinin adı GAME054TOKEN, GAME014TOKEN öğesinin adı ise GAME066TOKEN'dır.",
+    "guide_step_osmanthus": "Osmanthus Rain açıldığında, ikisini de aynı değerde oldukları için Osmanthus Rain veya GAME066TOKEN satın alabilirsin.",
     "limit_reached": "Satın alma sınırına ulaştınız mı?",
     "limit_reset": "GAME036TOKEN'a gidin, ikinci sekmeyi açın ve dekorasyonları Bud Biletleri karşılığında geri satın. Bu, satın alma limitini sıfırlar.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → bir öğe seçin → GAME014TOKEN",

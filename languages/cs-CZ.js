@@ -224,7 +224,8 @@ window.AniilandLocales["cs-CZ"]={
     "Trait": "Vlastnost",
     "Any": "Žádný",
     "options on": "možnosti zapnuty",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Přesuňte své nastavení Aniiland mezi stolním počítačem/mobilem nebo jej sdílejte s někým jiným. Zahrnuje nastavení plánovače, vlastní nastavení, odemknutí/vyloučení receptu, průběh události, aktivní objednávky a aktuální rozvržení půdorysu. Zdroje pro upgrade RV zůstávají místní a nikdy nejsou sdíleny."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Přesuňte své nastavení Aniiland mezi stolním počítačem/mobilem nebo jej sdílejte s někým jiným. Zahrnuje nastavení plánovače, vlastní nastavení, odemknutí/vyloučení receptu, průběh události, aktivní objednávky a aktuální rozvržení půdorysu. Zdroje pro upgrade RV zůstávají místní a nikdy nejsou sdíleny.",
+  "Efficiency helper": "Pomocník efektivity"
   },
   "v2": {
     "harvest_moon_festival": "GAME001TOKEN",
@@ -252,6 +253,7 @@ window.AniilandLocales["cs-CZ"]={
     "guide_step_market": "Kupte GAME032TOKEN, dokud se GAME071TOKEN neodemkne.",
     "guide_step_laurel": "Kupte GAME071TOKEN, dokud se GAME056TOKEN neodemkne.",
     "guide_step_flicker": "Pak kupte GAME066TOKEN. Jeho recept na odemknutí se nazývá GAME054TOKEN, zatímco položka GAME014TOKEN se nazývá GAME066TOKEN.",
+    "guide_step_osmanthus": "Po odemknutí Osmanthus Rain si můžete koupit Osmanthus Rain nebo GAME066TOKEN, protože oba mají stejnou hodnotu.",
     "limit_reached": "Dosáhli jste limitu nákupu?",
     "limit_reset": "Přejděte na GAME036TOKEN, otevřete druhou kartu a prodejte dekorace zpět za vstupenky Bud. Tím se resetuje limit nákupu.",
     "furniture_path": "GAME014TOKEN: GAME072TOKEN (9) → GAME029TOKEN → GAME042TOKEN → vybrat položku → GAME014TOKEN",

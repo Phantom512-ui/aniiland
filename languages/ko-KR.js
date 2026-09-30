@@ -224,7 +224,8 @@ window.AniilandLocales["ko-KR"]={
     "Trait": "특성",
     "Any": "어느",
     "options on": "옵션",
-    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Aniiland 설정을 데스크톱/모바일 간에 이동하거나 다른 사람과 공유하세요. 플래너 설정, 사용자 정의 설정, 레시피 잠금 해제/제외, 이벤트 진행, 활성 주문 및 현재 Floor Planner 레이아웃이 포함됩니다. RV 업그레이드 리소스는 로컬로 유지되며 공유되지 않습니다."
+    "Move your Aniiland setup between desktop/mobile or share it with someone else. Includes planner settings, Custom Setup, recipe unlocks/exclusions, event progress, active orders, and the current Floor Planner layout. RV Upgrade Resources stay local and are never shared.": "Aniiland 설정을 데스크톱/모바일 간에 이동하거나 다른 사람과 공유하세요. 플래너 설정, 사용자 정의 설정, 레시피 잠금 해제/제외, 이벤트 진행, 활성 주문 및 현재 Floor Planner 레이아웃이 포함됩니다. RV 업그레이드 리소스는 로컬로 유지되며 공유되지 않습니다.",
+  "Efficiency helper": "효율 도우미"
   },
   "v2": {
     "guide": "가이드",
@@ -277,6 +278,7 @@ window.AniilandLocales["ko-KR"]={
     "guide_step_market": "GAME071TOKEN이 잠금 해제될 때까지 GAME032TOKEN를 구매하세요.",
     "guide_step_laurel": "GAME056TOKEN이 잠금 해제될 때까지 GAME071TOKEN을 구매하세요.",
     "guide_step_flicker": "그런 다음 GAME066TOKEN을 구매하세요. 잠금 해제 레시피는 GAME054TOKEN라고 하고, GAME014TOKEN 항목은 GAME066TOKEN이라고 합니다.",
+    "guide_step_osmanthus": "Osmanthus Rain이 잠금 해제되면 Osmanthus Rain 또는 GAME066TOKEN을 구매할 수 있습니다. 둘의 가치가 동일합니다.",
     "limit_reset": "GAME036TOKEN으로 이동하여 두 번째 탭을 열고 장식을 버드 티켓으로 다시 판매하세요. 구매 한도가 재설정됩니다.",
     "recommended_event_farmlands": "추천 이벤트 GAME046TOKEN:",
     "two_farms_enough": "두 개의 예약된 GAME046TOKEN은 이벤트 주문 및 이벤트 일일을 공급하기에 충분합니다.",
