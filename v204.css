@@ -697,3 +697,29 @@
 .event-food-warning{flex-basis:100%;margin:8px 0 0;font-size:12px;line-height:1.5;max-width:100%}
 .event-v2-headbar>.event-food-warning{grid-column:1/-1}
 .source-block{min-width:0;overflow-wrap:anywhere}.source-block code,.source-block a{white-space:normal;overflow-wrap:anywhere}
+
+/* Phone production rows: readable names instead of compressed table columns. */
+@media(max-width:760px){
+ .mobile-production-table{overflow:visible;}
+ .mobile-production-table table,.mobile-production-table tbody{display:block!important;width:100%!important;min-width:0!important;max-width:100%;}
+ .mobile-production-table thead{display:none;}
+ .mobile-production-table tbody>tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:16px;border-bottom:1px solid #ffffff18;}
+ .mobile-production-table tbody>tr:last-child{border-bottom:0;}
+ .mobile-production-table tbody>tr>td{display:block!important;width:auto!important;min-width:0;padding:0!important;border:0;white-space:normal;word-break:normal;overflow-wrap:normal;}
+ .mobile-production-table tbody>tr>td:first-child{grid-column:1/-1;}
+ .mobile-production-table tbody>tr>td:nth-child(2){font-size:14px;line-height:1.65;}
+ .mobile-production-table tbody>tr>td:nth-child(3){align-self:start;font-size:13px;line-height:1.65;padding-left:8px!important;}
+ .mobile-production-table tbody>tr>td:nth-child(n+4){display:none!important;}
+ .mobile-production-table .craft-product-facility{grid-template-columns:46px minmax(0,1fr);column-gap:10px;min-height:50px;}
+ .mobile-production-table .craft-facility-icon{width:46px;height:46px;grid-row:1;}
+ .mobile-production-table .craft-facility-icon .facility-mini-icon{width:44px!important;height:44px!important;max-width:44px!important;max-height:44px!important;}
+ .mobile-production-table .craft-product-info{min-width:0;gap:6px;}
+ .mobile-production-table .craft-product-top{display:block!important;}
+ .mobile-production-table .craft-product-title{display:flex!important;gap:7px;font-size:15px;line-height:1.4;}
+ .mobile-production-table .craft-product-title>img{width:30px!important;height:30px!important;max-width:30px!important;max-height:30px!important;}
+ .mobile-production-table .craft-product-title .item-link{display:inline!important;white-space:normal!important;overflow:visible;text-overflow:clip;word-break:normal;overflow-wrap:normal;}
+ .mobile-production-table .craft-facility-name{font-size:12px;line-height:1.45;word-break:normal;overflow-wrap:normal;}
+ .mobile-production-table .recipe-module-note{display:none!important;}
+ .mobile-production-table .production-use-tag{display:block;margin:10px 0 0;padding:5px 8px;font-size:11px;line-height:1.5;word-break:normal;overflow-wrap:normal;max-width:100%;box-sizing:border-box;}
+ .production-card .production-use-tag{display:block;font-size:11px;line-height:1.5;word-break:normal;overflow-wrap:normal;}
+}
