@@ -15634,10 +15634,10 @@ return {renderLayoutPlanner,autoRedeployLayout,exportLayoutShareState,importLayo
 const {renderLayoutPlanner,autoRedeployLayout,exportLayoutShareState,importLayoutShareState}=__ANIILAND_LAYOUT;
 (async()=>{
 document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="v12.css">');
-document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="v204.css">');
+document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="v204.css?v=2.0.6">');
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const data=__ANIILAND_DATA;
-const APP_VERSION='2.0.4';
+const APP_VERSION='2.0.6';
 const PLAN_MODEL_SCHEMA=17;
 const versionEl=document.querySelector('.version');if(versionEl)versionEl.innerHTML='<b>'+APP_VERSION+'</b><small>30 September</small>';
 const byId=new Map(data.items.map(i=>[i.id,i]));const fmt=(n,d=0)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
@@ -16225,7 +16225,7 @@ function growGatherAvailabilityNote(item){
  return '';
 }
 function craftingAvailabilityNote(item){
- if(item?.currency==='none')return `<div class="recipe-module-note"><span class="recipe-upgrade-tag">RV Upgrade Material</span></div>`;
+ if(item?.currency==='none')return '';
  if(item?.module)return `<div class="recipe-module-note"><span>${esc(moduleRequirementLabel(item))}</span><button type="button" class="recipe-lock-btn" data-lock-recipe="${esc(item.id)}">Recipe locked in game?</button></div>`;
  if(isPremiumRecipe(item))return `<div class="recipe-module-note"><span class="recipe-premium-tag">Premium Recipe</span><button type="button" class="recipe-lock-btn" data-lock-recipe="${esc(item.id)}">Recipe locked in game?</button></div>`;
  return '';

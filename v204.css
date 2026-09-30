@@ -699,7 +699,7 @@
 .source-block{min-width:0;overflow-wrap:anywhere}.source-block code,.source-block a{white-space:normal;overflow-wrap:anywhere}
 
 /* Phone production rows: readable names instead of compressed table columns. */
-@media(max-width:760px){
+@media(max-width:760px), (max-width:960px) and (pointer:coarse){
  .mobile-production-table{overflow:visible;}
  .mobile-production-table table,.mobile-production-table tbody{display:block!important;width:100%!important;min-width:0!important;max-width:100%;}
  .mobile-production-table thead{display:none;}
