@@ -34,46 +34,50 @@
   };
   const finalizeRect=r=>r?{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.right-r.left,height:r.bottom-r.top}:null;
 
-  const steps=[
+  const tr=s=>window.AniilandI18n?.t?.(s)||s;
+  const ft=(key,fallback)=>window.AniilandFeatureText?.t?.(key,fallback)||fallback;
+  let steps=[];
+  const buildSteps=()=>[
     {
-      title:'Set your RV level',
+      title:tr('Your RV Level'),
       getEls(){return [$('.planner-sidebar .eyebrow'),$('.level-heading'),$('#level'),$('.setup-mode-main')].filter(Boolean)},
-      copy:'<p>Start by setting the <b>RV level</b> you are actually on. <b>Simple Setup</b> fills in the normal facility counts, unlocks, and modules for that RV automatically.</p><p>Use <b>Custom Setup</b> only when your Homeland is different, or if you lack or don’t want to use certain facilities/modules.</p>'
+      copy:`<p>${ft('setup','Simple Setup uses the normal RV defaults. Custom Setup lets you match the facilities and RV Components you actually own.')}</p>`
     },
     {
-      title:'Choose your planning goal',
+      title:tr('Your Homeland Goal'),
       getEls(){return [$('#strategy-grid'),$('.goal-shared-note')].filter(Boolean)},
-      copy:'<p><b>Most Coins</b> spends your spare Homeland capacity on coin profit. <b>Simplest RV Upgrade</b> keeps the plan focused on the cleanest path to the next RV.</p><p><b>Coins &amp; AniiEXP</b> uses spare capacity for Growth items, and <b>Coins &amp; AniiEXP &amp; Aniipods</b> adds Aniipod production too. The three general production goals keep the normal RV-upgrade timing. Simplest RV Upgrade is more aggressive: it keeps both upgrade-material chains running and builds extra Home Coins for the next level.</p>'
+      copy:`<p>${ft('goal','Choose what the planner should prioritize while it keeps the required RV upgrade materials running.')}</p>`
     },
     {
-      title:'Choose worker strength and plan length',
-      getEls(){return [$('#worker'),$('label[for="hours"]'),$('#hours')].filter(Boolean)},
-      copy:'<p><b>Minimum</b> uses the lowest ability levels that can do the jobs. <b>Recommended Lv.3+</b> is the normal fast setup. <b>Best available Lv.4</b> uses verified Lv.4 workers and prefers Prismana picks where they actually help.</p><p>The duration only changes for how long we plan the production and the seed supply for it. <b>Till the next RV level</b> is set to run until the slowest upgrade requirement is met.</p>'
+      title:tr('Your Aniimo Workers'),
+      getEls(){return [$('#worker')?.previousElementSibling,$('#worker'),$('#custom-aniimo-open')].filter(Boolean)},
+      copy:`<p>${ft('workers','Minimum uses the lowest valid trait level. Trait Level 3 is the recommended default. Lv.4 uses the best verified workers.')}</p>`
     },
     {
-      title:'Use the Sections menu to read the result',
+      title:tr('Sections'),
       getEls(){return [$('#plan-quick-nav')].filter(Boolean)},
-      copy:'<p>The floating <b>Sections</b> menu is the fastest way to move around a finished plan. It jumps you straight to the important parts instead of making you scroll through the whole page.</p><p><b>Overview</b> shows the headline result, <b>What to Grow &amp; Gather</b> and <b>What to Craft</b> show what each facility should run, <b>Aniimo Needed</b> shows the worker types and recommendations, and <b>Climate / Light / Power</b> shows the support setup behind the plan.</p>'
+      copy:`<p>${ft('results','Use the result sections to see what to grow, produce, sell, and which Aniimos and support facilities are needed.')}</p>`
     },
     {
-      title:'Track seasonal progress in the Event Center',
+      title:tr('Event Center'),
       getEls(){return [$('#event-center-btn')].filter(Boolean)},
-      copy:'<p>The <b>Event Center</b> is where the Harvest Moon event lives. It keeps the normal planner cleaner by putting the event tools in one place.</p><p>Use it to reserve the event farms, track unlocks, manage event orders and daily tasks, and check the current event strategy.</p>'
+      copy:`<p>${ft('event','Event Center keeps seasonal tools separate from the normal production plan.')}</p>`
     },
     {
-      title:'Use Order Solver for temporary requests',
+      title:tr('Order Solver'),
       getEls(){return [$('.order-fab-row'),$('.order-panel')].filter(Boolean)},
-      copy:'<p><b>Order Solver</b> is for temporary orders that you want to clear without rebuilding the whole permanent plan by hand.</p><p>Add your active orders there and Aniiland will show the temporary switches needed to make them, while keeping the main production setup intact.</p>'
+      copy:`<p>${ft('orders','Order Solver handles temporary orders without replacing the permanent production plan.')}</p>`
     },
     {
-      title:'Finish with the Floor Planner',
+      title:tr('Floor Planner'),
       getEls(){return [header.querySelector('nav [data-tab="layout"]')].filter(Boolean)},
-      copy:'<p>Once the Production Plan looks right, open <b>Floor Planner</b> and press <b>Auto-place current production plan</b>. It lays out the active facilities, climate support, storage, and Crackle power coverage for you.</p><p>It is a starting point, not a lock. You can still drag things around afterward and fine-tune the layout manually.</p>'
+      copy:`<p>${ft('floor','Floor Planner turns the current plan into a layout. Changes made while it is open redeploy automatically; Reverse Layout restores one of the last five layouts.')}</p>`
     }
   ];
 
   const targetForStep=step=>{
     const els=typeof step.getEls==='function'?step.getEls():[];
+    for(const el of els){const disclosure=el?.closest('details');if(disclosure)disclosure.open=true;}
     const rect=finalizeRect(unionRect(els));
     const target=els.find(visible)||$('.planner-sidebar')||header;
     return {target,rect};
@@ -92,6 +96,7 @@
 
   function place(){
     if(overlay.hidden||!activeRect)return;
+    activeRect=targetForStep(steps[index]).rect||activeRect;
     const pad=isPhone()?8:12;
     const left=Math.max(8,activeRect.left-pad);
     const top=Math.max(8,activeRect.top-pad);
@@ -146,16 +151,18 @@
     setTimeout(place,80);
   }
 
-  function open(){index=0;overlay.hidden=false;document.documentElement.classList.add('guide-open');render()}
+  function open(){steps=buildSteps();index=0;overlay.hidden=false;document.documentElement.classList.add('guide-open');render()}
   function close(){overlay.hidden=true;document.documentElement.classList.remove('guide-open');activeRect=null}
 
   btn.addEventListener('click',open);
   overlay.addEventListener('click',e=>{
+    if(!card.contains(e.target))return close();
     if(e.target.closest('[data-guide-close]'))return close();
     if(e.target.closest('[data-guide-back]')){if(index>0){index--;render()}return}
     if(e.target.closest('[data-guide-next]')){if(index>=steps.length-1)return close();index++;render();return}
   });
   window.addEventListener('resize',()=>{if(resizeRaf)return;resizeRaf=requestAnimationFrame(()=>{resizeRaf=0;place()})});
-  window.addEventListener('scroll',()=>{if(!overlay.hidden)place()},{passive:true});
+  window.addEventListener('aniiland:languagechange',()=>{if(!overlay.hidden){steps=buildSteps();index=Math.min(index,steps.length-1);render()}});
+  document.addEventListener('scroll',()=>{if(!overlay.hidden)place()},{passive:true,capture:true});
   document.addEventListener('keydown',e=>{if(!overlay.hidden&&e.key==='Escape')close()});
 })();

@@ -4,12 +4,33 @@
   const toggle=document.querySelector('[data-mobile-settings-toggle]');
   const summary=document.querySelector('[data-mobile-settings-summary]');
   if(!sidebar||!toggle||!summary)return;
+  const settingsDisclosures=[...sidebar.querySelectorAll('[data-mobile-expand]')];
+  const mobileDisclosureState=new Map();
 
   const getGoal=()=>document.querySelector('#strategy-grid .goal-btn.active')?.textContent?.trim()||document.querySelector('#strategy')?.selectedOptions?.[0]?.textContent?.trim()||'Planner';
+  const getWorkerSummary=()=>{
+    if(document.querySelector('#custom-aniimo-open.active'))return window.AniilandI18n?.t?.('Custom Aniimo Team')||'Custom Aniimo Team';
+    const mode=document.querySelector('#worker button.active')?.dataset.worker;
+    const worker=mode==='minimum'?'Minimum':mode==='4'?'Lv.4 Prismana':'Trait Lvl.3';
+    const enabled=['bonus','climate','light-climate','emode'].filter(id=>{
+      const input=document.getElementById(id);
+      return input&&!input.disabled&&input.checked;
+    }).length;
+    return `${window.AniilandI18n?.t?.(worker)||worker} · ${enabled} ${window.AniilandV2Text?.t?.('options_on')||'options on'}`;
+  };
+  const updateSettingsChoices=()=>{
+    const goalChoice=document.querySelector('[data-settings-choice="goal"]');
+    const workerChoice=document.querySelector('[data-settings-choice="workers"]');
+    if(goalChoice)goalChoice.textContent=getGoal();
+    if(workerChoice)workerChoice.textContent=getWorkerSummary();
+  };
   const updateSummary=()=>{
     const rv=document.querySelector('#level-value')?.textContent?.trim()||document.querySelector('#level')?.value||'—';
     summary.textContent=`RV ${rv} · ${getGoal()}`;
+    updateSettingsChoices();
   };
+  window.addEventListener('aniiland:languagechange',updateSummary);
+  window.addEventListener('aniiland:gamelanguagechange',updateSummary);
   const setOpen=(open)=>{
     if(!mq.matches)open=false;
     sidebar.classList.toggle('mobile-settings-open',!!open);
@@ -19,23 +40,41 @@
   };
   const syncMode=()=>{
     document.documentElement.classList.toggle('aniiland-phone',mq.matches);
+    settingsDisclosures.forEach(disclosure=>{
+      if(mq.matches){
+        if(!mobileDisclosureState.has(disclosure))mobileDisclosureState.set(disclosure,disclosure.open);
+        disclosure.open=true;
+      }else if(mobileDisclosureState.has(disclosure)){
+        disclosure.open=mobileDisclosureState.get(disclosure);
+        mobileDisclosureState.delete(disclosure);
+      }
+    });
     if(!mq.matches)setOpen(false);
     updateSummary();
   };
 
   toggle.addEventListener('click',()=>setOpen(!sidebar.classList.contains('mobile-settings-open')));
   document.addEventListener('click',e=>{
-    if(!mq.matches)return;
-    if(e.target.closest('header nav [data-tab]'))setOpen(false);
-    if(e.target.closest('#optimize'))setOpen(false);
+    if(!mq.matches||document.documentElement.classList.contains('guide-open'))return;
+    if(!sidebar.contains(e.target)||e.target.closest('header nav [data-tab]')||e.target.closest('#optimize'))setOpen(false);
+  });
+  document.addEventListener('keydown',e=>{
+    if(!mq.matches||e.key!=='Escape'||!sidebar.classList.contains('mobile-settings-open'))return;
+    setOpen(false);
+    toggle.focus();
   });
 
   const level=document.querySelector('#level-value');
   const goals=document.querySelector('#strategy-grid');
+  const workers=document.querySelector('#worker');
   if(level)new MutationObserver(updateSummary).observe(level,{childList:true,subtree:true,characterData:true});
   if(goals)new MutationObserver(updateSummary).observe(goals,{attributes:true,subtree:true,attributeFilter:['class']});
+  if(workers)new MutationObserver(updateSettingsChoices).observe(workers,{attributes:true,subtree:true,attributeFilter:['class']});
   document.querySelector('#strategy')?.addEventListener('change',updateSummary);
-
+  sidebar.addEventListener('change',e=>{
+    if(e.target.matches('#bonus,#climate,#light-climate,#emode'))updateSettingsChoices();
+  });
+  updateSettingsChoices();
 
   // Mobile Production Plan quick tree: reuse the desktop navigator, but make it
   // feel like a compact phone drawer. The app creates it lazily after RV changes.
