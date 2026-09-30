@@ -726,3 +726,8 @@
 
 /* Reserve a screen of content while the first production plan is calculated. */
 #content{min-height:100vh;min-height:100svh;}
+
+/* Keep desktop settings below the sticky site header. */
+@media(min-width:1101px){
+ .shell>.planner-sidebar{top:var(--planner-header-height,88px);height:calc(100vh - var(--planner-header-height,88px));height:calc(100dvh - var(--planner-header-height,88px));overflow-y:auto;}
+}
