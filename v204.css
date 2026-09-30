@@ -723,3 +723,6 @@
  .mobile-production-table .production-use-tag{display:block;margin:10px 0 0;padding:5px 8px;font-size:11px;line-height:1.5;word-break:normal;overflow-wrap:normal;max-width:100%;box-sizing:border-box;}
  .production-card .production-use-tag{display:block;font-size:11px;line-height:1.5;word-break:normal;overflow-wrap:normal;}
 }
+
+/* Reserve a screen of content while the first production plan is calculated. */
+#content{min-height:100vh;min-height:100svh;}
