@@ -13444,8 +13444,8 @@ const __ANIILAND_DATA={
       2
     ],
     "Sunlamp": [
-      2,
-      2
+      1,
+      1
     ],
     "Carousel Mill": [
       5.5,
@@ -13484,8 +13484,8 @@ const __ANIILAND_DATA={
       2
     ],
     "Joy Wheel Loom": [
-      3,
-      3
+      4,
+      4
     ],
     "Woodworking Bench": [
       2,
