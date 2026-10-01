@@ -14043,6 +14043,7 @@ const __ANIILAND_WORKER_SOURCE=[
   "    const cap=facilityAtLeast(settings,i.facility,i.facilityLevel);",
   "    integers.push(`z${n}`,`zw${n}`,`zu${n}`);",
   "    bounds.push(`0 <= z${n} <= ${cap}`,`0 <= zw${n} <= ${cap}`,`0 <= zu${n} <= ${cap}`);",
+  "    const placementCap=Number(settings.climatePlacementCaps?.[i.id]);if(i.environment&&Number.isFinite(placementCap))add([[1,`z${n}`]],'<=',Math.max(0,Math.min(cap,Math.floor(placementCap))));",
   "    add([[1,`z${n}`],[-1,`zw${n}`],[-1,`zu${n}`]],'=',0);",
   "    const normalThroughput=3600/i.seconds,wateredThroughput=normalThroughput*(4/3);",
   "    add([[1,`q${n}`],[-wateredThroughput,`zw${n}`],[-normalThroughput,`zu${n}`]],'<=',0);",
@@ -14407,6 +14408,12 @@ const __ANIILAND_WORKER_SOURCE=[
   "",
   "  objectives.push(...foodSlotTerms);",
   "",
+  "  for(const cut of settings.climatePlacementCuts||[]){",
+  "    const terms=[];let rhs=1;",
+  "    for(const entry of [...(cut.climate||[]),...(cut.crops||[]),...(cut.overlap||[])]){const value=Math.max(0,Math.min(Number(entry.max)||0,Math.round(Number(entry.count)||0)));if(value){terms.push([-1,entry.name]);rhs-=value}else terms.push([1,entry.name])}",
+  "    if(terms.length)add(terms,'>=',rhs);",
+  "  }",
+  "",
   "  const lp=`Maximize\\n profit: ${expression(objectives)}\\nSubject To\\n${constraints.join('\\n')}\\nBounds\\n ${bounds.join('\\n ')}\\n${integers.length?'Generals\\n '+integers.join(' '):''}\\nEnd`;",
   "  return {lp,items,products,facilities,staffList,settings,rosterJobs,fallbackJobs,rosterTaskTimes,rosterResidentRates,rosterUse,climateChoices,climateOverlapVars,aniimoCap:(Number.isFinite(Number(settings.aniimoLimit))?Math.max(0,Math.min(data.aniimo[settings.level-1],Math.floor(Number(settings.aniimoLimit)))):data.aniimo[settings.level-1]),baseAniimoCap:data.aniimo[settings.level-1],foodProducts,upgradeCost,generatorLevel,generatorPower};",
   "}",
@@ -14521,6 +14528,7 @@ const __ANIILAND_WORKER_SOURCE=[
   "    net:gross-seedCost,",
   "    byproducts,",
   "    level:settings.level,",
+  "    climatePlacementState:{climate:model.climateChoices.map(c=>({name:c.name,count:Math.round(val(c.name)),max:Math.max(0,Number(settings.facilities?.[c.building]?.count)||0)})),crops:items.map((item,n)=>item.environment?({name:item.seconds?`z${n}`:`u${n}`,count:Math.round(val(item.seconds?`z${n}`:`u${n}`)),max:facilityAtLeast(settings,item.facility,item.facilityLevel)}):null).filter(Boolean),overlap:(model.climateOverlapVars||[]).map(o=>({name:o.name,count:Math.round(val(o.name)),max:facilityAtLeast(settings,items[o.n].facility,items[o.n].facilityLevel)}))},",
   "    climate:model.climateChoices.filter(c=>val(c.name)>.5).map(c=>({...c,count:Math.round(val(c.name))})),",
   "    climateOverlap:(model.climateOverlapVars||[]).map(o=>({itemId:items[o.n]?.id,facility:items[o.n]?.facility,mode:o.mode,heatMode:o.heatMode,coolMode:o.coolMode,count:Math.round(val(o.name))})).filter(o=>o.count>0),",
   "    upgradeRate:upgradeCost?val('g_upgrade'):0,",
@@ -15048,20 +15056,25 @@ const {cycle,eligible}=__ANIILAND_SOLVER;
 const __ANIILAND_LAYOUT=(()=>{
 const STORE='aniiland-homeland-layout';
 const LEGACY_LAYOUT_STORES=['aniimo-homeland-layout-v132'];
-const PLOT_W=20,PLOT_H=15,MAP_COLS=4,MAP_ROWS=4,SCALE=18,DRAG_STEP=1/16,AUTO_STEP=.5;
+const SMALL_TILES_PER_SQUARE=4,SMALL_TILE=1/SMALL_TILES_PER_SQUARE,PLOT_W=20,PLOT_H=15,MAP_COLS=4,MAP_ROWS=4,SCALE=18,DRAG_STEP=SMALL_TILE,AUTO_STEP=SMALL_TILE;
 const PLOTS={1:[2,3],2:[1,3],3:[2,2],4:[1,2],5:[3,3],6:[3,2],7:[1,1],8:[2,1],9:[3,1],10:[0,3],11:[0,2],12:[0,1],13:[0,0],14:[1,0],15:[2,0],16:[3,0]};
 const MAP_ORDER=[13,14,15,16,12,7,8,9,11,4,3,6,10,2,1,5];
 const climateValue={Warm:1,Scorching:2,Cool:-1,Freeze:-2,Adequate:0};
+const LAYOUT_FOOTPRINT_OVERRIDES={'Farmland':[2,2],'Woodland':[4,4]};
+const snapGrid=value=>Math.round(Number(value)/SMALL_TILE)*SMALL_TILE;
+const layoutFootprint=(name,data)=>LAYOUT_FOOTPRINT_OVERRIDES[name]||data?.facilitySizes?.[name]||null;
+const gridSize=value=>snapGrid(value);
 const climateNames=['Heat Furnace','Cooling Unit','Sunlamp'];
 const climateColors={Scorching:'#e9805b',Warm:'#efa76f',Cool:'#58b9e8',Freeze:'#769de8',Adequate:'#e9ce56'};
 const facilityColors={Farmland:'#62bd83',Woodland:'#32a997',Mine:'#687daf',Well:'#48a8cc','Storage Unit':'#7b8795','Hatchinator':'#d9a84d','Crackle Power Pole':'#e0cd55','Crackle Generator':'#d9bf4a'};
-const load=()=>{try{const current=JSON.parse(window.localStorage.getItem(STORE)||'null');if(current)return current;for(const key of LEGACY_LAYOUT_STORES){const legacy=JSON.parse(window.localStorage.getItem(key)||'null');if(legacy){window.localStorage.setItem(STORE,JSON.stringify(legacy));return legacy}}return{}}catch{return{}}};
+const normalizeLoadedLayout=raw=>{if(!raw||typeof raw!=='object')return raw;const out=raw;out.items&&Object.values(out.items).forEach(item=>{if(!item||typeof item!=='object')return;const size=layoutFootprint(String(item.name||''),__ANIILAND_DATA);item.x=snapGrid(item.x);item.y=snapGrid(item.y);if(Array.isArray(size)){item.w=gridSize(size[0]);item.h=gridSize(size[1]);}else{item.w=gridSize(item.w);item.h=gridSize(item.h);}});return out};
+const load=()=>{try{const current=JSON.parse(window.localStorage.getItem(STORE)||'null');if(current)return normalizeLoadedLayout(current);for(const key of LEGACY_LAYOUT_STORES){const legacy=JSON.parse(window.localStorage.getItem(key)||'null');if(legacy){window.localStorage.setItem(STORE,JSON.stringify(legacy));return normalizeLoadedLayout(legacy)}}return{}}catch{return{}}};
 const save=s=>{try{window.localStorage.setItem(STORE,JSON.stringify(s))}catch{}};
 const layoutCountValue=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Math.max(0,Math.floor(Number(v))):null);
 const cleanSnapshot=s=>({items:typeof structuredClone==='function'?structuredClone(s.items||{}):JSON.parse(JSON.stringify(s.items||{})),planSignature:typeof s.planSignature==='string'?s.planSignature:'',storageCount:layoutCountValue(s.storageCount),hatchinatorCount:layoutCountValue(s.hatchinatorCount)});
 const pushHistory=s=>{if(!s||!Object.keys(s.items||{}).length)return;s.history=Array.isArray(s.history)?s.history:[];const snap=cleanSnapshot(s),last=s.history[0];if(last&&last.planSignature===snap.planSignature&&JSON.stringify(last.items)===JSON.stringify(snap.items)&&last.storageCount===snap.storageCount&&last.hatchinatorCount===snap.hatchinatorCount)return;s.history=[snap,...s.history].slice(0,5)};
 const restorePreviousLayout=s=>{if(!Array.isArray(s.history)||!s.history.length)return false;const snap=s.history.shift();s.items=snap&&typeof snap.items==='object'?snap.items:{};if(snap?.planSignature)s.planSignature=snap.planSignature;else delete s.planSignature;if(snap?.storageCount!==null&&Number.isFinite(Number(snap?.storageCount)))s.storageCount=layoutCountValue(snap.storageCount);else delete s.storageCount;if(snap?.hatchinatorCount!==null&&Number.isFinite(Number(snap?.hatchinatorCount)))s.hatchinatorCount=layoutCountValue(snap.hatchinatorCount);else delete s.hatchinatorCount;save(s);return true};
-const sanitizeSharedLayout=raw=>{if(!raw||typeof raw!=='object'||Array.isArray(raw))return null;const out={items:{},unlocked:Array.isArray(raw.unlocked)?raw.unlocked.map(String).filter(x=>PLOTS[x]).slice(0,16):['1'],placeUnused:raw.placeUnused!==false,iconVisual:raw.iconVisual!==false,spacing:[.25,.5,1].includes(Number(raw.spacing))?Number(raw.spacing):.5,zoom:Math.max(.45,Math.min(1.8,Number(raw.zoom)||.85)),storageCount:layoutCountValue(raw.storageCount),hatchinatorCount:layoutCountValue(raw.hatchinatorCount),planSignature:typeof raw.planSignature==='string'&&raw.planSignature.length<50000?raw.planSignature:''};let count=0;for(const [id,item] of Object.entries(raw.items||{})){if(count>=500||typeof id!=='string'||id.length>160||!item||typeof item!=='object')continue;const x=Number(item.x),y=Number(item.y),w=Number(item.w),h=Number(item.h);if(![x,y,w,h].every(Number.isFinite)||x<0||y<0||w<=0||h<=0||x>100||y>100||w>30||h>30)continue;out.items[id]={...item,id,name:String(item.name||'').slice(0,120),label:String(item.label||item.name||'').slice(0,160),x,y,w,h,level:Math.max(1,Math.min(20,Number(item.level)||1)),environment:String(item.environment||'').slice(0,40),climateMode:String(item.climateMode||'').slice(0,40),used:item.used!==false,poweredTarget:!!item.poweredTarget,powerDraw:Math.max(0,Number(item.powerDraw)||0),group:String(item.group||'').slice(0,40)};count++}return out};
+const sanitizeSharedLayout=raw=>{if(!raw||typeof raw!=='object'||Array.isArray(raw))return null;const out={items:{},unlocked:Array.isArray(raw.unlocked)?raw.unlocked.map(String).filter(x=>PLOTS[x]).slice(0,16):['1'],placeUnused:raw.placeUnused!==false,iconVisual:raw.iconVisual!==false,spacing:[.25,.5,1].includes(Number(raw.spacing))?Number(raw.spacing):.5,zoom:Math.max(.45,Math.min(1.8,Number(raw.zoom)||.85)),storageCount:layoutCountValue(raw.storageCount),hatchinatorCount:layoutCountValue(raw.hatchinatorCount),planSignature:typeof raw.planSignature==='string'&&raw.planSignature.length<50000?raw.planSignature:''};let count=0;for(const [id,item]of Object.entries(raw.items||{})){if(count>=500||typeof id!=='string'||id.length>160||!item||typeof item!=='object')continue;const x=Number(item.x),y=Number(item.y),rawW=Number(item.w),rawH=Number(item.h),size=layoutFootprint(String(item.name||''),__ANIILAND_DATA),w=Array.isArray(size)?Number(size[0]):rawW,h=Array.isArray(size)?Number(size[1]):rawH;if(![x,y,w,h].every(Number.isFinite)||x<0||y<0||w<=0||h<=0||x>100||y>100||w>30||h>30)continue;out.items[id]={...item,id,name:String(item.name||'').slice(0,120),label:String(item.label||item.name||'').slice(0,160),x:snapGrid(x),y:snapGrid(y),w:gridSize(w),h:gridSize(h),level:Math.max(1,Math.min(20,Number(item.level)||1)),environment:String(item.environment||'').slice(0,40),climateMode:String(item.climateMode||'').slice(0,40),used:item.used!==false,poweredTarget:!!item.poweredTarget,powerDraw:Math.max(0,Number(item.powerDraw)||0),group:String(item.group||'').slice(0,40)};count++}return out};
 function exportLayoutShareState(){const out=sanitizeSharedLayout(load());if(!out)return null;delete out.planSignature;return out}
 function importLayoutShareState(raw){const imported=sanitizeSharedLayout(raw);if(!imported)return false;const current=load();imported.history=Array.isArray(current.history)?current.history.slice(0,5):[];save(imported);return true}
 
@@ -15075,9 +15088,10 @@ const slotSize=i=>i.name==='Farmland'?2:i.name==='Woodland'?4:Math.max(i.w,i.h)>
 const storageUnitCount=(level,data)=>{const rows=data?.decodedFacilityData?.supplementaryFacilities?.['Storage Unit']?.effectivePlannerCounts;return Array.isArray(rows)?Number(rows[level-1]||0):(level>=10?4:level>=8?3:level>=4?2:level>=2?1:0)};
 const hatchinatorCount=(level,data)=>{const rows=data?.decodedFacilityData?.supplementaryFacilities?.Hatchinator?.counts;if(Array.isArray(rows)&&rows.length){return Number(rows[Math.min(level-1,rows.length-1)]||0)}return level<2?0:Math.min(level+1,10)}; const selectedLayoutCount=(state,key,max)=>{const raw=state[key];if(raw===null||raw===undefined||raw==='')return max;const n=Number(raw);return Number.isFinite(n)?Math.max(0,Math.min(max,Math.floor(n))):max};
 const powerPoleCount=(level,data,config)=>{const f=config?.['Crackle Power Pole'];if(f){if(Array.isArray(f.levels))return f.levels.reduce((n,g)=>n+(Number(g.count)||0),0);return Number(f.count)||0}const rows=data?.decodedFacilityData?.supplementaryFacilities?.['Crackle Power Pole']?.counts;return Array.isArray(rows)?Number(rows[level-1]||0):level>=12?6:0};
-const POWER_SMALL_TILE=1/4,GENERATOR_POWER_RANGE=11,POLE_POWER_RANGE=7;
+const POWER_SMALL_TILE=SMALL_TILE,GENERATOR_POWER_RANGE=11,POLE_POWER_RANGE=7;
 const powerRange=i=>i.name==='Crackle Generator'?{x:i.x-(GENERATOR_POWER_RANGE-i.w)/2,y:i.y-(GENERATOR_POWER_RANGE-i.h)/2,w:GENERATOR_POWER_RANGE,h:GENERATOR_POWER_RANGE}:i.name==='Crackle Power Pole'?{x:i.x-(POLE_POWER_RANGE-i.w)/2,y:i.y-(POLE_POWER_RANGE-i.h)/2,w:POLE_POWER_RANGE,h:POLE_POWER_RANGE}:null;
-const overlapAtLeast=(a,b,step=POWER_SMALL_TILE)=>Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>=step-1e-9&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>=step-1e-9;
+const climateRange=i=>({x:i.x+i.w/2-4.5,y:i.y+i.h/2-4.5,w:9,h:9});
+const overlapAtLeast=(a,b,step=SMALL_TILE)=>Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>=step-1e-9&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>=step-1e-9;
 const connectedPowerNodes=items=>{const gen=items.find(x=>x.name==='Crackle Generator'),poles=items.filter(x=>x.name==='Crackle Power Pole');if(!gen)return[];const connected=[gen],pending=[...poles];let changed=true;while(changed){changed=false;for(let i=pending.length-1;i>=0;i--){const pole=pending[i],pr=powerRange(pole);if(connected.some(n=>overlapAtLeast(pr,powerRange(n)))){connected.push(pole);pending.splice(i,1);changed=true}}}return connected};
 const powerLayoutStatus=items=>{const targets=items.filter(x=>x.poweredTarget),nodes=connectedPowerNodes(items),allPoles=items.filter(x=>x.name==='Crackle Power Pole'),connectedPoles=nodes.filter(x=>x.name==='Crackle Power Pole');const uncovered=targets.filter(t=>!nodes.some(n=>overlapAtLeast(t,powerRange(n))));return{nodes,targets,uncovered,disconnectedPoles:allPoles.filter(p=>!connectedPoles.includes(p)),ok:uncovered.length===0&&allPoles.length===connectedPoles.length}};
 const layoutFacilityIconMap={
@@ -15166,18 +15180,15 @@ function insideUnlocked(rect,unlocked){
  }
  return plots.length>0;
 }
-function valid(item,items,unlocked,gap=0){
+function valid(item,items,unlocked,gap=0,separateGroups=true){
  const itemRects=rectangles(item);if(!itemRects.every(r=>insideUnlocked(r,unlocked)))return false;
  const itemBounds={x:item.x,y:item.y,w:item.w,h:item.h+(item.name==='Hatchinator'?1:0)};
  for(const o of items){
   if(o.id===item.id)continue;
-  const otherBounds={x:o.x,y:o.y,w:o.w,h:o.h+(o.name==='Hatchinator'?1:0)},padding=gap+(item.group===o.group?0:.5);
+  const otherBounds={x:o.x,y:o.y,w:o.w,h:o.h+(o.name==='Hatchinator'?1:0)},padding=gap;
   if(!overlaps(inflate(itemBounds,padding),otherBounds))continue;
   if(itemRects.some(a=>rectangles(o).some(b=>overlaps(inflate(a,padding),b))))return false;
  }
- const isNode=item.name==='Crackle Generator'||item.name==='Crackle Power Pole';
- if(isNode){const pr=powerRange(item);if(pr)for(const o of items)if(!o.poweredTarget&&o.name!=='Crackle Generator'&&o.name!=='Crackle Power Pole'&&overlapAtLeast(o,pr))return false}
- else if(!item.poweredTarget)for(const n of items)if((n.name==='Crackle Generator'||n.name==='Crackle Power Pole')&&overlapAtLeast(item,powerRange(n)))return false;
  return true;
 }
 const kitchenFacilities=new Set(['Carousel Mill','Claw Game Cooker','Jukebox Dryer','Simmering Pot','Bouncy Brew Keg','Blazing Stove','Pickling Jar']);
@@ -15213,11 +15224,11 @@ function planAssignments(ctx){
 }
 function desired(ctx,state){
  const assignments=planAssignments(ctx),climateAssignments=new Map();
- for(const choice of ctx.plan?.climate||[]){const modes=climateAssignments.get(choice.building)||[];for(let i=0;i<Math.max(0,Number(choice.count)||0);i++)modes.push(choice.mode);climateAssignments.set(choice.building,modes)}
+ for(const choice of ctx.plan?.climate||[]){const modes=climateAssignments.get(choice.building)||[];for(let i=0;i<Math.max(0,Number(choice.count)||0);i++)modes.push({mode:choice.mode,choiceName:choice.name});climateAssignments.set(choice.building,modes)}
  const out=[];
  for(const[name,f]of Object.entries(ctx.config)){
   if(name==='Crackle Generator'||name==='Crackle Power Pole')continue;
-  const size=ctx.data.facilitySizes[name];if(!size||!f.count)continue;
+  const size=layoutFootprint(name,ctx.data);if(!size||!f.count)continue;
   const levelSlots=(Array.isArray(f.levels)&&f.levels.length?f.levels.flatMap(g=>Array.from({length:g.count},()=>g.level)):Array.from({length:f.count},()=>f.level||1)).sort((a,b)=>b-a);
   const work=[...(assignments.get(name)||[])].sort((a,b)=>(b.facilityLevel||1)-(a.facilityLevel||1)),deviceModes=climateAssignments.get(name)||[];
   for(let i=0;i<f.count;i++){
@@ -15227,19 +15238,19 @@ function desired(ctx,state){
     const ai=work.findIndex(a=>(a.facilityLevel||1)<=level);
     if(ai>=0)assignment=work.splice(ai,1)[0];
    }
-   const climateMode=deviceModes[i]||'',alwaysRequired=upgradeFacilities.has(name),used=alwaysRequired||(climateNames.includes(name)?!!climateMode:!!assignment);
+  const climateAssignment=deviceModes[i]||null,climateMode=climateAssignment?.mode||'',alwaysRequired=upgradeFacilities.has(name),used=alwaysRequired||(climateNames.includes(name)?!!climateMode:!!assignment);
    if(!used&&state.placeUnused===false)continue;
    const environment=used?(assignment?.environment||climateMode||''):'';
-   out.push({id:`${name}:${i}`,name,label:assignment?.label||name,w:size[0],h:size[1],level,environment,climateMode,used,poweredTarget:!!assignment?.powered,powerDraw:assignment?.powered?assignment.powerDrawPerUnit||0:0,group:used?(assignment?.powered?'power':activeGroup(name,environment)):'unused'});
+  out.push({id:`${name}:${i}`,name,label:assignment?.label||name,w:size[0],h:size[1],level,environment,climateMode,climateChoiceName:climateAssignment?.choiceName||'',used,poweredTarget:!!assignment?.powered,powerDraw:assignment?.powered?assignment.powerDrawPerUnit||0:0,group:used?(assignment?.powered?'power':activeGroup(name,environment)):'unused'});
   }
  }
  const storageMax=storageUnitCount(ctx.level,ctx.data),storageCount=storageMax>0?Math.max(1,selectedLayoutCount(state,'storageCount',storageMax)):0;
- for(let i=0;i<storageCount;i++)out.push({id:`Storage Unit:${i}`,name:'Storage Unit',label:'Storage Unit',w:2,h:2,level:1,used:true,group:'storage'});
- const hatchMax=hatchinatorCount(ctx.level,ctx.data),hatchCount=selectedLayoutCount(state,'hatchinatorCount',hatchMax),hatchSize=ctx.data.facilitySizes.Hatchinator||[2,2];
+ const storageSize=layoutFootprint('Storage Unit',ctx.data)||[2,2];for(let i=0;i<storageCount;i++)out.push({id:`Storage Unit:${i}`,name:'Storage Unit',label:'Storage Unit',w:gridSize(storageSize[0]),h:gridSize(storageSize[1]),level:1,used:true,group:'storage'});
+ const hatchMax=hatchinatorCount(ctx.level,ctx.data),hatchCount=selectedLayoutCount(state,'hatchinatorCount',hatchMax),hatchSize=layoutFootprint('Hatchinator',ctx.data)||[2,2];
  for(let i=0;i<hatchCount;i++)out.push({id:`Hatchinator:${i}`,name:'Hatchinator',label:'Hatchinator',w:hatchSize[0],h:hatchSize[1],level:1,used:true,group:'hatchinator'});
  if(ctx.plan?.eModeActive&&ctx.level>=12&&Number(ctx.config?.['Crackle Generator']?.count||0)>0){
-  const size=ctx.data.facilitySizes['Crackle Generator']||[2,2],generatorLevel=Number(ctx.config?.['Crackle Generator']?.level||ctx.plan.generatorLevel||1);out.push({id:'Crackle Generator:0',name:'Crackle Generator',label:'Crackle Generator · E-mode',w:size[0],h:size[1],level:generatorLevel,used:true,group:'power'});
-  const poweredCount=out.filter(x=>x.poweredTarget).length,maxPoles=powerPoleCount(ctx.level,ctx.data,ctx.config),polePool=poweredCount?maxPoles:0,poleSize=ctx.data.facilitySizes['Crackle Power Pole']||[1.5,1.5];
+  const size=layoutFootprint('Crackle Generator',ctx.data)||[2,2],generatorLevel=Number(ctx.config?.['Crackle Generator']?.level||ctx.plan.generatorLevel||1);out.push({id:'Crackle Generator:0',name:'Crackle Generator',label:'Crackle Generator · E-mode',w:size[0],h:size[1],level:generatorLevel,used:true,group:'power'});
+  const poweredCount=out.filter(x=>x.poweredTarget).length,maxPoles=powerPoleCount(ctx.level,ctx.data,ctx.config),polePool=poweredCount?maxPoles:0,poleSize=layoutFootprint('Crackle Power Pole',ctx.data)||[1.5,1.5];
   for(let i=0;i<polePool;i++)out.push({id:`Crackle Power Pole:${i}`,name:'Crackle Power Pole',label:'Crackle Power Pole',w:poleSize[0],h:poleSize[1],level:1,used:true,group:'power',optional:true});
  }
  return out;
@@ -15269,14 +15280,14 @@ function placeHatchinatorBottom(item,placed,unlocked){
  ys.reverse();
  for(const y of ys)for(const x of xs){
   const test={...item,x,y};
-  if(valid(test,placed,unlocked,.25))return test;
+  if(valid(test,placed,unlocked,SMALL_TILE))return test;
  }
  return null;
 }
 function placeNear(item,placed,unlocked,gap,refs){
  const points=[];
  for(const r of refs){
-  const g=Math.max(.25,gap);
+  const g=Math.max(SMALL_TILE,gap);
   points.push([r.x+r.w+g,r.y],[r.x-item.w-g,r.y],[r.x,r.y+r.h+g],[r.x,r.y-item.h-g],
    [r.x+r.w+g,r.y+r.h-item.h],[r.x-item.w-g,r.y+r.h-item.h],
    [r.x+r.w/2-item.w/2,r.y+r.h+g],[r.x+r.w/2-item.w/2,r.y-item.h-g]);
@@ -15288,7 +15299,7 @@ function placeNear(item,placed,unlocked,gap,refs){
 function placeStorageNear(item,placed,unlocked,gap,refs,storagePlaced,minSeparation=6){
  const points=[];
  for(const r of refs){
-  const g=Math.max(.25,gap);
+  const g=Math.max(SMALL_TILE,gap);
   points.push([r.x+r.w+g,r.y],[r.x-item.w-g,r.y],[r.x,r.y+r.h+g],[r.x,r.y-item.h-g],
    [r.x+r.w+g,r.y+r.h-item.h],[r.x-item.w-g,r.y+r.h-item.h],
    [r.x+r.w/2-item.w/2,r.y+r.h+g],[r.x+r.w/2-item.w/2,r.y-item.h-g]);
@@ -15321,11 +15332,11 @@ function scanPlaceCentered(item,placed,unlocked,gap){
 }
 function placePowerPoleNear(item,placed,unlocked,gap,nodes){
  const candidates=[];for(const n of nodes){const g=0;candidates.push([n.x+n.w+g,n.y],[n.x-item.w-g,n.y],[n.x,n.y+n.h+g],[n.x,n.y-item.h-g]);}
- for(const[x0,y0]of candidates){const test={...item,x:Math.round(x0/.25)*.25,y:Math.round(y0/.25)*.25};if(valid(test,placed,unlocked,0)&&nodes.some(n=>overlapAtLeast(powerRange(test),powerRange(n))))return test}return null;
+ for(const[x0,y0]of candidates){const test={...item,x:Math.round(x0/SMALL_TILE)*SMALL_TILE,y:Math.round(y0/SMALL_TILE)*SMALL_TILE};if(valid(test,placed,unlocked,0)&&nodes.some(n=>overlapAtLeast(powerRange(test),powerRange(n))))return test}return null;
 }
 function placePoweredNear(item,placed,unlocked,gap,nodes){
  const points=[];for(const n of nodes){const g=0;points.push([n.x+n.w+g,n.y],[n.x-item.w-g,n.y],[n.x,n.y+n.h+g],[n.x,n.y-item.h-g],[n.x+n.w+g,n.y+n.h-item.h],[n.x-item.w-g,n.y+n.h-item.h]);}
- for(const[x0,y0]of points){const test={...item,x:Math.round(x0/.25)*.25,y:Math.round(y0/.25)*.25};if(valid(test,placed,unlocked,0)&&nodes.some(n=>overlapAtLeast(test,powerRange(n))))return test}return null;
+ for(const[x0,y0]of points){const test={...item,x:Math.round(x0/SMALL_TILE)*SMALL_TILE,y:Math.round(y0/SMALL_TILE)*SMALL_TILE};if(valid(test,placed,unlocked,0)&&nodes.some(n=>overlapAtLeast(test,powerRange(n))))return test}return null;
 }
 function ownedBounds(unlocked){const ps=unlocked.map(plotRect);if(!ps.length)return{x:0,y:0,w:MAP_COLS*PLOT_W,h:MAP_ROWS*PLOT_H};const x=Math.min(...ps.map(p=>p.x)),y=Math.min(...ps.map(p=>p.y)),r=Math.max(...ps.map(p=>p.x+p.w)),b=Math.max(...ps.map(p=>p.y+p.h));return{x,y,w:r-x,h:b-y}}
 function farCornerDirection(unlocked,active){
@@ -15366,11 +15377,9 @@ function activeGroupAnchors(active){
  for(const item of active){if(!byGroup.has(item.group))byGroup.set(item.group,[]);byGroup.get(item.group).push(item)}
  return [...byGroup.values()].map(items=>items.sort((a,b)=>a.x-b.x||a.y-b.y)[Math.floor(items.length/2)]).sort((a,b)=>a.x-b.x||a.y-b.y);
 }
-function autoPlace(ctx,state){
+function autoPlace(ctx,state,{persist=true}={}){
  const wants=desired(ctx,state),unlocked=(state.unlocked||[]).filter(id=>+id<=Math.min(ctx.level,16));
- const placed=[];let moved=0;const missing=[],gap=Number(state.spacing??.5),failed=new Set(),maxX=MAP_COLS*PLOT_W,maxY=MAP_ROWS*PLOT_H;
- const hatchinators=wants.filter(x=>x.group==='hatchinator').sort((a,b)=>a.id.localeCompare(b.id));
- for(const item of hatchinators){const found=placeHatchinatorBottom(item,placed,unlocked);if(found){placed.push(found);moved++}else missing.push(item)}
+ const placed=[];let moved=0;const missing=[],gap=0,failed=new Set(),maxX=MAP_COLS*PLOT_W,maxY=MAP_ROWS*PLOT_H;
  const overlapSpecs=[],overlapItemIds=new Set();
  for(const spec of ctx.plan?.climateOverlap||[]){
   const product=ctx.data.items.find(x=>x.id===spec.itemId),pool=wants.filter(x=>x.used&&!climateNames.includes(x.name)&&x.name===spec.facility&&x.environment===spec.mode&&(!product||x.label===product.name)&&!overlapItemIds.has(x.id)).slice(0,Math.max(0,Number(spec.count)||0));
@@ -15380,41 +15389,31 @@ function autoPlace(ctx,state){
   const area=choice=>wants.filter(x=>x.used&&x.environment===choice.mode&&!climateNames.includes(x.name)&&!overlapItemIds.has(x.id)).reduce((n,x)=>n+x.w*x.h,0);
   return area(b)-area(a);
  });
- const rangeOf=c=>({x:c.x-3.5,y:c.y-3.5,w:9,h:9});
- const localValid=(item,items)=>!items.some(o=>o.id!==item.id&&rectangles(item).some(a=>rectangles(o).some(b=>overlaps(inflate(a,item.group===o.group?0:.5),b))));
- const localClimatePlace=(targets,base,focusA,focusB=null)=>{
-  const local=[];
-  for(const item of [...targets].sort((a,b)=>b.w*b.h-a.w*a.h)){
-   const ra=rangeOf(focusA),rb=focusB?rangeOf(focusB):null;
-   let minX=ra.x-item.w+AUTO_STEP,maxCX=ra.x+ra.w-AUTO_STEP,minY=ra.y-item.h+AUTO_STEP,maxCY=ra.y+ra.h-AUTO_STEP;
-   if(rb){minX=Math.max(minX,rb.x-item.w+AUTO_STEP);maxCX=Math.min(maxCX,rb.x+rb.w-AUTO_STEP);minY=Math.max(minY,rb.y-item.h+AUTO_STEP);maxCY=Math.min(maxCY,rb.y+rb.h-AUTO_STEP)}
-   if(maxCX<minX||maxCY<minY)return null;
-   const points=[];
-   for(let y=Math.ceil(minY/AUTO_STEP)*AUTO_STEP;y<=maxCY+1e-9;y+=AUTO_STEP)for(let x=Math.ceil(minX/AUTO_STEP)*AUTO_STEP;x<=maxCX+1e-9;x+=AUTO_STEP)points.push([x,y]);let found=null;
-   for(const[x,y]of points){const test={...item,x,y},all=[...base,...local,test];if(localValid(test,[...base,...local])&&envFor(test,all,ctx).ok){found=test;break}}
-   if(!found)return null;local.push(found);
+ const rangeOf=c=>climateRange(c);
+ const localValid=(item,items)=>!items.some(o=>o.id!==item.id&&rectangles(item).some(a=>rectangles(o).some(b=>overlaps(a,b))));
+ const climateCandidatePositions=(item,focusA,focusB=null)=>{
+  const ranges=[rangeOf(focusA),...(focusB?[rangeOf(focusB)]:[])].filter(Boolean);
+  if(!ranges.length)return[];
+  const minX=Math.min(...ranges.map(r=>r.x-item.w+AUTO_STEP)),maxX=Math.max(...ranges.map(r=>r.x+r.w-AUTO_STEP)),minY=Math.min(...ranges.map(r=>r.y-item.h+AUTO_STEP)),maxY=Math.max(...ranges.map(r=>r.y+r.h-AUTO_STEP));
+  if(maxX<minX||maxY<minY)return[];
+  const centerX=ranges.reduce((n,r)=>n+r.x+r.w/2,0)/ranges.length,centerY=ranges.reduce((n,r)=>n+r.y+r.h/2,0)/ranges.length,points=[];
+  for(let y=Math.ceil(minY/AUTO_STEP)*AUTO_STEP;y<=maxY+1e-9;y+=AUTO_STEP)for(let x=Math.ceil(minX/AUTO_STEP)*AUTO_STEP;x<=maxX+1e-9;x+=AUTO_STEP){
+  const rect={x,y,w:item.w,h:item.h},coveredByRanges=ranges.filter(r=>overlapAtLeast(rect,r,SMALL_TILE)).length;if(focusB?coveredByRanges!==ranges.length:!coveredByRanges)continue;
+   const covered=ranges.reduce((n,r)=>n+Math.max(0,Math.min(x+item.w,r.x+r.w)-Math.max(x,r.x))*Math.max(0,Math.min(y+item.h,r.y+r.h)-Math.max(y,r.y)),0),edgeDistance=Math.hypot(x+item.w/2-centerX,y+item.h/2-centerY);
+   points.push({x,y,covered,edgeDistance});
   }
-  return local;
+  return points.sort((a,b)=>a.covered-b.covered||b.edgeDistance-a.edgeDistance);
  };
  const directTargetsFor=(choice)=>{
   const pool=wants.filter(x=>x.used&&x.environment===choice.mode&&!climateNames.includes(x.name)&&!overlapItemIds.has(x.id)&&!placed.some(p=>p.id===x.id)),out=[];
   for(const size of [5,4,2]){const cap=(choice.layout||[]).filter(x=>x.s===size).length;out.push(...pool.filter(x=>slotSize(x)===size).slice(0,cap))}
   return out;
  };
- const localClimatePlacePartial=(targets,base,focusA,focusB=null)=>{
+ const localClimatePlacePartial=(targets,base,focusA,focusB=null,withinBounds=false)=>{
   const local=[];
   for(const item of [...targets].sort((a,b)=>b.w*b.h-a.w*a.h)){
-   const ra=rangeOf(focusA),rb=focusB?rangeOf(focusB):null;
-   let minX=ra.x-item.w+AUTO_STEP,maxCX=ra.x+ra.w-AUTO_STEP,minY=ra.y-item.h+AUTO_STEP,maxCY=ra.y+ra.h-AUTO_STEP;
-   if(rb){minX=Math.max(minX,rb.x-item.w+AUTO_STEP);maxCX=Math.min(maxCX,rb.x+rb.w-AUTO_STEP);minY=Math.max(minY,rb.y-item.h+AUTO_STEP);maxCY=Math.min(maxCY,rb.y+rb.h-AUTO_STEP)}
-   if(maxCX<minX||maxCY<minY)continue;
    let found=null;
-   for(let y=Math.ceil(minY/AUTO_STEP)*AUTO_STEP;y<=maxCY+1e-9&&!found;y+=AUTO_STEP){
-    for(let x=Math.ceil(minX/AUTO_STEP)*AUTO_STEP;x<=maxCX+1e-9;x+=AUTO_STEP){
-     const test={...item,x,y},all=[...base,...local,test];
-     if(localValid(test,[...base,...local])&&envFor(test,all,ctx).ok){found=test;break}
-    }
-   }
+   for(const{x,y}of climateCandidatePositions(item,focusA,focusB)){const test={...item,x,y},all=[...base,...local,test];if((!withinBounds||rectangles(test).every(r=>insideUnlocked(r,unlocked)))&&localValid(test,[...base,...local])&&envFor(test,all,ctx).ok){found=test;break}}
    if(found)local.push(found);
   }
   return local;
@@ -15437,12 +15436,21 @@ function autoPlace(ctx,state){
  };
  const tryPair=(heatDevice,coolDevice,heatChoice,coolChoice,targets)=>{
   const heatTargets=directTargetsFor(heatChoice),coolTargets=directTargetsFor(coolChoice);
+    const largestTarget=Math.max(2,...targets.map(x=>Math.max(x.w,x.h))),preferredDistance=Math.max((heatDevice.w+coolDevice.w)/2,(heatDevice.h+coolDevice.h)/2,9-largestTarget/2);
+    const centerDistance=9+largestTarget-2*SMALL_TILE;
+    const edgeOffsets=[];for(const d of [centerDistance,centerDistance-.5,centerDistance-1]){const dx=d-(coolDevice.w-heatDevice.w)/2,dy=d-(coolDevice.h-heatDevice.h)/2;edgeOffsets.push([dx,0],[-dx,0],[0,dy],[0,-dy],[dx,dy],[dx,-dy],[-dx,dy],[-dx,-dy])}
+    const preferredOffsets=[];for(const d of [preferredDistance,preferredDistance-.25,preferredDistance+.25]){const dx=d-(coolDevice.w-heatDevice.w)/2,dy=d-(coolDevice.h-heatDevice.h)/2;preferredOffsets.push([dx,0],[-dx,0],[0,dy],[0,-dy])}
+    const offsets=[...preferredOffsets,...edgeOffsets];
+    for(let distance=heatDevice.w/2+coolDevice.w/2;distance<=centerDistance+1e-9;distance+=AUTO_STEP){
+     const axis=distance-(coolDevice.w-heatDevice.w)/2,diagonal=distance/Math.SQRT2-(coolDevice.w-heatDevice.w)/2;
+     offsets.push([axis,0],[-axis,0],[0,axis],[0,-axis],[diagonal,diagonal],[diagonal,-diagonal],[-diagonal,diagonal],[-diagonal,-diagonal]);
+    }
+    offsets.push(...pairOffsets);
   let best=null,bestScore=-1;
-  for(const[dx,dy]of pairOffsets){
+    for(const[dx,dy]of offsets){
    const heat={...heatDevice,x:0,y:0},cool={...coolDevice,x:dx,y:dy};
    if(!localValid(cool,[heat]))continue;
-   const base=[heat,cool],overlapPlaced=localClimatePlace(targets,base,heat,cool);
-   if(!overlapPlaced)continue;
+    const base=[heat,cool],overlapPlaced=localClimatePlacePartial(targets,base,heat,cool);
    const heatPlaced=localClimatePlacePartial(heatTargets,[...base,...overlapPlaced],heat);
    const coolPlaced=localClimatePlacePartial(coolTargets,[...base,...overlapPlaced,...heatPlaced],cool);
    const local=[...base,...overlapPlaced,...heatPlaced,...coolPlaced];
@@ -15453,13 +15461,13 @@ function autoPlace(ctx,state){
   translationSearch:for(let ty=minTY;ty<=maxTY;ty+=AUTO_STEP){
    for(let tx=minTX;tx<=maxTX;tx+=AUTO_STEP){
      const candidate=local.map(x=>({...x,x:x.x+tx,y:x.y+ty})),added=[];
-     const fits=candidate.every(item=>{const ok=valid(item,[...placed,...added],unlocked,0);if(ok)added.push(item);return ok});
+    const fits=candidate.every(item=>{const ok=valid(item,[...placed,...added],unlocked,0,false);if(ok)added.push(item);return ok});
      if(!fits)continue;
      const combined=[...placed,...candidate];
      if(!candidate.filter(x=>x.used&&x.environment&&!climateNames.includes(x.name)).every(x=>envFor(x,combined,ctx).ok))continue;
-     const score=heatPlaced.length+coolPlaced.length;
+    const score=overlapPlaced.length+heatPlaced.length+coolPlaced.length;
      if(score>bestScore){best=candidate;bestScore=score}
-     if(score>=heatTargets.length+coolTargets.length)return candidate;
+    if(score>=targets.length+heatTargets.length+coolTargets.length)return candidate;
     break translationSearch;
     }
    }
@@ -15467,12 +15475,13 @@ function autoPlace(ctx,state){
   return best;
  };
  for(const specs of pairGroups.values()){
-  const first=specs[0],heatChoice=climateChoices.find(x=>x.building==='Heat Furnace'&&x.mode===first.heatMode),coolChoice=climateChoices.find(x=>x.building==='Cooling Unit'&&x.mode===first.coolMode);
-  if(!heatChoice||!coolChoice)continue;
+  const first=specs[0];
+  if(!climateChoices.some(x=>x.building==='Heat Furnace'&&x.mode===first.heatMode)||!climateChoices.some(x=>x.building==='Cooling Unit'&&x.mode===first.coolMode))continue;
   const pending=specs.flatMap(x=>x.items).filter(x=>!placed.some(p=>p.id===x.id));
   while(pending.length){
-   const heatDevice=wants.find(x=>x.name==='Heat Furnace'&&x.used&&(x.climateMode||x.environment)===first.heatMode&&!placed.some(p=>p.id===x.id));
-   const coolDevice=wants.find(x=>x.name==='Cooling Unit'&&x.used&&(x.climateMode||x.environment)===first.coolMode&&!placed.some(p=>p.id===x.id));
+   const heatChoice=climateChoices.find(c=>c.building==='Heat Furnace'&&c.mode===first.heatMode&&wants.some(x=>x.name==='Heat Furnace'&&x.climateChoiceName===c.name&&!placed.some(p=>p.id===x.id))),coolChoice=climateChoices.find(c=>c.building==='Cooling Unit'&&c.mode===first.coolMode&&wants.some(x=>x.name==='Cooling Unit'&&x.climateChoiceName===c.name&&!placed.some(p=>p.id===x.id)));
+   const heatDevice=heatChoice&&wants.find(x=>x.name==='Heat Furnace'&&x.climateChoiceName===heatChoice.name&&!placed.some(p=>p.id===x.id));
+   const coolDevice=coolChoice&&wants.find(x=>x.name==='Cooling Unit'&&x.climateChoiceName===coolChoice.name&&!placed.some(p=>p.id===x.id));
    if(!heatDevice||!coolDevice)break;
    let cluster=null,targets=[];
    for(const scale of [1,.75,.5,.25]){
@@ -15494,7 +15503,7 @@ function autoPlace(ctx,state){
  const remainingByMode=new Map();
  for(const choice of climateChoices){
   const modeKey=`${choice.building}:${choice.mode}`,deps=remainingByMode.get(modeKey)||wants.filter(x=>x.used&&x.environment===choice.mode&&!climateNames.includes(x.name)&&!overlapItemIds.has(x.id)&&!placed.some(p=>p.id===x.id));remainingByMode.set(modeKey,deps);
-  const already=placed.filter(x=>x.name===choice.building&&(x.climateMode||x.environment)===choice.mode).length,remainingCount=Math.max(0,Math.max(0,Number(choice.count)||0)-already),devices=wants.filter(x=>x.name===choice.building&&x.used&&(x.climateMode||x.environment)===choice.mode&&!placed.some(p=>p.id===x.id)).slice(0,remainingCount);
+  const devices=wants.filter(x=>x.name===choice.building&&x.used&&x.climateChoiceName===choice.name&&!placed.some(p=>p.id===x.id)).slice(0,Math.max(0,Number(choice.count)||0));
   for(const device of devices){
    const slots=[];
    for(const size of [5,4,2]){
@@ -15505,37 +15514,72 @@ function autoPlace(ctx,state){
    let cluster=null;
    for(let cy=1;cy<=maxY-1&&!cluster;cy+=AUTO_STEP)for(let cx=1;cx<=maxX-1;cx+=AUTO_STEP){
     const candidate=[{...device,x:cx,y:cy},...slots.map(({item,slot})=>({...item,x:cx+slot.x,y:cy+slot.y}))],local=[];
-    const fits=candidate.every(item=>{const ok=valid(item,[...placed,...local],unlocked,0);if(ok)local.push(item);return ok});
+    const fits=candidate.every(item=>{const ok=valid(item,[...placed,...local],unlocked,0,false);if(ok)local.push(item);return ok});
     const combined=[...placed,...candidate],safe=combined.filter(x=>x.used&&x.environment&&!climateNames.includes(x.name)).every(x=>envFor(x,combined,ctx).ok);
     if(fits&&safe){cluster=candidate;break}
    }
-   if(cluster){placed.push(...cluster);moved+=cluster.length;for(const {item}of slots){const j=deps.findIndex(x=>x.id===item.id);if(j>=0)deps.splice(j,1)}}else failed.add(device.id);
+  if(cluster){placed.push(...cluster);moved+=cluster.length;for(const {item}of slots){const j=deps.findIndex(x=>x.id===item.id);if(j>=0)deps.splice(j,1)}}
+  else{const preservesClimate=test=>placed.filter(x=>x.used&&x.environment&&!climateNames.includes(x.name)).every(x=>envFor(x,[...placed,test],ctx).ok);let standalone=scanPlaceCentered(device,placed,unlocked,0);if(standalone&&!preservesClimate(standalone))standalone=null;if(!standalone){const bounds=ownedBounds(unlocked),centerX=bounds.x+bounds.w/2,centerY=bounds.y+bounds.h/2,points=[];for(let y=bounds.y;y<=Math.min(maxY-device.h,bounds.y+bounds.h-device.h);y+=AUTO_STEP)for(let x=bounds.x;x<=Math.min(maxX-device.w,bounds.x+bounds.w-device.w);x+=AUTO_STEP)points.push({x,y,distance:Math.hypot(x+device.w/2-centerX,y+device.h/2-centerY)});points.sort((a,b)=>a.distance-b.distance);for(const{x,y}of points){const test={...device,x,y};if(valid(test,placed,unlocked,0,false)&&preservesClimate(test)){standalone=test;break}}}if(standalone){placed.push(standalone);moved++;const targets=deps.filter(x=>!placed.some(p=>p.id===x.id)),local=localClimatePlacePartial(targets,placed,standalone,null,true);placed.push(...local);moved+=local.length;for(const item of local){const index=deps.findIndex(x=>x.id===item.id);if(index>=0)deps.splice(index,1)}}else failed.add(device.id)}
   }
  }
  for(const deps of remainingByMode.values())for(const item of deps)if(!placed.some(p=>p.id===item.id)){
   let found=null;
-  for(let y=0;y<=maxY-item.h&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-item.w&&!found;x+=AUTO_STEP){const test={...item,x,y};if(valid(test,placed,unlocked,Math.min(.25,gap))&&envFor(test,[...placed,test],ctx).ok)found=test}
+  for(let y=0;y<=maxY-item.h&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-item.w&&!found;x+=AUTO_STEP){const test={...item,x,y};if(valid(test,placed,unlocked,0,false)&&envFor(test,[...placed,test],ctx).ok)found=test}
   if(found){placed.push(found);moved++}else failed.add(item.id)
  }
  for(const spec of overlapSpecs)for(const item of spec.items)if(!placed.some(p=>p.id===item.id)){
   let found=null;
-  for(let y=0;y<=maxY-item.h&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-item.w&&!found;x+=AUTO_STEP){const test={...item,x,y};if(valid(test,placed,unlocked,0)&&envFor(test,[...placed,test],ctx).ok)found=test}
+  for(let y=0;y<=maxY-item.h&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-item.w&&!found;x+=AUTO_STEP){const test={...item,x,y};if(valid(test,placed,unlocked,0,false)&&envFor(test,[...placed,test],ctx).ok)found=test}
   if(found){placed.push(found);moved++}else failed.add(item.id)
  }
  const powerGenerator=wants.find(x=>x.name==='Crackle Generator'),powerPoles=wants.filter(x=>x.name==='Crackle Power Pole'),powerTargets=wants.filter(x=>x.poweredTarget);
  if(powerGenerator){
-  const powerGap=0;
-  let gen=scanPlaceCentered(powerGenerator,placed,unlocked,powerGap)||scanPlaceInZone(powerGenerator,placed,unlocked,powerGap,preferredZone('power',unlocked),'tr')||scanPlace(powerGenerator,placed,unlocked,powerGap,'tr');
-  if(gen){placed.push(gen);moved++;const nodes=[gen],remainingPoles=[...powerPoles];
-   for(const target of powerTargets){
-    let found=placePoweredNear(target,placed,unlocked,powerGap,nodes);
-    while(!found&&remainingPoles.length){const pole=remainingPoles.shift(),p=placePowerPoleNear(pole,placed,unlocked,powerGap,nodes);if(!p)continue;placed.push(p);nodes.push(p);moved++;found=placePoweredNear(target,placed,unlocked,powerGap,nodes)}
-    if(!found){const zone=preferredZone('power-target',unlocked);for(let y=zone.y;y<=zone.y+zone.h-target.h&&!found;y+=AUTO_STEP)for(let x=zone.x;x<=zone.x+zone.w-target.w;x+=AUTO_STEP){const t={...target,x,y};if(valid(t,placed,unlocked,powerGap)&&nodes.some(n=>overlapAtLeast(t,powerRange(n))))found=t}}
-    if(!found){for(let y=0;y<=maxY-target.h&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-target.w;x+=AUTO_STEP){const t={...target,x,y};if(valid(t,placed,unlocked,powerGap)&&nodes.some(n=>overlapAtLeast(t,powerRange(n))))found=t}}
-    if(found){placed.push(found);moved++}else missing.push(target)
+  const bounds=ownedBounds(unlocked),powerGap=0,orderedTargets=[...powerTargets].sort((a,b)=>b.w*b.h-a.w*a.h),genSeeds=[],addGenSeed=gen=>{if(gen&&!genSeeds.some(x=>x.x===gen.x&&x.y===gen.y))genSeeds.push(gen)};
+  addGenSeed(scanPlaceCentered(powerGenerator,placed,unlocked,powerGap));
+  addGenSeed(scanPlaceInZone(powerGenerator,placed,unlocked,powerGap,preferredZone('power',unlocked),'tr'));
+  for(const direction of ['tl','tr','bl','br'])addGenSeed(scanPlace(powerGenerator,placed,unlocked,powerGap,direction));
+  const findPoweredTarget=(target,nodes,local)=>{
+   let best=null,bestDistance=Infinity;
+  for(const node of nodes){const range=powerRange(node),minX=Math.max(bounds.x,0,range.x-target.w+SMALL_TILE),maxItemX=Math.min(maxX-target.w,bounds.x+bounds.w-target.w,range.x+range.w-SMALL_TILE),minY=Math.max(bounds.y,0,range.y-target.h+SMALL_TILE),maxItemY=Math.min(maxY-target.h,bounds.y+bounds.h-target.h,range.y+range.h-SMALL_TILE),cx=range.x+range.w/2,cy=range.y+range.h/2;
+   for(let y=Math.ceil(minY/AUTO_STEP)*AUTO_STEP;y<=maxItemY+1e-9;y+=AUTO_STEP)for(let x=Math.ceil(minX/AUTO_STEP)*AUTO_STEP;x<=maxItemX+1e-9;x+=AUTO_STEP){const test={...target,x,y},distance=Math.hypot(x+target.w/2-cx,y+target.h/2-cy);if(distance>=bestDistance||!valid(test,[...placed,...local],unlocked,0,false)||!overlapAtLeast(test,range)||!envFor(test,[...placed,...local,test],ctx).ok)continue;best=test;bestDistance=distance}
    }
-  }else missing.push(powerGenerator);
+   return best;
+  };
+  const poleOffsetsFor=(pole,nodes)=>{
+   const points=[],seen=new Set(),angles=Array.from({length:16},(_,i)=>i*Math.PI/8);
+   for(const node of nodes){const range=powerRange(node),maxDistance=(range.w+7)/2-SMALL_TILE;
+    for(let distance=maxDistance;distance>=SMALL_TILE;distance-=SMALL_TILE)for(const angle of angles){const x=snapGrid(range.x+range.w/2+Math.cos(angle)*distance-pole.w/2),y=snapGrid(range.y+range.h/2+Math.sin(angle)*distance-pole.h/2),key=`${x}:${y}`;if(!seen.has(key)){seen.add(key);points.push({x,y})}}
+   }
+   return points;
+  };
+  let bestPower=null;
+  for(const gen of genSeeds){
+   const local=[gen],nodes=[gen],pending=[];
+   for(const target of orderedTargets){const found=findPoweredTarget(target,nodes,local);if(found)local.push(found);else pending.push(target)}
+   const poles=[...powerPoles];
+   while(pending.length&&poles.length){
+    const poleTemplate=poles[0];let bestExtension=null;
+    for(const{x,y}of poleOffsetsFor(poleTemplate,nodes)){
+     const pole={...poleTemplate,x,y};if(!valid(pole,[...placed,...local],unlocked,0,false))continue;
+     const poleRange=powerRange(pole);if(!nodes.some(node=>overlapAtLeast(poleRange,powerRange(node))))continue;
+     const simNodes=[...nodes,pole],simLocal=[...local,pole],newTargets=[],stillPending=[];
+     for(const target of pending){const found=findPoweredTarget(target,simNodes,[...simLocal,...newTargets]);if(found)newTargets.push(found);else stillPending.push(target)}
+     if(!newTargets.length)continue;
+     const score=newTargets.length*100-Math.hypot(pole.x+pole.w/2-(bounds.x+bounds.w/2),pole.y+pole.h/2-(bounds.y+bounds.h/2));
+     if(!bestExtension||score>bestExtension.score)bestExtension={pole,newTargets,stillPending,score};
+     if(!stillPending.length)break;
+    }
+    if(!bestExtension)break;
+    local.push(bestExtension.pole,...bestExtension.newTargets);nodes.push(bestExtension.pole);pending.splice(0,pending.length,...bestExtension.stillPending);poles.shift();
+   }
+   const score=orderedTargets.length-pending.length,rank=score*1000-(nodes.length-1);
+   if(!bestPower||rank>bestPower.rank)bestPower={items:local,missing:pending,rank};
+   if(!pending.length&&nodes.length===1)break;
+  }
+  if(bestPower){placed.push(...bestPower.items);moved+=bestPower.items.length;missing.push(...bestPower.missing)}else missing.push(powerGenerator,...powerTargets);
  }
+ const hatchinators=wants.filter(x=>x.group==='hatchinator').sort((a,b)=>a.id.localeCompare(b.id));
+ for(const item of hatchinators){const found=placeHatchinatorBottom(item,placed,unlocked);if(found){placed.push(found);moved++}else missing.push(item)}
  const groupDirections={mine:'tr',woodland:'tl',resource:'tr',farmland:'bl',kitchen:'tl',upgrade:'tl',artisan:'tr',special:'tr',processing:'tl'};
  const groupOrder=['mine','resource','woodland','farmland','kitchen','upgrade','artisan','special','processing'];
  for(const group of groupOrder){
@@ -15563,21 +15607,41 @@ function autoPlace(ctx,state){
   if(!found)found=scanPlace(item,placed,unlocked,gap,'br');
   if(found){placed.push(found);storagePlaced.push(found);moved++}else missing.push(item);
  }
+ const protectedFromRepack=item=>item.used&&(item.environment||item.poweredTarget||climateNames.includes(item.name)||item.name==='Crackle Generator'||item.name==='Crackle Power Pole');
+ const repackUsed=placed.filter(x=>!protectedFromRepack(x)),retryUsed=missing.filter(x=>x.used&&!protectedFromRepack(x));
+ if(retryUsed.length){
+  const movingIds=new Set([...repackUsed,...retryUsed].map(x=>x.id)),unusedPlaced=repackUsed.filter(x=>!x.used),queue=[...new Map([...repackUsed.filter(x=>x.used),...retryUsed].map(x=>[x.id,x])).values()].sort((a,b)=>b.w*b.h-a.w*a.h);
+  placed.splice(0,placed.length,...placed.filter(x=>!movingIds.has(x.id)));
+  for(let i=missing.length-1;i>=0;i--)if(retryUsed.some(x=>x.id===missing[i].id))missing.splice(i,1);
+  for(const item of queue){const found=item.name==='Hatchinator'?placeHatchinatorBottom(item,placed,unlocked):scanPlace(item,placed,unlocked,0,'tl');if(found)placed.push(found);else missing.push(item)}
+  for(const item of unusedPlaced){const found=scanPlace(item,placed,unlocked,0,'tl');if(found)placed.push(found)}
+ }
  const unused=wants.filter(x=>!x.used&&x.group==='unused'&&!placed.some(p=>p.id===x.id)&&!failed.has(x.id)).sort((a,b)=>b.w*b.h-a.w*a.h),unusedDirection=farCornerDirection(unlocked,placed.filter(x=>x.used));
  for(const item of unused){let found=scanPlaceInZone(item,placed,unlocked,gap,preferredZone('unused',unlocked),unusedDirection);if(!found)found=scanPlace(item,placed,unlocked,gap,unusedDirection);if(found){placed.push(found);moved++}else missing.push(item)}
  const pending=wants.filter(x=>!x.optional&&!placed.some(p=>p.id===x.id)&&!failed.has(x.id)&&!missing.some(m=>m.id===x.id));
- for(const item of pending){let found=null;if(item.environment&&!climateNames.includes(item.name)){for(let y=0;y<=maxY-item.h&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-item.w&&!found;x+=AUTO_STEP){const test={...item,x,y};if(valid(test,placed,unlocked,Math.min(.25,gap))&&envFor(test,[...placed,test],ctx).ok)found=test}}else found=scanPlace(item,placed,unlocked,gap,'tl');if(found){placed.push(found);moved++}else missing.push(item)}
- for(let mi=missing.length-1;mi>=0;mi--){const item=missing[mi];if(!item.used||item.environment||item.poweredTarget||climateNames.includes(item.name)||item.name==='Crackle Generator'||item.name==='Crackle Power Pole')continue;let found=scanPlace(item,placed,unlocked,Math.min(.25,gap),'tl');if(!found)found=scanPlace(item,placed,unlocked,0,'tl');if(found){placed.push(found);moved++;missing.splice(mi,1)}}
+ for(const item of pending){let found=null;if(item.environment&&!climateNames.includes(item.name)){for(let y=0;y<=maxY-item.h&&!found;y+=AUTO_STEP)for(let x=0;x<=maxX-item.w&&!found;x+=AUTO_STEP){const test={...item,x,y};if(valid(test,placed,unlocked,Math.min(SMALL_TILE,gap))&&envFor(test,[...placed,test],ctx).ok)found=test}}else found=scanPlace(item,placed,unlocked,gap,'tl');if(found){placed.push(found);moved++}else missing.push(item)}
+ for(let mi=missing.length-1;mi>=0;mi--){const item=missing[mi];if(!item.used||item.environment||item.poweredTarget||climateNames.includes(item.name)||item.name==='Crackle Generator'||item.name==='Crackle Power Pole')continue;let found=scanPlace(item,placed,unlocked,Math.min(SMALL_TILE,gap),'tl');if(!found)found=scanPlace(item,placed,unlocked,0,'tl');if(found){placed.push(found);moved++;missing.splice(mi,1)}}
  for(const id of failed){const item=wants.find(x=>x.id===id);if(item&&!missing.some(m=>m.id===id))missing.push(item)}
- state.unlocked=unlocked;state.items=Object.fromEntries(placed.map(x=>[x.id,x]));state.planSignature=layoutPlanSignature(ctx,state);save(state);return{placed,moved,missing};
+ for(let index=0;index<placed.length;index++){
+  const item=placed[index];if(!item.used||!item.environment||climateNames.includes(item.name)||envFor(item,placed,ctx).ok)continue;
+  const others=placed.filter(x=>x.id!==item.id),devices=others.filter(x=>climateNames.includes(x.name)),candidates=new Map();
+  for(const device of devices)for(const{x,y}of climateCandidatePositions(item,device))candidates.set(`${x}:${y}`,{x,y});
+  let found=null;
+  const accepts=(x,y)=>{const test={...item,x,y};return valid(test,others,unlocked,0,false)&&envFor(test,[...others,test],ctx).ok?test:null};
+  for(const{x,y}of candidates.values()){found=accepts(x,y);if(found)break}
+  if(!found){const bounds=ownedBounds(unlocked);for(let y=bounds.y;y<=Math.min(maxY-item.h,bounds.y+bounds.h-item.h)&&!found;y+=AUTO_STEP)for(let x=bounds.x;x<=Math.min(maxX-item.w,bounds.x+bounds.w-item.w);x+=AUTO_STEP){found=accepts(x,y);if(found)break}}
+  if(found)placed[index]=found;
+  else{placed.splice(index,1);if(!missing.some(x=>x.id===item.id))missing.push(item);index--}
+ }
+ state.unlocked=unlocked;state.items=Object.fromEntries(placed.map(x=>[x.id,x]));state.planSignature=layoutPlanSignature(ctx,state);if(persist)save(state);return{placed,moved,missing};
 }
 function envFor(item,items,ctx){
  if(climateNames.includes(item.name))return{need:'',temp:0,light:false,ok:true};
  const need=item.environment||'';let temp=0,light=false;
  for(const c of items.filter(x=>climateNames.includes(x.name))){
   const mode=c.climateMode||c.environment||ctx.plan?.climate.find(x=>x.building===c.name)?.mode;if(!mode)continue;
-  const area={x:c.x-3.5,y:c.y-3.5,w:9,h:9};
-  if(overlaps(item,area)){if(c.name==='Sunlamp')light=true;else temp+=climateValue[mode]||0}
+  const area=climateRange(c);
+  if(overlapAtLeast(item,area,SMALL_TILE)){if(c.name==='Sunlamp')light=true;else temp+=climateValue[mode]||0}
  }
  return{need,temp,light,ok:!need||(need==='Adequate'?light:climateValue[need]===temp)};
 }
@@ -15586,6 +15650,29 @@ function syncLayoutMismatchWarning(ctx,state,root){
  const mismatch=layoutPlanMismatch(ctx,state),existing=container.querySelector('.layout-plan-mismatch');
  if(mismatch&&!existing)root.insertAdjacentHTML('beforebegin','<div class="note warn layout-plan-mismatch"><span class="layout-plan-mismatch-icon">↻</span><div><b>Floor layout needs an update.</b><span>The current Production Plan uses different facilities, crops, or climate placement from this saved floor layout. Press <strong>Auto-place current production plan</strong> to sync it; your owned-plot selections are kept.</span></div></div>');
  else if(!mismatch&&existing)existing.remove();
+}
+function layoutCanvasMarkup(ctx,state,items,unlocked){
+ const limit=Math.min(ctx.level,16);
+ return MAP_ORDER.map(id=>{const[c,r]=PLOTS[id],active=unlocked.includes(String(id)),available=id<=limit;return `<div class="land-plot ${active?'unlocked':''} ${available?'available':'locked'}" style="left:${c*PLOT_W*SCALE}px;top:${r*PLOT_H*SCALE}px;width:${PLOT_W*SCALE}px;height:${PLOT_H*SCALE}px"><span>Plot ${id}</span><small>${active?'OWNED':available?'AVAILABLE':`RV ${id}`}</small></div>`}).join('')+items.map(i=>{
+  const env=envFor(i,items,ctx),climate=climateNames.includes(i.name)&&i.used,a=access(i),pr=powerRange(i);
+  const displayFacility=layoutGame(ctx,'facility',i.name),displayLabel=i.label&&i.label!==i.name?layoutGame(ctx,'item',i.label):displayFacility;
+  const description=`${displayLabel}${i.label!==i.name?` · ${displayFacility}`:''} · ${i.w}×${i.h}${i.level?` · Lv.${i.level}`:''}${env.need?` · ${env.need} ${env.ok?'covered':'not covered'}`:''}${i.poweredTarget?` · ${i.powerDraw||0} power`:''}`;
+  return `${climate?`<div class="climate-range ${i.name.replaceAll(' ','-').toLowerCase()}" style="left:${climateRange(i).x*SCALE}px;top:${climateRange(i).y*SCALE}px;width:${9*SCALE}px;height:${9*SCALE}px"></div>`:''}${pr?`<div class="power-range ${i.name==='Crackle Generator'?'generator':'pole'}" style="left:${pr.x*SCALE}px;top:${pr.y*SCALE}px;width:${pr.w*SCALE}px;height:${pr.h*SCALE}px"></div>`:''}<div class="placed ${climate?'climate-device':''} ${i.poweredTarget?'power-target':''} ${env.need&&!env.ok?'bad-env':''} ${state.iconVisual!==false?'icon-view':''} ${mobileSelectedItemId===i.id?'layout-selected':''}" data-id="${i.id}" title="${description}" aria-label="${description}" style="--block-color:${colorFor(i)};left:${i.x*SCALE}px;top:${i.y*SCALE}px;width:${i.w*SCALE}px;height:${i.h*SCALE}px">${state.iconVisual!==false&&layoutFacilityIconPath(i.name,i.level)?`<img class="placed-icon" src="${layoutFacilityIconPath(i.name,i.level)}" alt="">`:''}<span class="sr-only">${description}</span></div>${a?`<div class="access-strip" style="left:${a.x*SCALE}px;top:${a.y*SCALE}px;width:${a.w*SCALE}px;height:${a.h*SCALE}px"></div>`:''}`;
+ }).join('');
+}
+let layoutPreviewCache=null;
+function renderLayoutPreview(ctx){
+ const state=load();state.unlocked??=['1'];state.placeUnused??=true;state.iconVisual??=true;state.spacing??=.5;state.zoom??=.85;
+ const storageMax=storageUnitCount(ctx.level,ctx.data),hatchMax=hatchinatorCount(ctx.level,ctx.data);
+ state.storageCount=storageMax>0?Math.max(1,selectedLayoutCount(state,'storageCount',storageMax)):0;
+ state.hatchinatorCount=selectedLayoutCount(state,'hatchinatorCount',hatchMax);
+ state.unlocked=state.unlocked.map(String).filter(id=>PLOTS[id]&&+id<=Math.min(ctx.level,16));if(!state.unlocked.length&&ctx.level>=1)state.unlocked=['1'];
+ const key=JSON.stringify({schema:3,plan:layoutPlanSignature(ctx,state),unlocked:state.unlocked,placeUnused:state.placeUnused,storageCount:state.storageCount,hatchinatorCount:state.hatchinatorCount,iconVisual:state.iconVisual});
+ let result=layoutPreviewCache?.key===key?layoutPreviewCache.result:null;
+ if(!result){const previewState={...state,items:{},history:[]};const placed=autoPlace(ctx,previewState,{persist:false});layoutPreviewCache={key,result:{items:placed.placed,missing:placed.missing}};result=layoutPreviewCache.result;}
+ const items=result.items,unlocked=state.unlocked,missing=[...new Set(result.missing.map(x=>x.label))];
+ const status=missing.length?`Preview: ${items.length} facilities placed · ${missing.length} could not fit`:`Preview: ${items.length} facilities placed · all required facilities fit`;
+ return `<div class="layout-preview"><div class="layout-preview-scroll"><div class="layout-canvas-stage"><div class="layout-canvas layout-preview-canvas" aria-label="Floor Planner preview">${layoutCanvasMarkup(ctx,state,items,unlocked)}</div></div></div><div class="layout-preview-status">${status}</div></div>`;
 }
 function draw(ctx,state,status=''){
  const root=document.querySelector('#layout-root');if(!root)return;
@@ -15596,12 +15683,7 @@ function draw(ctx,state,status=''){
  const canvas=root.querySelector('.layout-canvas');
  const stage=root.querySelector('.layout-canvas-stage');
  applyZoom(root,state);
- canvas.innerHTML=MAP_ORDER.map(id=>{const[c,r]=PLOTS[id],active=unlocked.includes(String(id)),available=id<=limit;return `<div class="land-plot ${active?'unlocked':''} ${available?'available':'locked'}" style="left:${c*PLOT_W*SCALE}px;top:${r*PLOT_H*SCALE}px;width:${PLOT_W*SCALE}px;height:${PLOT_H*SCALE}px"><span>Plot ${id}</span><small>${active?'OWNED':available?'AVAILABLE':`RV ${id}`}</small></div>`}).join('')+items.map(i=>{
-  const env=envFor(i,items,ctx),climate=climateNames.includes(i.name)&&i.used,a=access(i),pr=powerRange(i);
-  const displayFacility=layoutGame(ctx,'facility',i.name),displayLabel=i.label&&i.label!==i.name?layoutGame(ctx,'item',i.label):displayFacility;
-  const description=`${displayLabel}${i.label!==i.name?` · ${displayFacility}`:''} · ${i.w}×${i.h}${i.level?` · Lv.${i.level}`:''}${env.need?` · ${env.need} ${env.ok?'covered':'not covered'}`:''}${i.poweredTarget?` · ${i.powerDraw||0} power`:''}`;
-  return `${climate?`<div class="climate-range ${i.name.replaceAll(' ','-').toLowerCase()}" style="left:${(i.x-3.5)*SCALE}px;top:${(i.y-3.5)*SCALE}px;width:${9*SCALE}px;height:${9*SCALE}px"></div>`:''}${pr?`<div class="power-range ${i.name==='Crackle Generator'?'generator':'pole'}" style="left:${pr.x*SCALE}px;top:${pr.y*SCALE}px;width:${pr.w*SCALE}px;height:${pr.h*SCALE}px"></div>`:''}<div class="placed ${climate?'climate-device':''} ${i.poweredTarget?'power-target':''} ${env.need&&!env.ok?'bad-env':''} ${state.iconVisual!==false?'icon-view':''} ${mobileSelectedItemId===i.id?'layout-selected':''}" data-id="${i.id}" title="${description}" aria-label="${description}" style="--block-color:${colorFor(i)};left:${i.x*SCALE}px;top:${i.y*SCALE}px;width:${i.w*SCALE}px;height:${i.h*SCALE}px">${state.iconVisual!==false&&layoutFacilityIconPath(i.name,i.level)?`<img class="placed-icon" src="${layoutFacilityIconPath(i.name,i.level)}" alt="">`:''}<span class="sr-only">${description}</span></div>${a?`<div class="access-strip" style="left:${a.x*SCALE}px;top:${a.y*SCALE}px;width:${a.w*SCALE}px;height:${a.h*SCALE}px"></div>`:''}`;
- }).join('');
+ canvas.innerHTML=layoutCanvasMarkup(ctx,state,items,unlocked);
  const entries=new Map();for(const i of items){const key=layoutLegendKey(i),facilityLabel=layoutGame(ctx,'facility',i.name),itemLabel=i.label===i.name?facilityLabel:layoutGame(ctx,'item',i.label);const e=entries.get(key)||{label:i.label===i.name?facilityLabel:`${itemLabel} · ${facilityLabel}`,detail:`${i.w}×${i.h}${i.environment?` · ${i.environment}`:''}`,color:colorFor(i),count:0,level:i.level||1};e.count++;entries.set(key,e)}
  const selectedLegendKey=mobileSelectedItemId&&state.items?.[mobileSelectedItemId]?layoutLegendKey(state.items[mobileSelectedItemId]):'';
  root.querySelector('.layout-legend').innerHTML=[...entries.entries()].map(([k,e])=>`<div class="layout-legend-row ${selectedLegendKey===k?'layout-selected':''}" data-layout-legend-key="${encodeURIComponent(k)}">${state.iconVisual!==false&&layoutFacilityIconPath(k.split('|')[1]||k,e.level||1)?`<img class="layout-legend-icon" src="${layoutFacilityIconPath(k.split('|')[1]||k,e.level||1)}" alt="">`:`<i style="background:${e.color}"></i>`}<span><b data-i18n-ignore>${layoutHtml(e.label)}</b><small>${e.count} placed · ${e.detail}</small></span></div>`).join('')||'<p class="muted">Auto-place facilities to build the legend.</p>';
@@ -15613,7 +15695,7 @@ function draw(ctx,state,status=''){
 function applyZoom(root,state){const scroll=root.querySelector('.layout-scroll'),stage=root.querySelector('.layout-canvas-stage'),canvas=root.querySelector('.layout-canvas');if(!scroll||!stage||!canvas)return;const z=Math.max(.45,Math.min(1.8,Number(state.zoom)||1));state.zoom=z;stage.style.width=`${Math.round(1440*z)}px`;stage.style.height=`${Math.round(1080*z)}px`;canvas.style.transform=`scale(${z})`;canvas.style.transformOrigin='top left';const meter=root.querySelector('.layout-zoom-value');if(meter)meter.textContent=`${Math.round(z*100)}%`;save(state)}
 function fitZoom(root,state){const scroll=root.querySelector('.layout-scroll');if(!scroll)return;const available=Math.max(700,scroll.clientWidth-16);state.zoom=Math.max(.45,Math.min(1.4,available/1440));applyZoom(root,state)}
 function bindDrag(ctx,state,canvas){
- canvas.querySelectorAll('.placed').forEach(el=>el.onpointerdown=e=>{e.preventDefault();const id=el.dataset.id,item=state.items[id];applyLayoutSelection(ctx,state,canvas.closest('#layout-root'),id);const start={x:item.x,y:item.y,px:e.clientX,py:e.clientY},phoneTouch=window.innerWidth<=960&&window.matchMedia?.('(pointer:coarse)').matches,dragZoom=phoneTouch?Math.max(.45,Number(state.zoom)||1):1;el.setPointerCapture(e.pointerId);el.onpointermove=ev=>{item.x=Math.max(0,Math.round((start.x+(ev.clientX-start.px)/(SCALE*dragZoom))/DRAG_STEP)*DRAG_STEP);item.y=Math.max(0,Math.round((start.y+(ev.clientY-start.py)/(SCALE*dragZoom))/DRAG_STEP)*DRAG_STEP);el.style.left=`${item.x*SCALE}px`;el.style.top=`${item.y*SCALE}px`};el.onpointerup=()=>{const others=Object.values(state.items);if(!valid(item,others,state.unlocked||[],0)){item.x=start.x;item.y=start.y;draw(ctx,state,'That position overlaps another facility, an incubator access strip, or locked land.')}else if(ctx.plan?.eModeActive&&!powerLayoutStatus(others).ok){item.x=start.x;item.y=start.y;draw(ctx,state,'That move would disconnect the Crackle power network. Generator/pole ranges and powered facilities must overlap by at least one small power-grid tile (¼ square).')}else{save(state);draw(ctx,state)}}});
+ canvas.querySelectorAll('.placed').forEach(el=>el.onpointerdown=e=>{e.preventDefault();const id=el.dataset.id,item=state.items[id];applyLayoutSelection(ctx,state,canvas.closest('#layout-root'),id);const start={x:item.x,y:item.y,px:e.clientX,py:e.clientY},phoneTouch=window.innerWidth<=960&&window.matchMedia?.('(pointer:coarse)').matches,dragZoom=phoneTouch?Math.max(.45,Number(state.zoom)||1):1;el.setPointerCapture(e.pointerId);el.onpointermove=ev=>{item.x=Math.max(0,Math.round((start.x+(ev.clientX-start.px)/(SCALE*dragZoom))/DRAG_STEP)*DRAG_STEP);item.y=Math.max(0,Math.round((start.y+(ev.clientY-start.py)/(SCALE*dragZoom))/DRAG_STEP)*DRAG_STEP);el.style.left=`${item.x*SCALE}px`;el.style.top=`${item.y*SCALE}px`};el.onpointerup=()=>{const others=Object.values(state.items);if(!valid(item,others,state.unlocked||[],0)){item.x=start.x;item.y=start.y;draw(ctx,state,'That position overlaps another facility, an incubator access strip, or locked land.')}else if(ctx.plan?.eModeActive&&!powerLayoutStatus(others).ok){item.x=start.x;item.y=start.y;draw(ctx,state,'That move would disconnect the Crackle power network. Generator/pole ranges and powered facilities must overlap by at least one small tile (¼ square).')}else{save(state);draw(ctx,state)}}});
 }
 function renderLayoutPlanner(container,ctx){
  const state=load();state.unlocked??=['1'];state.items??={};state.placeUnused??=true;state.iconVisual??=true;state.spacing??=.5;state.zoom??=.85;
@@ -15621,9 +15703,10 @@ function renderLayoutPlanner(container,ctx){
  const storageMax=storageUnitCount(ctx.level,ctx.data),hatchMax=hatchinatorCount(ctx.level,ctx.data);state.storageCount=storageMax>0?Math.max(1,selectedLayoutCount(state,'storageCount',storageMax)):0;state.hatchinatorCount=selectedLayoutCount(state,'hatchinatorCount',hatchMax);
  state.unlocked=state.unlocked.map(String).filter(id=>PLOTS[id]&&+id<=Math.min(ctx.level,16));if(!state.unlocked.length&&ctx.level>=1)state.unlocked=['1'];save(state);
  const planMismatch=layoutPlanMismatch(ctx,state),storageCount=state.storageCount,hatchCount=state.hatchinatorCount;
- container.innerHTML=ctx.title('Homeland Floor Layout','Auto-place keeps similar facilities together, Storage close to production, and unused facilities out of the way.',ctx.helpButton?ctx.helpButton('floor'):'')+`${planMismatch?'<div class="note warn layout-plan-mismatch"><span class="layout-plan-mismatch-icon">↻</span><div><b>Floor layout needs an update.</b><span>The current Production Plan uses different facilities, crops, or climate placement from this saved floor layout. Press <strong>Auto-place current production plan</strong> to sync it; your owned-plot selections are kept.</span></div></div>':''}<div id="layout-root"><div class="layout-controls"><div><h3>Your Homeland plots</h3><div class="plot-picker"></div></div><div class="layout-actions"><div class="layout-quantity-grid"><div class="layout-quantity-control"><div class="layout-quantity-head"><label for="layout-storage-count"><span data-i18n-ignore>${layoutHtml(layoutGame(ctx,'facility','Storage Unit'))}</span> bins</label><span class="layout-quantity-max">${storageMax>0?`1–${storageMax}`:`0`}</span></div><select id="layout-storage-count" aria-label="Storage bin count" ${storageMax>0?'':'disabled'}>${Array.from({length:Math.max(0,storageMax)},(_,i)=>{const n=i+1;return `<option value="${n}" ${state.storageCount===n?'selected':''}>${n}</option>`}).join('')}</select></div><div class="layout-quantity-control"><div class="layout-quantity-head"><label for="layout-hatch-count">Hatchinators</label><span class="layout-quantity-max">0–${hatchMax}</span></div><select id="layout-hatch-count" aria-label="Hatchinator count">${Array.from({length:hatchMax+1},(_,n)=>`<option value="${n}" ${state.hatchinatorCount===n?'selected':''}>${n}</option>`).join('')}</select><small>Choose how many to include in the floor layout.</small></div></div><div class="layout-fixed-info"><b>${storageCount} storage bins · ${hatchCount} Hatchinators</b></div><label class="check"><input id="layout-unused" type="checkbox" ${state.placeUnused!==false?'checked':''}>Place currently not used facilities</label><label class="check"><input id="layout-icon-visual" type="checkbox" ${state.iconVisual!==false?'checked':''}>Use facility icons</label><label for="layout-spacing">Space between normal buildings</label><select id="layout-spacing"><option value=".25" ${state.spacing===.25?'selected':''}>Compact · ¼ square</option><option value=".5" ${state.spacing===.5?'selected':''}>Comfortable · ½ square</option><option value="1" ${state.spacing===1?'selected':''}>Wide · 1 square</option></select><div class="layout-zoom-controls"><button type="button" class="secondary" id="layout-zoom-out">−</button><button type="button" class="secondary" id="layout-zoom-fit">Fit</button><button type="button" class="secondary" id="layout-zoom-in">+</button><span class="layout-zoom-value">100%</span></div><button class="primary" id="auto-layout">Auto-place current production plan</button><button class="secondary" id="reverse-layout" ${Array.isArray(state.history)&&state.history.length?'':'disabled'}>Reverse Layout</button><button class="secondary" id="clear-layout">Clear facility positions</button></div></div><div class="note"><b>Exact Homeland scale:</b> 1 plot = 20×15 squares. Heat Furnace is 1×1 square; Cooling Unit and Sunlamp are 2×2 squares. Climate ranges are 9×9 squares. Crackle Generator coverage is 11×11 squares (44×44 power-grid small tiles), and Power Pole coverage is 7×7 squares (28×28); Crackle relays need at least 1 power-grid small tile / ¼ square of overlap.</div><div class="layout-workspace"><div class="layout-scroll"><div class="layout-selection-info" hidden aria-live="polite"></div><div class="layout-canvas-stage"><div class="layout-canvas"></div></div></div><aside class="layout-legend" aria-label="Facility color legend"></aside></div><div class="layout-status"></div><p class="hint">Hover or tap a block for its exact name, footprint, level and climate status. Dragging snaps to the smallest tile (1/16 square). Hatchinators stay along the bottom edge and reserve one square of clear access space in front.</p></div>`;
+ container.innerHTML=ctx.title('Homeland Floor Layout','Auto-place keeps similar facilities together, Storage close to production, and unused facilities out of the way.',ctx.helpButton?ctx.helpButton('floor'):'')+`${planMismatch?'<div class="note warn layout-plan-mismatch"><span class="layout-plan-mismatch-icon">↻</span><div><b>Floor layout needs an update.</b><span>The current Production Plan uses different facilities, crops, or climate placement from this saved floor layout. Press <strong>Auto-place current production plan</strong> to sync it; your owned-plot selections are kept.</span></div></div>':''}<div id="layout-root"><div class="layout-controls"><div><h3>Your Homeland plots</h3><div class="plot-picker"></div></div><div class="layout-actions"><div class="layout-quantity-grid"><div class="layout-quantity-control"><div class="layout-quantity-head"><label for="layout-storage-count"><span data-i18n-ignore>${layoutHtml(layoutGame(ctx,'facility','Storage Unit'))}</span> bins</label><span class="layout-quantity-max">${storageMax>0?`1–${storageMax}`:`0`}</span></div><select id="layout-storage-count" aria-label="Storage bin count" ${storageMax>0?'':'disabled'}>${Array.from({length:Math.max(0,storageMax)},(_,i)=>{const n=i+1;return `<option value="${n}" ${state.storageCount===n?'selected':''}>${n}</option>`}).join('')}</select></div><div class="layout-quantity-control"><div class="layout-quantity-head"><label for="layout-hatch-count">Hatchinators</label><span class="layout-quantity-max">0–${hatchMax}</span></div><select id="layout-hatch-count" aria-label="Hatchinator count">${Array.from({length:hatchMax+1},(_,n)=>`<option value="${n}" ${state.hatchinatorCount===n?'selected':''}>${n}</option>`).join('')}</select><small>Choose how many to include in the floor layout.</small></div></div><div class="layout-fixed-info"><b>${storageCount} storage bins · ${hatchCount} Hatchinators</b></div><label class="check"><input id="layout-unused" type="checkbox" ${state.placeUnused!==false?'checked':''}>Place currently not used facilities</label><label class="check"><input id="layout-icon-visual" type="checkbox" ${state.iconVisual!==false?'checked':''}>Use facility icons</label><label for="layout-spacing">Space between normal buildings</label><select id="layout-spacing"><option value=".25" ${state.spacing===.25?'selected':''}>Compact · ¼ square</option><option value=".5" ${state.spacing===.5?'selected':''}>Comfortable · ½ square</option><option value="1" ${state.spacing===1?'selected':''}>Wide · 1 square</option></select><div class="layout-zoom-controls"><button type="button" class="secondary" id="layout-zoom-out">−</button><button type="button" class="secondary" id="layout-zoom-fit">Fit</button><button type="button" class="secondary" id="layout-zoom-in">+</button><span class="layout-zoom-value">100%</span></div><button class="primary" id="auto-layout">Auto-place current production plan</button><button class="secondary" id="reverse-layout" ${Array.isArray(state.history)&&state.history.length?'':'disabled'}>Reverse Layout</button><button class="secondary" id="clear-layout">Clear facility positions</button></div></div><div class="note"><b>Exact Homeland scale:</b> 1 plot = 20×15 squares. Heat Furnace is 1×1 square; Cooling Unit and Sunlamp are 2×2 squares. Climate ranges are 9×9 squares. Crackle Generator coverage is 11×11 squares (44×44 small tiles), and Power Pole coverage is 7×7 squares (28×28 small tiles); Crackle relays need at least 1 small tile / ¼ square of overlap.</div><div class="layout-workspace"><div class="layout-scroll"><div class="layout-selection-info" hidden aria-live="polite"></div><div class="layout-canvas-stage"><div class="layout-canvas"></div></div></div><aside class="layout-legend" aria-label="Facility color legend"></aside></div><div class="layout-status"></div><p class="hint">Hover or tap a block for its exact name, footprint, level and climate status. Dragging snaps to the smallest tile (1/4 square). Hatchinators stay along the bottom edge and reserve one square of clear access space in front.</p></div>`;
  const root=container.querySelector('#layout-root');
- root.onclick=e=>{const placed=e.target.closest('.placed');if(placed){applyLayoutSelection(ctx,state,root,placed.dataset.id);return}const p=e.target.closest('[data-plot]');if(p&&!p.disabled){const id=p.dataset.plot;state.unlocked=state.unlocked.includes(id)?state.unlocked.filter(x=>x!==id):[...state.unlocked,id];save(state);draw(ctx,state);return}if(e.target.closest('#layout-zoom-in')){state.zoom=Math.min(1.8,(Number(state.zoom)||1)+.1);applyZoom(root,state);return}if(e.target.closest('#layout-zoom-out')){state.zoom=Math.max(.45,(Number(state.zoom)||1)-.1);applyZoom(root,state);return}if(e.target.closest('#layout-zoom-fit')){fitZoom(root,state);return}if(e.target.closest('#auto-layout')){pushHistory(state);const r=autoPlace(ctx,state),missing=[...new Set(r.missing.map(x=>x.label))].join(', ');draw(ctx,state,r.missing.length?`Could not fit ${r.missing.length} facilities (${missing}) with the selected spacing. Mark more plots as owned, reduce spacing, or turn off unused facilities.`:`Placed ${r.placed.length} facilities with active production grouped and Storage spread near the active work areas.`);root.parentElement?.querySelectorAll('.layout-plan-mismatch').forEach(n=>n.remove());return}if(e.target.closest('#reverse-layout')){if(restorePreviousLayout(state)){mobileSelectedItemId=null;draw(ctx,state,'Restored the previous deployed floor layout.')}return}if(e.target.closest('#clear-layout')){pushHistory(state);state.items={};mobileSelectedItemId=null;delete state.planSignature;save(state);draw(ctx,state,'Facility positions cleared; owned plots were kept.');return}if(e.target.closest('.layout-canvas'))applyLayoutSelection(ctx,state,root,null)};
+ root.querySelector('#layout-spacing')?.remove();root.querySelector('label[for="layout-spacing"]')?.remove();
+ root.onclick=e=>{const placed=e.target.closest('.placed');if(placed){applyLayoutSelection(ctx,state,root,placed.dataset.id);return}const p=e.target.closest('[data-plot]');if(p&&!p.disabled){const id=p.dataset.plot;state.unlocked=state.unlocked.includes(id)?state.unlocked.filter(x=>x!==id):[...state.unlocked,id];save(state);draw(ctx,state);return}if(e.target.closest('#layout-zoom-in')){state.zoom=Math.min(1.8,(Number(state.zoom)||1)+.1);applyZoom(root,state);return}if(e.target.closest('#layout-zoom-out')){state.zoom=Math.max(.45,(Number(state.zoom)||1)-.1);applyZoom(root,state);return}if(e.target.closest('#layout-zoom-fit')){fitZoom(root,state);return}if(e.target.closest('#auto-layout')){pushHistory(state);const r=autoPlace(ctx,state),missing=[...new Set(r.missing.map(x=>x.label))].join(', ');draw(ctx,state,r.missing.length?`Could not fit ${r.missing.length} facilities (${missing}). Mark more plots as owned or turn off unused facilities.`:`Placed ${r.placed.length} facilities with active production grouped and Storage spread near the active work areas.`);root.parentElement?.querySelectorAll('.layout-plan-mismatch').forEach(n=>n.remove());return}if(e.target.closest('#reverse-layout')){if(restorePreviousLayout(state)){mobileSelectedItemId=null;draw(ctx,state,'Restored the previous deployed floor layout.')}return}if(e.target.closest('#clear-layout')){pushHistory(state);state.items={};mobileSelectedItemId=null;delete state.planSignature;save(state);draw(ctx,state,'Facility positions cleared; owned plots were kept.');return}if(e.target.closest('.layout-canvas'))applyLayoutSelection(ctx,state,root,null)};
  root.onchange=e=>{if(e.target.id==='layout-unused')state.placeUnused=e.target.checked;if(e.target.id==='layout-icon-visual')state.iconVisual=e.target.checked;if(e.target.id==='layout-spacing')state.spacing=Number(e.target.value);if(e.target.id==='layout-storage-count')state.storageCount=storageMax>0?Math.max(1,selectedLayoutCount({storageCount:Number(e.target.value)},'storageCount',storageMax)):0;if(e.target.id==='layout-hatch-count')state.hatchinatorCount=selectedLayoutCount({hatchinatorCount:Number(e.target.value)},'hatchinatorCount',hatchMax);save(state);draw(ctx,state)};
  draw(ctx,state);
  setTimeout(()=>fitZoom(root,state),0);
@@ -15631,17 +15714,17 @@ function renderLayoutPlanner(container,ctx){
 
 function autoRedeployLayout(ctx){const state=load();state.unlocked??=['1'];state.items??={};state.placeUnused??=true;state.iconVisual??=true;state.spacing??=.5;state.zoom??=.85;const storageMax=storageUnitCount(ctx.level,ctx.data),hatchMax=hatchinatorCount(ctx.level,ctx.data);state.storageCount=storageMax>0?Math.max(1,selectedLayoutCount(state,'storageCount',storageMax)):0;state.hatchinatorCount=selectedLayoutCount(state,'hatchinatorCount',hatchMax);state.unlocked=state.unlocked.map(String).filter(id=>PLOTS[id]&&+id<=Math.min(ctx.level,16));if(!state.unlocked.length&&ctx.level>=1)state.unlocked=['1'];save(state);pushHistory(state);const result=autoPlace(ctx,state),container=document.querySelector('#content');if(container){renderLayoutPlanner(container,ctx);const root=document.querySelector('#layout-root'),missing=[...new Set(result.missing.map(x=>x.label))].join(', ');if(root){root.querySelector('.layout-status').textContent=result.missing.length?`Auto-redeployed, but ${result.missing.length} facilities could not fit (${missing}).`:`Floor layout automatically redeployed for the updated planner settings.`;root.parentElement?.querySelectorAll('.layout-plan-mismatch').forEach(n=>n.remove())}}return result}
 
-return {renderLayoutPlanner,autoRedeployLayout,exportLayoutShareState,importLayoutShareState};
+return {renderLayoutPlanner,autoRedeployLayout,exportLayoutShareState,importLayoutShareState,renderLayoutPreview};
 })();
-const {renderLayoutPlanner,autoRedeployLayout,exportLayoutShareState,importLayoutShareState}=__ANIILAND_LAYOUT;
+const {renderLayoutPlanner,autoRedeployLayout,exportLayoutShareState,importLayoutShareState,renderLayoutPreview}=__ANIILAND_LAYOUT;
 (async()=>{
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const data=__ANIILAND_DATA;
-const APP_VERSION='2.0.9';
+const APP_VERSION='2.1.0';
 const plannerHeader=document.querySelector('body>header');
 if(plannerHeader){const updatePlannerHeaderHeight=()=>document.documentElement.style.setProperty('--planner-header-height',`${plannerHeader.getBoundingClientRect().height}px`);updatePlannerHeaderHeight();new ResizeObserver(updatePlannerHeaderHeight).observe(plannerHeader);}
 
-const PLAN_MODEL_SCHEMA=17;
+const PLAN_MODEL_SCHEMA=18;
 const versionEl=document.querySelector('.version');if(versionEl)versionEl.innerHTML='<b>'+APP_VERSION+'</b><small>30 September</small>';
 const byId=new Map(data.items.map(i=>[i.id,i]));const fmt=(n,d=0)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16104,9 +16187,42 @@ function resetConfig(){
 }
 function title(t,sub,extra=''){return `<div class="page-title"><div><div class="eyebrow">HOMELAND / LEVEL ${level}</div><h1>${t}</h1><p class="subtitle">${sub}</p></div>${extra}</div>`}
 function blank(){return title('Your Production Plan','Farmland, woodland, mines and crafting — optimized together.')+'<div class="loading"><span class="spinner"></span>Balancing production chains…</div>'}
+function climatePlacementAudit(plan){
+ const expected=new Map();
+ for(const row of plan.rows||[]){const item=byId.get(row.id),count=Math.max(0,Math.round(row.plots??row.units??0));if(!item?.environment||!count)continue;const key=JSON.stringify([item.name,row.facility,item.environment]);expected.set(key,(expected.get(key)||0)+count)}
+ if(!expected.size)return{ok:true,missing:[]};
+ const template=document.createElement('template');template.innerHTML=climateDiagram(plan);
+ const placed=new Map();
+ for(const target of template.content.querySelectorAll('.climate-preview-facility')){const title=target.dataset.climateTitle||'',detail=target.dataset.climateDetail||'',match=detail.match(/^(.+?) · [0-9.]+×[0-9.]+ squares · (Warm|Scorching|Cool|Freeze|Adequate)(?: ·|$)/);if(!match)continue;const key=JSON.stringify([title,match[1],match[2]]);placed.set(key,(placed.get(key)||0)+1)}
+ const missing=[];for(const[key,count]of expected){const got=placed.get(key)||0;if(got<count){const[name,facility,mode]=JSON.parse(key);missing.push({name,facility,mode,count:count-got})}}
+ return{ok:missing.length===0,missing};
+}
+function climatePlacementNoGoodCut(plan){
+ const state=plan.climatePlacementState||{};
+ return{climate:state.climate||[],crops:state.crops||[],overlap:state.overlap||[]};
+}
+function climatePlacementCropCaps(plan,audit,currentCaps){
+ const caps={...currentCaps};let changed=false;
+ for(const missing of audit.missing||[]){
+  const row=(plan.rows||[]).find(candidate=>{const item=byId.get(candidate.id);return item?.name===missing.name&&candidate.facility===missing.facility&&item.environment===missing.mode});
+  if(!row)continue;
+  const current=Math.max(0,Math.round(row.plots??row.units??0)),next=Math.max(0,current-Math.max(1,Number(missing.count)||1)),previous=Number.isFinite(Number(caps[row.id]))?Number(caps[row.id]):current;
+  if(next<previous){caps[row.id]=next;changed=true}
+ }
+ return{caps,changed};
+}
 async function calculate(){
  const my=++generation;busy=true;$('#optimize').disabled=true;pendingPlannerUpdate=null;renderPlannerUpdateButton();if(tab==='plan')$('#content').innerHTML=blank();const st=settings();
- const cachedSolve=async cfg=>{const key=JSON.stringify(cfg);let result=cache.get(key);if(!result){result=await solve(cfg);cache.set(key,result)}return result};
+ const cachedSolve=async cfg=>{
+  const cuts=[],caps={},seenCuts=new Set();
+  while(true){
+  const candidateSettings={...cfg,...(cuts.length?{climatePlacementCuts:cuts}:{}),...(Object.keys(caps).length?{climatePlacementCaps:caps}:{})},key=JSON.stringify(candidateSettings);let result=cache.get(key);if(!result){try{result=await solve(candidateSettings);cache.set(key,result)}catch(error){if(cuts.length&&/No feasible plan: Infeasible/.test(String(error?.message||error)))break;throw error}}
+   const audit=climatePlacementAudit(result);if(audit.ok)return cuts.length?{...result,proven:false,climatePlacementFallback:cuts.length}:result;
+   const cut=climatePlacementNoGoodCut(result),signature=JSON.stringify(cut);if(seenCuts.has(signature))break;seenCuts.add(signature);cuts.push(cut);
+   const capped=climatePlacementCropCaps(result,audit,caps);if(capped.changed)Object.assign(caps,capped.caps);
+  }
+  throw Error('The highest-ranked plans could not fit all climate-dependent facilities. Try fewer climate-dependent facilities or a different production setup.');
+ };
  try{
   let r=structuredClone(await cachedSolve(st));r=applyAniimoForwardBonuses(r,st);let upgradePlan=null;
   if(level<20){
@@ -16131,33 +16247,121 @@ function practicalFlows(r,hours){const saleMap=new Map(r.sales.map(s=>[s.id,s]))
 function bonusOutputs(r,hours){const rows=r.rows.map(row=>({row,item:byId.get(row.id)}));const xp=rows.filter(x=>x.item?.currency==='aniimo_exp').map(({row,item})=>({id:item.id,name:item.name,units:Math.max(0,Math.floor(row.batches*hours+1e-9)*item.yield),value:item.price||0})).filter(x=>x.units>0);const pods=rows.filter(x=>x.item?.currency==='aniipods').map(({row,item})=>({id:item.id,name:item.name,units:Math.max(0,Math.floor(row.batches*hours+1e-9)*item.yield)})).filter(x=>x.units>0);return{xp,pods,totalXp:xp.reduce((a,x)=>a+x.units*x.value,0)}}
 function climateProfile(r){const heat=r.climate.find(x=>x.building==='Heat Furnace')?.mode,cool=r.climate.find(x=>x.building==='Cooling Unit')?.mode;const hi=heat==='Scorching'?2:heat==='Warm'?1:0,lo=cool==='Freeze'?-2:cool==='Cool'?-1:0;return [...new Set([lo,0,hi,lo+hi])].sort((a,b)=>a-b).filter((x,i,a)=>i===0||x!==a[i-1]).map(x=>x>0?`+${x}`:x).join(' / ')}
 function climateDiagram(r){
+ const climateNames=['Heat Furnace','Cooling Unit','Sunlamp'];
+ const PREVIEW_SMALL_TILE=.25,PREVIEW_SCALE=18,snap=v=>Math.round(Number(v)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE;
+ const temperatureValue={Warm:1,Scorching:2,Cool:-1,Freeze:-2};
  if(!r.climate.length)return '<div class="empty">No climate-controlled production is used.</div>';
- const colors={Farmland:'#62bd83',Woodland:'#32a997',Large:'#9c7bd1','Heat Furnace':'#e9805b','Cooling Unit':'#58b9e8',Sunlamp:'#e9ce56'},tempColors={Warm:'#efa76f',Scorching:'#e9805b',Cool:'#58b9e8',Freeze:'#769de8'},cropPalette=['#f4a261','#63c7da','#c69af0','#ef88a5','#c8d65b','#67cda7','#ff8f70','#829df2','#dfab5f','#a6d86b','#df8fe8','#5bc0a8'];
- const cropColor=name=>{let h=7;for(const ch of String(name||''))h=(h*31+ch.charCodeAt(0))|0;return cropPalette[Math.abs(h)%cropPalette.length]};
- const overlapByItem=new Map();for(const o of r.climateOverlap||[]){const k=`${o.itemId}|${o.mode}`;overlapByItem.set(k,(overlapByItem.get(k)||0)+Math.max(0,Number(o.count)||0))}
- const directFor=mode=>{const m=new Map();for(const row of r.rows){const i=byId.get(row.id);if(i?.environment!==mode)continue;const total=Math.max(0,Math.round(row.plots!=null?row.plots:row.units||0)),count=Math.max(0,total-(overlapByItem.get(`${i.id}|${mode}`)||0));if(!count)continue;const key=`${i.name}|${i.facility}`,cur=m.get(key)||{name:i.name,facility:i.facility,size:i.facility==='Farmland'?2:i.facility==='Woodland'?4:5,facilityLevel:i.facilityLevel||1,count:0};cur.count+=count;m.set(key,cur)}return[...m.values()]};
- const targetMeta=(p,extra='')=>{const key=encodeURIComponent(`${p.name}|${p.facility}|${p.mode}`),title=p.name,detail=`${p.facility} · ${p.size}×${p.size} squares · ${p.mode}${extra}`;return{key,title,detail,color:cropColor(p.name)}};
- const targetGroup=(p,extra='')=>{const m=targetMeta(p,extra);return `<g class="climate-target" tabindex="0" data-climate-key="${esc(m.key)}" data-climate-title="${esc(m.title)}" data-climate-detail="${esc(m.detail)}" style="--crop-color:${m.color}"><title>${esc(`${m.title} · ${m.detail}`)}</title><rect class="climate-facility-box" x="${p.x}" y="${p.y}" width="${p.size}" height="${p.size}" rx=".12" fill="${m.color}70" stroke="${m.color}" stroke-width=".11"/>${climateIconView&&facilityIconFor(p.facility,p.facilityLevel)?`<image href="${facilityIconFor(p.facility,p.facilityLevel)}" x="${p.x+.1}" y="${p.y+.1}" width="${Math.max(.6,p.size-.2)}" height="${Math.max(.6,p.size-.2)}" preserveAspectRatio="xMidYMid meet"/>`:''}</g>`};
- const keyRow=(x,extra='')=>{const m=targetMeta(x,extra);return `<div class="climate-key-row climate-target" tabindex="0" data-climate-key="${esc(m.key)}" data-climate-title="${esc(m.title)}" data-climate-detail="${esc(m.detail)}" style="--crop-color:${m.color}"><i class="climate-crop-swatch" style="background:${m.color}"></i>${climateIconView&&facilityIconFor(x.facility,x.facilityLevel)?`<img class="climate-key-icon" src="${esc(facilityIconFor(x.facility,x.facilityLevel))}" alt="">`:''}<span><b>${gameHtml('item',x.name)}</b><small>${x.count} × ${gameHtml('facility',x.facility)} · ${x.size}×${x.size} · ${esc(x.mode)}${extra}</small></span></div>`};
- const groupedOverlap=new Map();for(const o of r.climateOverlap||[]){const k=`${o.heatMode}|${o.coolMode}|${o.mode}`,list=groupedOverlap.get(k)||[];list.push(o);groupedOverlap.set(k,list)}
- const consumedChoice=new Map(),shownDirect=new Map(),usedDirect=(mode,p)=>{const k=`${mode}|${p.name}|${p.facility}`;shownDirect.set(k,(shownDirect.get(k)||0)+1)},availableChoice=(building,mode)=>r.climate.map((c,i)=>({c,i})).find(x=>x.c.building===building&&x.c.mode===mode&&(Number(x.c.count)||0)>(consumedChoice.get(x.i)||0));
- const overlapPlans=[...groupedOverlap.values()].map((group,gi)=>{const first=group[0],heatPick=availableChoice('Heat Furnace',first.heatMode),coolPick=availableChoice('Cooling Unit',first.coolMode);if(!heatPick||!coolPick)return null;consumedChoice.set(heatPick.i,(consumedChoice.get(heatPick.i)||0)+1);consumedChoice.set(coolPick.i,(consumedChoice.get(coolPick.i)||0)+1);return{group,gi,first,heat:heatPick.c,cool:coolPick.c}}).filter(Boolean);
- const overlapFigures=overlapPlans.map(({group,gi,first,heat,cool})=>{
-  const dx=8.5,heatRange={x:-4,y:-4,w:9,h:9},coolRange={x:dx-3.5,y:-3.5,w:9,h:9},hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
-  const directBoxes=(entries,choice,shift,otherRange,mode)=>{const out=[],taken=new Set();for(const e of entries){const slots=(choice.layout||[]).filter(x=>x.s===e.size).map(x=>({...x,x:x.x+shift})).filter(x=>!hit({x:x.x,y:x.y,w:x.s,h:x.s},otherRange)&&!taken.has(`${x.x}:${x.y}:${x.s}`)).sort((a,b)=>Math.hypot(a.x+a.s/2,a.y+a.s/2)-Math.hypot(b.x+b.s/2,b.y+b.s/2));for(let n=0;n<Math.min(e.count,slots.length);n++){const slot=slots[n];taken.add(`${slot.x}:${slot.y}:${slot.s}`);const p={...e,x:slot.x,y:slot.y,mode,kind:'direct'};out.push(p);usedDirect(mode,p)}}return out};
-  const heatBoxes=directBoxes(directFor(first.heatMode),heat,0,coolRange,first.heatMode),coolBoxes=directBoxes(directFor(first.coolMode),cool,dx,heatRange,first.coolMode),overlapEntries=[...new Map(group.map(o=>{const item=byId.get(o.itemId),key=`${item?.name||o.itemId}|${item?.facility||o.facility}`;return[key,{name:item?.name||o.itemId,facility:item?.facility||o.facility,size:item?.facility==='Farmland'?2:item?.facility==='Woodland'?4:5,facilityLevel:item?.facilityLevel||1,count:Math.max(0,Number(o.count)||0),mode:first.mode,kind:'overlap'}]})).values()],overlapBoxes=[];
-  for(const e of overlapEntries){const minX=Math.max(heatRange.x-e.size+.25,coolRange.x-e.size+.25),maxX=Math.min(heatRange.x+heatRange.w-.25,coolRange.x+coolRange.w-.25),minY=Math.max(heatRange.y-e.size+.25,coolRange.y-e.size+.25),maxY=Math.min(heatRange.y+heatRange.h-.25,coolRange.y+coolRange.h-.25),spots=[];for(let y=minY;y<=maxY+1e-9;y+=e.size)for(let x=minX;x<=maxX+1e-9;x+=e.size){const box={x,y,w:e.size,h:e.size};if(hit(box,{x:0,y:0,w:1,h:1})||hit(box,{x:dx,y:0,w:2,h:2})||overlapBoxes.some(z=>hit(box,{x:z.x,y:z.y,w:z.size,h:z.size})))continue;spots.push([x,y])}for(let n=0;n<Math.min(e.count,spots.length);n++)overlapBoxes.push({...e,x:spots[n][0],y:spots[n][1]})}
-  const boxes=[...heatBoxes,...overlapBoxes,...coolBoxes],minX=Math.min(-4.25,...boxes.map(x=>x.x-.5)),minY=Math.min(-4.25,...boxes.map(x=>x.y-.5)),maxX=Math.max(dx+5.75,...boxes.map(x=>x.x+x.size+.5)),maxY=Math.max(5.75,...boxes.map(x=>x.y+x.size+.5)),derivedColor=tempColors[first.mode]||'#efa76f';
-  const groupedRows=arr=>[...arr.reduce((m,x)=>{const k=`${x.name}|${x.facility}|${x.mode}|${x.kind}`,v=m.get(k)||{...x,count:0};v.count++;m.set(k,v);return m},new Map()).values()];
-  const rows=groupedRows(boxes);
-  return `<figure class="climate-map overlap-climate-map"><div class="climate-visual"><svg viewBox="${minX} ${minY} ${maxX-minX} ${maxY-minY}" role="img" aria-label="${esc(first.heatMode)} plus ${esc(first.coolMode)} creates ${esc(first.mode)}"><defs><pattern id="go${gi}" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M 1 0 L 0 0 0 1" fill="none" stroke="#ffffff25" stroke-width=".04"/></pattern></defs><rect x="${minX}" y="${minY}" width="${maxX-minX}" height="${maxY-minY}" fill="url(#go${gi})"/><rect x="${heatRange.x}" y="${heatRange.y}" width="9" height="9" rx=".25" fill="${colors['Heat Furnace']}22" stroke="${colors['Heat Furnace']}" stroke-width=".14"/><rect x="${coolRange.x}" y="${coolRange.y}" width="9" height="9" rx=".25" fill="${colors['Cooling Unit']}22" stroke="${colors['Cooling Unit']}" stroke-width=".14"/><rect x="${coolRange.x}" y="-3.5" width="${heatRange.x+heatRange.w-coolRange.x}" height="9" fill="${derivedColor}30" stroke="${derivedColor}" stroke-width=".06" stroke-dasharray=".18 .12"/>${boxes.map(p=>targetGroup(p,p.kind==='overlap'?` from ${first.heatMode} + ${first.coolMode} overlap`:'')).join('')}<g><title>Heat Furnace · ${esc(first.heatMode)} · 9×9 range</title><rect x="0" y="0" width="1" height="1" rx=".15" fill="${colors['Heat Furnace']}" stroke="#fff8" stroke-width=".08"/>${climateIconView&&facilityIconFor('Heat Furnace',1)?`<image href="${facilityIconFor('Heat Furnace',1)}" x=".08" y=".08" width=".84" height=".84" preserveAspectRatio="xMidYMid meet"/>`:''}</g><g><title>Cooling Unit · ${esc(first.coolMode)} · 9×9 range</title><rect x="${dx}" y="0" width="2" height="2" rx=".15" fill="${colors['Cooling Unit']}" stroke="#fff8" stroke-width=".08"/>${climateIconView&&facilityIconFor('Cooling Unit',1)?`<image href="${facilityIconFor('Cooling Unit',1)}" x="${dx+.12}" y=".12" width="1.76" height="1.76" preserveAspectRatio="xMidYMid meet"/>`:''}</g></svg><div class="climate-key"><div class="climate-device-key">${climateIconView&&facilityIconFor('Heat Furnace',1)?`<img class="climate-key-icon" src="${esc(facilityIconFor('Heat Furnace',1))}" alt="">`:`<i style="background:${colors['Heat Furnace']}"></i>`}<span><b>${gameHtml('facility','Heat Furnace')}</b><small>1 × ${esc(first.heatMode)} · 9×9 range</small></span></div><div class="climate-device-key">${climateIconView&&facilityIconFor('Cooling Unit',1)?`<img class="climate-key-icon" src="${esc(facilityIconFor('Cooling Unit',1))}" alt="">`:`<i style="background:${colors['Cooling Unit']}"></i>`}<span><b>${gameHtml('facility','Cooling Unit')}</b><small>1 × ${esc(first.coolMode)} · 9×9 range</small></span></div>${rows.map(x=>keyRow(x,x.kind==='overlap'?` from ${first.heatMode} + ${first.coolMode} overlap`:'' )).join('')}</div></div><figcaption><b>${esc(first.heatMode)} + ${esc(first.coolMode)} → ${esc(first.mode)}</b><small>This card uses one Heat Furnace and one Cooling Unit. ${esc(first.mode)} facilities touch both ranges.</small></figcaption></figure>`;
- }).join('');
- const standaloneShown=new Map(),leftFor=mode=>directFor(mode).map(e=>{const k=`${mode}|${e.name}|${e.facility}`,used=(shownDirect.get(k)||0)+(standaloneShown.get(k)||0);return{...e,count:Math.max(0,e.count-used)}}).filter(e=>e.count>0),markStandalone=(mode,p)=>{const k=`${mode}|${p.name}|${p.facility}`;standaloneShown.set(k,(standaloneShown.get(k)||0)+1)};
- const standalone=[];r.climate.forEach((c,ci)=>{const remaining=Math.max(0,(Number(c.count)||0)-(consumedChoice.get(ci)||0));for(let unit=0;unit<remaining;unit++){const required=leftFor(c.mode),used=[];for(const size of [5,4,2]){const slots=(c.layout||[]).filter(x=>x.s===size).sort((a,b)=>Math.hypot(a.x+a.s/2,a.y+a.s/2)-Math.hypot(b.x+b.s/2,b.y+b.s/2));let si=0;for(const e of required.filter(x=>x.size===size)){for(let n=0;n<e.count&&si<slots.length;n++,si++){const p={...e,...slots[si],mode:c.mode,kind:'direct'};used.push(p);markStandalone(c.mode,p)}}}
-  const deviceSize=c.building==='Heat Furnace'?1:2,rangeOrigin=deviceSize===1?-4:-3.5,minX=Math.min(rangeOrigin-.75,...used.map(x=>x.x-.5)),minY=Math.min(rangeOrigin-.75,...used.map(x=>x.y-.5)),maxX=Math.max(rangeOrigin+9+.75,...used.map(x=>x.x+x.s+.5)),maxY=Math.max(rangeOrigin+9+.75,...used.map(x=>x.y+x.s+.5)),deviceColor=colors[c.building],legend=[...used.reduce((m,x)=>{const k=`${x.name}|${x.facility}|${x.mode}`,v=m.get(k)||{...x,count:0,size:x.s};v.count++;m.set(k,v);return m},new Map()).values()],sid=`gs${ci}_${unit}`;
-  standalone.push(`<figure class="climate-map"><div class="climate-visual"><svg viewBox="${minX} ${minY} ${maxX-minX} ${maxY-minY}" role="img" aria-label="${esc(c.building)} ${esc(c.mode)} coverage"><defs><pattern id="${sid}" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M 1 0 L 0 0 0 1" fill="none" stroke="#ffffff25" stroke-width=".04"/></pattern></defs><rect x="${minX}" y="${minY}" width="${maxX-minX}" height="${maxY-minY}" fill="url(#${sid})"/><rect x="${rangeOrigin}" y="${rangeOrigin}" width="9" height="9" rx=".25" fill="${deviceColor}22" stroke="${deviceColor}" stroke-width=".14"/>${used.map(p=>targetGroup({...p,size:p.s})).join('')}<g><title>${esc(c.building)} · ${esc(c.mode)} · 9×9 range</title><rect x="0" y="0" width="${deviceSize}" height="${deviceSize}" rx=".15" fill="${deviceColor}" stroke="#fff8" stroke-width=".08"/>${climateIconView&&facilityIconFor(c.building,1)?`<image href="${facilityIconFor(c.building,1)}" x="${deviceSize===1?.08:.12}" y="${deviceSize===1?.08:.12}" width="${deviceSize===1?.84:1.76}" height="${deviceSize===1?.84:1.76}" preserveAspectRatio="xMidYMid meet"/>`:''}</g></svg><div class="climate-key"><div class="climate-device-key">${climateIconView&&facilityIconFor(c.building,1)?`<img class="climate-key-icon" src="${esc(facilityIconFor(c.building,1))}" alt="">`:`<i style="background:${deviceColor}"></i>`}<span><b>${gameHtml('facility',c.building)}</b><small>1 × ${esc(c.mode)} · 9×9 range${remaining>1?` · unit ${unit+1}/${remaining}`:''}</small></span></div>${legend.map(x=>keyRow(x)).join('')}</div></div><figcaption><b>${esc(c.building)} · ${esc(c.mode)}${remaining>1?` · ${unit+1}/${remaining}`:''}</b><small>Every shown facility overlaps this range and receives the full effect.</small></figcaption></figure>`)
- }});
- return `<p class="hint climate-placement-note"><b>Only the crops/facilities shown in this section need special placement.</b> They must touch the required temperature or lighting range. Crops with no temperature/light requirement can be placed anywhere you want.</p><div class="climate-visual-toggle"><label class="check"><input type="checkbox" id="climate-icon-toggle" ${climateIconView?'checked':''}><span></span>Use facility icons</label></div><div class="climate-selection-info" hidden aria-live="polite"></div><div class="climate-grid">${overlapFigures}${standalone.join('')}</div>`;
+ const deviceColors={'Heat Furnace':'#e9805b','Cooling Unit':'#58b9e8','Sunlamp':'#e9ce56'};
+ const facilityPreviewColors={Farmland:'#62bd83',Woodland:'#32a997',Mine:'#687daf',Well:'#48a8cc','Storage Unit':'#7b8795','Hatchinator':'#d9a84d'};
+ const climateDeviceSize=name=>name==='Heat Furnace'?[1,1]:[2,2];
+ const facilitySize=name=>{const s=data.facilitySizes?.[name]||[2,2];return[snap(Number(s[0])||2),snap(Number(s[1])||2)]};
+ const climateRangeAt=i=>({x:i.x+i.w/2-4.5,y:i.y+i.h/2-4.5,w:9,h:9});
+ const rectHit=(a,b)=>a.x<b.x+b.w-1e-9&&a.x+a.w>b.x+1e-9&&a.y<b.y+b.h-1e-9&&a.y+a.h>b.y+1e-9;
+ const climateHit=(a,b)=>Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>=PREVIEW_SMALL_TILE-1e-9&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>=PREVIEW_SMALL_TILE-1e-9;
+ const sizeIndex=size=>size===5?0:size===4?1:2;
+ const totalForRow=row=>Math.max(0,Math.round(row.plots!=null?row.plots:row.units||0));
+ const totalDemand=new Map();
+ for(const row of r.rows){const item=byId.get(row.id);if(!item?.environment||climateNames.includes(item.facility)||climateNames.includes(item.name))continue;const mode=item.environment,[w,h]=facilitySize(item.facility),size=Math.max(w,h),key=`${item.id}|${item.facility}|${mode}`;const cur=totalDemand.get(key)||{id:item.id,name:item.name,facility:item.facility,facilityLevel:item.facilityLevel||1,mode,w,h,size,count:0};cur.count+=totalForRow(row);totalDemand.set(key,cur)}
+ const overlapDemand=new Map();
+ for(const o of r.climateOverlap||[]){const item=byId.get(o.itemId),[w,h]=facilitySize(o.facility||item?.facility||'');if(!item&&!o.facility)continue;const key=`${o.itemId}|${o.facility||item?.facility||''}|${o.mode}`;const total=totalDemand.get(key)?.count||0;const cur=overlapDemand.get(key)||{id:o.itemId,name:item?.name||o.itemId,facility:o.facility||item?.facility||'',facilityLevel:item?.facilityLevel||1,mode:o.mode,w,h,size:Math.max(w,h),count:0};cur.count=Math.min(total,cur.count+Math.max(0,Number(o.count)||0));overlapDemand.set(key,cur)}
+ const directDemand=new Map();
+ for(const [key,v] of totalDemand){const overlap=overlapDemand.get(key)?.count||0;const cur={...v,count:Math.max(0,v.count-overlap)};if(cur.count)directDemand.set(key,cur)}
+ const remainingDirect=new Map([...directDemand].map(([k,v])=>[k,{...v}]));
+ const remainingOverlap=new Map([...overlapDemand].map(([k,v])=>[k,{...v}]));
+ const choiceState=r.climate.map((c,i)=>({...c,_i:i,_remaining:Math.max(0,Math.floor(Number(c.count)||0))}));
+ const choiceFor=(building,mode)=>choiceState.find(c=>c.building===building&&c.mode===mode&&c._remaining>0);
+ const capFor=(choice,size)=>Math.max(0,Number(choice?.counts?.[sizeIndex(size)])||0);
+ const takeByCapacity=(pool,caps)=>{
+   const out=[];
+   for(const size of [5,4,2]){
+     let cap=Math.max(0,Number(caps[size])||0);if(!cap)continue;
+     const entries=pool instanceof Map?[...pool.values()]:pool;for(const v of entries){if(v.size!==size||v.count<=0||cap<=0)continue;const n=Math.min(v.count,cap);if(n){out.push({...v,count:n});v.count-=n;cap-=n}}
+   }
+   return out;
+ };
+ const decrementMap=(map,entries)=>{for(const e of entries){const key=`${e.id}|${e.facility}|${e.mode}`,v=map.get(key);if(v){v.count=Math.max(0,v.count-e.count);if(v.count<=0)map.delete(key)}}};
+ const renderGrid=(gridIndex,title,devices,targets,caption)=>{
+   const ranges=devices.map(climateRangeAt),all=[...devices,...targets],xMin=Math.min(...all.map(x=>x.x),...ranges.map(x=>x.x)),yMin=Math.min(...all.map(x=>x.y),...ranges.map(x=>x.y)),xMax=Math.max(...all.map(x=>x.x+x.w),...ranges.map(x=>x.x+x.w)),yMax=Math.max(...all.map(x=>x.y+x.h),...ranges.map(x=>x.y+x.h));
+   const minX=Math.floor((xMin-.5)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,minY=Math.floor((yMin-.5)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,maxX=Math.ceil((xMax+.5)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,maxY=Math.ceil((yMax+.5)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE;
+  const previewMaxWidth=window.innerWidth<=740?window.innerWidth-88:window.innerWidth<1100?280:420,previewScale=Math.min(PREVIEW_SCALE*1.25,Math.max(1,previewMaxWidth/Math.max(1,maxX-minX))),width=Math.max(10,(maxX-minX)*previewScale),height=Math.max(10,(maxY-minY)*previewScale),gid=`climate_grid_${gridIndex}`;
+   const targetMeta=(p,kind)=>{const key=encodeURIComponent(`${gid}|${kind}|${p.name}|${p.facility}|${p.mode}`),color=facilityPreviewColors[p.facility]||'#9c7bd1',detail=`${p.facility} · ${p.w}×${p.h} squares · ${p.mode}${kind==='overlap'?' · overlaps both climate ranges':''}`;return{key,color,detail,title:p.name}};
+   const deviceMeta=(p)=>{const key=encodeURIComponent(`${gid}|device|${p.name}|${p.mode}`),detail=`${p.name} · ${p.w}×${p.h} squares · ${p.mode} · 9×9-square range`;return{key,color:deviceColors[p.name]||'#e9ce56',detail,title:p.name}};
+  const climateLegendPalettes={Scorching:['#D94F04','#F3722C','#B93815','#FF9F1C'],Warm:['#F5C400','#FFD60A','#D99A00','#FFE066'],Cool:['#56CFE1','#00A6D6','#90E0EF','#2A9DCC'],Freeze:['#4361EE','#1D4ED8','#2B59C3','#5B8DEF'],Adequate:['#48A868','#86C96D','#168AAD','#A3D977']},legendShadeIndex=new Map(),legendShades=new Map();
+  const legendColor=p=>{const key=`${p.name}|${p.facility}|${p.mode}|${p.kind}`;if(legendShades.has(key))return legendShades.get(key);const palette=climateLegendPalettes[p.mode]||['#8fb6c9','#739eb4','#abc8d5'],index=legendShadeIndex.get(p.mode)||0;legendShadeIndex.set(p.mode,index+1);const color=palette[index%palette.length];legendShades.set(key,color);return color};
+  const pos=(x,y)=>`left:${(x-minX)*previewScale}px;top:${(y-minY)*previewScale}px`;
+  const rangeHtml=ranges.map((rr,i)=>{const d=devices[i],m=deviceMeta(d);return `<div class="climate-preview-range ${d.name.replaceAll(' ','-').toLowerCase()}" style="${pos(rr.x,rr.y)};width:${rr.w*previewScale}px;height:${rr.h*previewScale}px;--range-color:${m.color}" title="${esc(m.detail)}" aria-label="${esc(m.detail)}"></div>`}).join('');
+  const deviceHtml=devices.map(d=>{const m=deviceMeta(d),src=facilityIconFor(d.name,d.level||1);return `<div class="climate-target climate-preview-device" tabindex="0" data-climate-key="${esc(m.key)}" data-climate-title="${esc(m.title)}" data-climate-detail="${esc(m.detail)}" style="${pos(d.x,d.y)};width:${d.w*previewScale}px;height:${d.h*previewScale}px;--crop-color:${m.color}" title="${esc(m.detail)}" aria-label="${esc(m.detail)}">${climateIconView&&src?`<img src="${esc(src)}" alt="">`:''}<span class="sr-only">${esc(m.detail)}</span></div>`}).join('');
+  const targetHtml=targets.map(p=>{const m=targetMeta(p,p.kind),src=facilityIconFor(p.facility,p.facilityLevel),color=legendColor(p);return `<div class="climate-target climate-preview-facility ${p.kind==='overlap'?'overlap-target':''}" tabindex="0" data-climate-key="${esc(m.key)}" data-climate-title="${esc(m.title)}" data-climate-detail="${esc(m.detail)}" style="${pos(p.x,p.y)};width:${p.w*previewScale}px;height:${p.h*previewScale}px;--crop-color:${color}" title="${esc(m.detail)}" aria-label="${esc(m.detail)}">${climateIconView&&src?`<img src="${esc(src)}" alt="">`:''}<span class="sr-only">${esc(m.title)} · ${esc(m.detail)}</span></div>`}).join('');
+   const deviceLegend=devices.map(d=>{const m=deviceMeta(d),src=facilityIconFor(d.name,d.level||1);return `<div class="climate-device-key climate-target" tabindex="0" data-climate-key="${esc(m.key)}" data-climate-title="${esc(m.title)}" data-climate-detail="${esc(m.detail)}" style="--crop-color:${m.color}">${climateIconView&&src?`<img class="climate-key-icon" src="${esc(src)}" alt="">`:`<i style="background:${m.color}"></i>`}<span><b>${gameHtml('facility',d.name)}</b><small>${esc(d.mode)} · 9×9-square range</small></span></div>`}).join('');
+  const legend=[...targets.reduce((m,p)=>{const k=`${p.name}|${p.facility}|${p.mode}|${p.kind}`,v=m.get(k)||{...p,count:0};v.count++;m.set(k,v);return m},new Map()).values()].map(p=>{const m=targetMeta(p,p.kind),src=facilityIconFor(p.facility,p.facilityLevel),color=legendColor(p);return `<div class="climate-key-row climate-target" tabindex="0" data-climate-key="${esc(m.key)}" data-climate-title="${esc(m.title)}" data-climate-detail="${esc(m.detail)}" style="--crop-color:${color}"><i class="climate-crop-swatch" style="background:${color}"></i>${climateIconView&&src?`<img class="climate-key-icon" src="${esc(src)}" alt="">`:''}<span><b>${gameHtml('item',p.name)}</b><small>${p.count} × ${gameHtml('facility',p.facility)} · ${p.w}×${p.h} · ${esc(p.mode)}${p.kind==='overlap'?' · both ranges':''}</small></span></div>`}).join('');
+  return `<figure class="climate-map climate-void-map"><div class="climate-visual"><div class="climate-preview-scroll"><div class="climate-preview-canvas" role="img" aria-label="${esc(title)}" style="width:${width}px;height:${height}px"><div class="climate-preview-grid-bg" style="background-size:${previewScale}px ${previewScale}px,${previewScale}px ${previewScale}px,${previewScale/4}px ${previewScale/4}px,${previewScale/4}px ${previewScale/4}px"></div>${rangeHtml}${deviceHtml}${targetHtml}</div></div><div class="climate-key">${deviceLegend}${legend}</div></div><figcaption><b>${esc(title)}</b></figcaption></figure>`;
+ };
+ const grids=[];
+ const pairGroups=new Map();
+ for(const o of r.climateOverlap||[]){const key=`${o.heatMode}|${o.coolMode}`,list=pairGroups.get(key)||[];list.push(o);pairGroups.set(key,list)}
+ let gridIndex=0;
+ for(const [pairKey,rawGroup] of pairGroups){
+   const [heatMode,coolMode]=pairKey.split('|'),heatChoice=choiceFor('Heat Furnace',heatMode),coolChoice=choiceFor('Cooling Unit',coolMode);if(!heatChoice||!coolChoice)continue;
+   const group=new Map();
+   for(const o of rawGroup){const item=byId.get(o.itemId),key=`${o.itemId}|${o.facility||item?.facility||''}|${o.mode}`,v=remainingOverlap.get(key);if(!v||v.count<=0)continue;const n=Math.min(v.count,Math.max(0,Number(o.count)||0));if(n<=0)continue;const cur=group.get(key)||{...v,count:0};cur.count+=n;group.set(key,cur)}
+   let pending=[...group.values()];
+   const maxPairs=Math.min(heatChoice._remaining,coolChoice._remaining);
+   for(let pair=0;pair<maxPairs&&pending.some(x=>x.count>0);pair++){
+     const overlapCap={5:Math.min(capFor(heatChoice,5),capFor(coolChoice,5)),4:Math.min(capFor(heatChoice,4),capFor(coolChoice,4)),2:Math.min(capFor(heatChoice,2),capFor(coolChoice,2))};
+     const overlapTargets=takeByCapacity(pending.map(x=>({...x})),overlapCap);if(!overlapTargets.length)break;
+    const largestTarget=Math.max(2,...overlapTargets.map(x=>Math.max(x.w,x.h)),...[...remainingDirect.values()].filter(x=>x.mode===heatMode||x.mode===coolMode).map(x=>Math.max(x.w,x.h))),minDistance=1.5,maxDistance=9+largestTarget-2*PREVIEW_SMALL_TILE,preferredDistance=Math.max(minDistance,9-largestTarget/2),offsets=[],seenOffsets=new Set();
+    const addOffset=(centerX,centerY)=>{const dx=centerX+(1-2)/2,dy=centerY+(1-2)/2,key=`${dx.toFixed(4)}:${dy.toFixed(4)}`;if(!seenOffsets.has(key)){seenOffsets.add(key);offsets.push([dx,dy])}};
+    const addDistance=distance=>{if(distance<minDistance||distance>maxDistance)return;const diagonal=distance/Math.SQRT2;for(const[x,y]of [[distance,0],[-distance,0],[0,distance],[0,-distance],[diagonal,diagonal],[diagonal,-diagonal],[-diagonal,diagonal],[-diagonal,-diagonal]])addOffset(x,y)};
+    for(const distance of [preferredDistance,preferredDistance-.25,preferredDistance+.25,maxDistance,maxDistance-.5,maxDistance-1])addDistance(distance);
+    for(let distance=minDistance;distance<=maxDistance+1e-9;distance+=.5)addDistance(distance);
+    const overlapArea=(a,b)=>Math.max(0,Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y));
+    const evaluatePair=(heatDevice,coolDevice)=>{
+     if(rectHit(heatDevice,coolDevice))return null;
+     const heatRange=climateRangeAt(heatDevice),coolRange=climateRangeAt(coolDevice),blocked=[heatDevice,coolDevice],overlapPlaced=[],sharedCenter={x:(heatRange.x+coolRange.x+heatRange.w+coolRange.w)/2,y:(heatRange.y+coolRange.y+heatRange.h+coolRange.h)/2};
+     const placeInBoth=e=>{
+      const minX=Math.ceil(Math.max(heatRange.x-e.w+PREVIEW_SMALL_TILE,coolRange.x-e.w+PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,maxX=Math.floor(Math.min(heatRange.x+heatRange.w-PREVIEW_SMALL_TILE,coolRange.x+coolRange.w-PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,minY=Math.ceil(Math.max(heatRange.y-e.h+PREVIEW_SMALL_TILE,coolRange.y-e.h+PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,maxY=Math.floor(Math.min(heatRange.y+heatRange.h-PREVIEW_SMALL_TILE,coolRange.y+coolRange.h-PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,points=[];
+      for(let y=minY;y<=maxY+1e-9;y+=PREVIEW_SMALL_TILE)for(let x=minX;x<=maxX+1e-9;x+=PREVIEW_SMALL_TILE){const p={...e,count:1,x:snap(x),y:snap(y),kind:'overlap'};if(climateHit(p,heatRange)&&climateHit(p,coolRange)&&!blocked.some(b=>rectHit(p,b))&&!overlapPlaced.some(b=>rectHit(p,b)))points.push(p)}
+      points.sort((a,b)=>overlapArea(a,heatRange)+overlapArea(a,coolRange)-overlapArea(b,heatRange)-overlapArea(b,coolRange)||Math.hypot(b.x+b.w/2-sharedCenter.x,b.y+b.h/2-sharedCenter.y)-Math.hypot(a.x+a.w/2-sharedCenter.x,a.y+a.h/2-sharedCenter.y)||a.y-b.y||a.x-b.x);return points[0]||null;
+     };
+     for(const e of overlapTargets)for(let n=0;n<e.count;n++){const p=placeInBoth(e);if(p)overlapPlaced.push(p)}
+     const heatCap={5:capFor(heatChoice,5),4:capFor(heatChoice,4),2:capFor(heatChoice,2)},coolCap={5:capFor(coolChoice,5),4:capFor(coolChoice,4),2:capFor(coolChoice,2)};
+     for(const e of overlapPlaced){heatCap[e.size]=Math.max(0,heatCap[e.size]-1);coolCap[e.size]=Math.max(0,coolCap[e.size]-1)}
+     const heatDirect=takeByCapacity([...remainingDirect.values()].filter(x=>x.mode===heatMode).map(x=>({...x})),heatCap),coolDirect=takeByCapacity([...remainingDirect.values()].filter(x=>x.mode===coolMode).map(x=>({...x})),coolCap);
+     const placeDirect=(entries,range,occupied,mode)=>{
+      const out=[],climateDevices=[heatDevice,coolDevice],rangeCenter={x:range.x+range.w/2,y:range.y+range.h/2};
+      for(const e of entries)for(let n=0;n<e.count;n++){
+       const minX=Math.ceil((range.x-e.w+PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,maxX=Math.floor((range.x+range.w-PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,minY=Math.ceil((range.y-e.h+PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,maxY=Math.floor((range.y+range.h-PREVIEW_SMALL_TILE)/PREVIEW_SMALL_TILE)*PREVIEW_SMALL_TILE,points=[];
+       for(let y=minY;y<=maxY+1e-9;y+=PREVIEW_SMALL_TILE)for(let x=minX;x<=maxX+1e-9;x+=PREVIEW_SMALL_TILE){const p={...e,count:1,x:snap(x),y:snap(y),kind:'direct'},net=climateDevices.reduce((sum,d)=>sum+(climateHit(p,climateRangeAt(d))?(temperatureValue[d.mode]||0):0),0);if(climateHit(p,range)&&net===temperatureValue[mode]&&!blocked.some(b=>rectHit(p,b))&&!occupied.some(b=>rectHit(p,b))&&!out.some(b=>rectHit(p,b)))points.push(p)}
+       points.sort((a,b)=>overlapArea(a,range)-overlapArea(b,range)||Math.hypot(b.x+e.w/2-rangeCenter.x,b.y+e.h/2-rangeCenter.y)-Math.hypot(a.x+e.w/2-rangeCenter.x,a.y+e.h/2-rangeCenter.y)||a.y-b.y||a.x-b.x);if(points[0])out.push(points[0]);
+      }
+      return out;
+     };
+     const heatPlaced=placeDirect(heatDirect,heatRange,overlapPlaced,heatMode),coolPlaced=placeDirect(coolDirect,coolRange,[...overlapPlaced,...heatPlaced],coolMode),targets=[...overlapPlaced,...heatPlaced,...coolPlaced];
+     return{heatDevice,coolDevice,overlapPlaced,heatPlaced,coolPlaced,targets,score:targets.length};
+    };
+    let bestPair=null;
+    for(const[dx,dy]of offsets){const heatDevice={name:'Heat Furnace',mode:heatMode,w:1,h:1,x:.25,y:.25,level:1},coolDevice={name:'Cooling Unit',mode:coolMode,w:2,h:2,x:heatDevice.x+dx,y:heatDevice.y+dy,level:1},candidate=evaluatePair(heatDevice,coolDevice);if(candidate&&(!bestPair||candidate.score>bestPair.score))bestPair=candidate}
+    if(!bestPair)break;
+    for(const item of bestPair.overlapPlaced){const key=`${item.id}|${item.facility}|${item.mode}`,entry=group.get(key);if(entry)entry.count=Math.max(0,entry.count-1)}
+    pending=[...group.values()].filter(x=>x.count>0);
+    decrementMap(remainingOverlap,bestPair.overlapPlaced);decrementMap(remainingDirect,[...bestPair.heatPlaced,...bestPair.coolPlaced]);
+     grids.push(renderGrid(gridIndex++,`${heatMode} + ${coolMode} climate overlap`,[bestPair.heatDevice,bestPair.coolDevice],bestPair.targets,`Separate climate-only grid. Shown facilities receive the full temperature effect when they overlap each required range by at least 1 small tile (¼ square).`));
+     heatChoice._remaining--;coolChoice._remaining--;
+   }
+   // Any overlap demand that was not consumed above remains direct-only below; do not alter the solver.
+ }
+ for(const c of choiceState){if(c._remaining<=0)continue;for(let unit=0;unit<c._remaining;unit++){
+  const caps={5:capFor(c,5),4:capFor(c,4),2:capFor(c,2)},currentDirect=[...remainingDirect.values()].filter(x=>x.mode===c.mode).map(x=>({...x})),targets=takeByCapacity(currentDirect,caps)
+   const devSize=climateDeviceSize(c.building),deviceOffset=c.building==='Heat Furnace'?.25:-.25,device={name:c.building,mode:c.mode,w:devSize[0],h:devSize[1],x:deviceOffset,y:deviceOffset,level:1},range=climateRangeAt(device),used=[];
+   // Use the solver's selected candidate footprint as the template, but render it in this separate void grid.
+   const slots=(c.layout||[]).filter(x=>x.s===2||x.s===4||x.s===5).map(x=>({x:snap(x.x),y:snap(x.y),s:x.s}));
+  for(const e of targets){for(let n=0;n<e.count;n++){const slot=slots.findIndex(s=>s.s===e.size&&!used.some(u=>rectHit({x:s.x,y:s.y,w:s.s,h:s.s},u))&&!rectHit({x:s.x,y:s.y,w:s.s,h:s.s},device)&&climateHit({x:s.x,y:s.y,w:s.s,h:s.s},range));if(slot>=0){const s=slots.splice(slot,1)[0];used.push({...e,count:1,x:s.x,y:s.y,w:e.w,h:e.h,kind:'direct'})}}}
+  decrementMap(remainingDirect,used)
+   grids.push(renderGrid(gridIndex++,`${c.building} · ${c.mode}${c._remaining>1?` · ${unit+1}/${c._remaining}`:''}`,[device],used,`Separate climate-only grid. Every shown facility overlaps the ${c.mode} range by at least 1 small tile (¼ square).`));
+ }
+ }
+ if(!grids.length)return '<div class="empty">No climate-controlled production is used.</div>';
+ return `<p class="hint climate-placement-note"><b>Climate previews are separate from the Floor Layout Planner.</b> Each card is its own read-only climate-only grid. The floor planner can place other facilities anywhere later; they are not included here. Climate effect is full once a facility overlaps the required 9×9 range by at least 1 small tile (¼ square).</p><div class="climate-visual-toggle"><label class="check"><input type="checkbox" id="climate-icon-toggle" ${climateIconView?'checked':''}><span></span>Use facility icons</label></div><div class="climate-selection-info" hidden aria-live="polite"></div><div class="climate-grid">${grids.join('')}</div>`;
 }
 let climatePreviewSelectedKey='';
 function climatePreviewTargetInfo(el){return el?{key:el.dataset.climateKey||'',title:el.dataset.climateTitle||'',detail:el.dataset.climateDetail||''}:null}
@@ -16502,6 +16706,7 @@ function homebuildingPanel(r){
  return `<div class="homebuilding-card"><div class="homebuilding-head"><div><span class="eyebrow">HOMEBUILDING ZONE</span><b>Allocate spare Aniimo</b><small>Generates its own Homebuilding Zone currency. It does not change the current production plan unless you explicitly recalculate for a shortage.</small></div><label>Allocated<input id="homebuilding-aniimo" type="number" min="0" max="${cap}" step="1" value="${alloc}"></label></div>${status}${energyNote}</div>`;
 }
 function powerNetworkDiagram(r){
+ const POWER_PREVIEW_SMALL_TILE=.25,POWER_PREVIEW_SCALE=18,snap=v=>Math.round(Number(v)/POWER_PREVIEW_SMALL_TILE)*POWER_PREVIEW_SMALL_TILE;
  if(!r.eModeActive)return'';
  const powered=[];
  for(const row of r.rows.filter(x=>x.powered)){const groups=row.poweredLevels?.length?row.poweredLevels:[{units:row.poweredUnits,level:r.settings.facilities?.[row.facility]?.level||1,watts:(row.powerDraw||0)/Math.max(1,row.poweredUnits||1)}];for(const group of groups)for(let n=0;n<group.units;n++)powered.push({facility:row.facility,level:group.level,power:Math.round(group.watts)})}
@@ -16511,32 +16716,28 @@ function powerNetworkDiagram(r){
  const neededNodes=Math.max(1,Math.ceil(powered.length/2));
  for(let i=0;i<neededNodes;i++){
    const type=i===0?'generator':'pole',w=type==='generator'?2:1.5,h=w;
-   const cx=6+i*nodeGap,cy=7;
-   nodes.push({type,w,h,x:cx-w/2,y:cy-h/2,cx,cy});
+   const cx=snap(6+i*nodeGap),cy=snap(7);
+   nodes.push({type,w,h,x:snap(cx-w/2),y:snap(cy-h/2),cx,cy});
  }
- const rangeRect=n=>{const total=n.type==='generator'?generatorRange:poleRange;return{x:n.cx-total/2,y:n.cy-total/2,w:total,h:total}};
+ const rangeRect=n=>{const total=n.type==='generator'?generatorRange:poleRange;return{x:snap(n.cx-total/2),y:snap(n.cy-total/2),w:total,h:total}};
  const objects=powered.map((p,idx)=>{
-   const node=nodes[Math.floor(idx/2)],lane=idx%2;
-   const size=data.facilitySizes[p.facility]||[2,2],w=size[0],h=size[1];
-   const y=lane===0?Math.max(.35,node.y-h-.6):node.y+node.h+.6;
-   const x=node.cx-w/2;
+   const node=nodes[Math.floor(idx/2)],lane=idx%2,size=data.facilitySizes[p.facility]||[2,2],w=snap(size[0]),h=snap(size[1]);
+   const y=snap(lane===0?Math.max(.25,node.y-h-.75):node.y+node.h+.75),x=snap(node.cx-w/2);
    return {...p,x,y,w,h,nodeIndex:Math.floor(idx/2)};
  });
- const allRanges=nodes.map(rangeRect);
- const minX=Math.min(0,...allRanges.map(r=>r.x),...objects.map(o=>o.x))-.5;
- const minY=Math.min(0,...allRanges.map(r=>r.y),...objects.map(o=>o.y))-.5;
- const maxX=Math.max(...allRanges.map(r=>r.x+r.w),...objects.map(o=>o.x+o.w))+1;
- const maxY=Math.max(...allRanges.map(r=>r.y+r.h),...objects.map(o=>o.y+o.h))+1;
- const vbW=maxX-minX,vbH=maxY-minY;
- return `<div class="power-preview"><div class="power-preview-title"><b>Suggested power-only placement</b><small>${v2Html('power_preview_hint')}</small></div><svg viewBox="${minX} ${minY} ${vbW} ${vbH}" role="img" aria-label="Crackle power network placement preview"><defs><pattern id="powergrid" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M 1 0 L 0 0 0 1" fill="none" stroke="#ffffff20" stroke-width=".035"/></pattern></defs><rect x="${minX}" y="${minY}" width="${vbW}" height="${vbH}" fill="url(#powergrid)"/>${nodes.map(n=>{const rr=rangeRect(n),name=n.type==='generator'?'Crackle Generator':'Crackle Power Pole',src=facilityIconFor(name,1);return `<g class="power-preview-node" data-node-type="${n.type}"><rect class="power-preview-range" x="${rr.x}" y="${rr.y}" width="${rr.w}" height="${rr.h}" rx=".08" fill="#f2d54a18" stroke="#f2d54a" stroke-width=".06" stroke-dasharray=".12 .08"/><rect class="power-preview-hardware" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx=".1" fill="#64551f" stroke="#fff6b5" stroke-width=".05"/>${src?`<image href="${src}" x="${n.x+.08}" y="${n.y+.08}" width="${Math.max(.4,n.w-.16)}" height="${Math.max(.4,n.h-.16)}" preserveAspectRatio="xMidYMid meet"/>`:''}</g>`}).join('')}${objects.map(o=>{const src=facilityIconFor(o.facility,o.level);return `<g class="power-preview-facility" data-node-index="${o.nodeIndex}"><rect x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}" rx=".1" fill="#243a4a" stroke="#bdeaff" stroke-width=".05"/>${src?`<image href="${src}" x="${o.x+.08}" y="${o.y+.08}" width="${Math.max(.4,o.w-.16)}" height="${Math.max(.4,o.h-.16)}" preserveAspectRatio="xMidYMid meet"/>`:''}</g>`}).join('')}</svg><div class="power-preview-key"><span>${facilityIconHtml('Crackle Generator',1)} Generator · 11×11 squares (44×44 small tiles)</span><span>${facilityIconHtml('Crackle Power Pole',1)} Pole · 7×7 squares (28×28 small tiles)</span></div></div>`
+ const allRanges=nodes.map(rangeRect),allObjects=objects.map(o=>({x:o.x,y:o.y,w:o.w,h:o.h})),xMin=Math.min(0,...allRanges.map(r=>r.x),...allObjects.map(o=>o.x)),yMin=Math.min(0,...allRanges.map(r=>r.y),...allObjects.map(o=>o.y)),xMax=Math.max(...allRanges.map(r=>r.x+r.w),...allObjects.map(o=>o.x+o.w)),yMax=Math.max(...allRanges.map(r=>r.y+r.h),...allObjects.map(o=>o.y+o.h));
+ const minX=Math.floor((xMin-.5)/POWER_PREVIEW_SMALL_TILE)*POWER_PREVIEW_SMALL_TILE,minY=Math.floor((yMin-.5)/POWER_PREVIEW_SMALL_TILE)*POWER_PREVIEW_SMALL_TILE,maxX=Math.ceil((xMax+.5)/POWER_PREVIEW_SMALL_TILE)*POWER_PREVIEW_SMALL_TILE,maxY=Math.ceil((yMax+.5)/POWER_PREVIEW_SMALL_TILE)*POWER_PREVIEW_SMALL_TILE;
+ const vbW=maxX-minX,vbH=maxY-minY,scale=POWER_PREVIEW_SCALE;
+ return `<div class="power-preview"><div class="power-preview-title"><b>Suggested power-only placement</b><small>${v2Html('power_preview_hint')}</small></div><div class="power-preview-scroll"><div class="power-preview-canvas" style="width:${vbW*scale}px;height:${vbH*scale}px" role="img" aria-label="Crackle power network placement preview"><div class="power-preview-grid-bg"></div>${nodes.map(n=>{const rr=rangeRect(n),name=n.type==='generator'?'Crackle Generator':'Crackle Power Pole',src=facilityIconFor(name,1),detail=name==='Crackle Generator'?'11×11-square range (44×44 small tiles)':'7×7-square relay range (28×28 small tiles)';return `<div class="power-preview-range ${n.type}" style="left:${(rr.x-minX)*scale}px;top:${(rr.y-minY)*scale}px;width:${rr.w*scale}px;height:${rr.h*scale}px" title="${esc(name)} · ${esc(detail)}"></div><div class="power-preview-hardware ${n.type}" title="${esc(name)}" aria-label="${esc(name)}" style="left:${(n.x-minX)*scale}px;top:${(n.y-minY)*scale}px;width:${n.w*scale}px;height:${n.h*scale}px">${src?`<img src="${esc(src)}" alt="">`:''}</div>`}).join('')}${objects.map(o=>{const src=facilityIconFor(o.facility,o.level),detail=`${o.facility} · ${o.w}×${o.h} squares · ${o.power} power`;return `<div class="power-preview-facility" title="${esc(detail)}" aria-label="${esc(detail)}" style="left:${(o.x-minX)*scale}px;top:${(o.y-minY)*scale}px;width:${o.w*scale}px;height:${o.h*scale}px">${src?`<img src="${esc(src)}" alt="">`:''}<span class="sr-only">${esc(detail)}</span></div>`}).join('')}</div></div><div class="power-preview-key"><span>${facilityIconHtml('Crackle Generator',1)} Generator · 11×11 squares (44×44 small tiles)</span><span>${facilityIconHtml('Crackle Power Pole',1)} Pole · 7×7 squares (28×28 small tiles)</span></div></div>`
 }
+
 function powerNetworkSummary
 
 (r){
  if(!r.settings?.experimentalEMode)return'';
  if(!r.eModeActive)return `<div class="power-setup-card inactive"><div>${facilityIconHtml('Crackle Generator',1)}<span><b>Crackle Power Network</b><small>E-mode is enabled, but this plan does not need to power any facilities.</small></span></div></div>`;
  const powered=r.rows.filter(x=>x.powered),poleCfg=activeFacilitiesConfig()?.['Crackle Power Pole'],poles=Array.isArray(poleCfg?.levels)?poleCfg.levels.reduce((n,g)=>n+(Number(g.count)||0),0):Number(poleCfg?.count||0);
- return `<div class="power-setup-card"><div class="power-setup-head">${facilityIconHtml('Crackle Generator',r.generatorLevel||1)}<span><b>Crackle Power Network · ${fmt(r.powerDraw||0)} / ${fmt(r.generatorPower||600)} power</b><small>${r.powerEfficiency||120}% E-mode efficiency · ${r.powerEfficiency===120?'at or below the 500-power boost threshold':'above 500 power, so the network runs at 100% efficiency'}</small></span></div><div class="power-setup-rules"><span>${facilityIconHtml('Crackle Generator',1)} Generator: <b>2×2 squares</b> · <b>11×11 squares</b> coverage (44×44 small tiles)</span><span>${facilityIconHtml('Crackle Power Pole',1)} Up to ${poles} relay pole${poles===1?'':'s'} available · <b>1.5×1.5 squares</b> · <b>7×7 squares</b> coverage (28×28 small tiles)</span><span>Generator/pole coverage must overlap by at least <b>1 small power-grid tile (¼ square)</b> to relay power.</span></div>${powerNetworkDiagram(r)}<div class="power-load-grid">${powered.map(row=>`<span>${facilityIconHtml(row.facility,byId.get(row.id)?.facilityLevel||1)}<b>${gameHtml('facility',row.facility)}</b><small>${row.poweredUnits} powered · ${row.powerDraw} power · ${row.powerMode||`${r.powerEfficiency}%`}</small></span>`).join('')}</div></div>`;
+ return `<div class="power-setup-card"><div class="power-setup-head">${facilityIconHtml('Crackle Generator',r.generatorLevel||1)}<span><b>Crackle Power Network · ${fmt(r.powerDraw||0)} / ${fmt(r.generatorPower||600)} power</b><small>${r.powerEfficiency||120}% E-mode efficiency · ${r.powerEfficiency===120?'at or below the 500-power boost threshold':'above 500 power, so the network runs at 100% efficiency'}</small></span></div><div class="power-setup-rules"><span>${facilityIconHtml('Crackle Generator',1)} Generator: <b>2×2 squares</b> · <b>11×11 squares</b> coverage (44×44 small tiles)</span><span>${facilityIconHtml('Crackle Power Pole',1)} Up to ${poles} relay pole${poles===1?'':'s'} available · <b>1.5×1.5 squares</b> · <b>7×7 squares</b> coverage (28×28 small tiles)</span><span>Generator/pole coverage must overlap by at least <b>1 small tile (¼ square)</b> to relay power.</span></div>${powerNetworkDiagram(r)}<div class="power-load-grid">${powered.map(row=>`<span>${facilityIconHtml(row.facility,byId.get(row.id)?.facilityLevel||1)}<b>${gameHtml('facility',row.facility)}</b><small>${row.poweredUnits} powered · ${row.powerDraw} power · ${row.powerMode||`${r.powerEfficiency}%`}</small></span>`).join('')}</div></div>`;
 }
 function eventSeedBudgetNote(){return''}
 function renderPlanV12(){
@@ -16556,6 +16757,7 @@ function renderPlanV12(){
  const extras=bonusOutputs(r,hours),showExtras=['xp','xp_aniipod'].includes(r.settings.strategy),extraTitle=r.settings.strategy==='xp_aniipod'?'Aniimo Training & Aniipods':'Aniimo Training',extraBlock=showExtras?`<div class="section-head"><h2>${extraTitle}</h2><span>Completed items / ${periodHeader}</span></div><div class="bonus-output-card">${extras.xp.map(x=>`<div>${icon(byId.get(x.id))}<span><b>${gameEsc('item',x.name)} × ${fmt(x.units)}</b><small>${fmt(x.units*x.value)} Aniimo EXP</small></span></div>`).join('')}${extras.pods.map(x=>`<div>${icon(byId.get(x.id))}<span><b>${gameEsc('item',x.name)} × ${fmt(x.units)}</b><small>Completed Aniipods</small></span></div>`).join('')}${extras.totalXp?`<div class="bonus-total"><span><b>Total Aniimo EXP</b><small>from completed Growth items</small></span><strong>${fmt(extras.totalXp)}</strong></div>`:''}</div>`:'';
  $('#content').innerHTML=title('Your Production Plan',`Current RV ${level} · ${r.settings.customTeam?rosterTr('Custom Aniimo Team'):modes[r.settings.worker]} · ${$('#strategy').selectedOptions[0].text}`,`<span class="badge">${r.proven?'Optimal within this setup':'Best feasible plan found'}</span>`)+durationOverrunNotice+(r.settings.experimentalEMode?`<div class="note crackle-plan-note"><b>Crackle Generator E-mode ${r.eModeActive?'is active':'is enabled'}.</b><span>${r.eModeActive?`The network is using ${fmt(r.powerDraw||0)} / ${fmt(r.generatorPower||600)} power at ${r.powerEfficiency||120}% efficiency and uses one dedicated Lightning Aniimo.`:'No facility needed E-mode in this result.'} Generator capacity and the 120% efficiency band use the active Generator level.</span></div>`:'')+`<div class="metrics"><div class="metric"><label>NET HOME COINS / HOUR</label><strong>${coinIcon()}${fmt(r.net,1)}</strong><small>${coinIcon()}${fmt(r.gross,1)} sales − ${coinIcon()}${fmt(r.cost,1)} seeds</small></div><div class="metric"><label>PROJECTED / ${period.title.toUpperCase()}</label><strong>${coinIcon()}${fmt(projectedNet)}</strong><small>${period.label.startsWith('until')?`${period.detail} plan · `:''}${coinIcon()}${fmt(flows.gross)} sales − ${coinIcon()}${fmt(flows.seedCost)} seeds</small></div><div class="metric"><label>ANIIMO ASSIGNED</label><strong>${staff}<span class="muted"> / ${r.baseAniimoCap??data.aniimo[level-1]}</span></strong><small>Food: ${fmt(foodEnergy)} energy/hour${Number.isFinite(Number(r.settings?.aniimoLimit))?` · constrained to ${r.settings.aniimoLimit} production slots`:''}</small></div></div>${eventPlanNote}${upgrade}${renderOrderPlanSection(orderAnalysis)}<div class="section-head"><h2>What to Grow & Gather ${helpButton('grow')}</h2><span>Each facility keeps the same assignment for this plan</span></div><div class="production-grid">${cards||'<div class="empty">No production is available.</div>'}</div><div class="section-head"><h2>What to Produce ${helpButton('produce')}</h2><span>One recipe per building — including Woodworking Bench and Chimney Kiln</span></div>${craft.length?`<div class="table-wrap mobile-production-table"><table><thead><tr><th>Product / facility</th><th>Ingredients</th><th class="num">Cycle</th><th class="num">Batches / ${periodHeader}</th><th class="num">Assigned / busy</th></tr></thead><tbody>${craft.map(row=>{const i=byId.get(row.id),shared=craftAllocation.allocations.get(row.id);return `<tr><td>${craftingProductFacilityCell(i)}${productionUseTag(i,r)}</td><td>${Object.entries(i.ingredients).map(([id,n])=>`${n} × ${itemButton(id)}`).join('<br>')}</td><td class="num">${fmt(row.seconds,1)}s</td><td class="num">${fmt(row.batches*hours,1)}</td><td class="num">${fmt(row.units)}${row.powered?` · ${row.poweredUnits} E-mode (${row.powerDraw} power)`:''} / ${fmt(row.machineHours*100,1)}%</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">Selling raw products is best for this setup.</div>'}<div class="section-head"><h2>Sell, Feed & Restock ${helpButton('sell')}</h2><span>What you need and what you can sell over ${periodHeader}</span></div>${foodBlock}<div class="flow-pair">${saleTable}${seedTable}</div>${extraBlock}<div class="section-head"><h2>Aniimo Needed <strong class="section-count">${staff}</strong> ${helpButton('workers')}</h2><span>${r.settings.experimentalEMode&&r.eModeActive?'E-mode is freeing processor workers':'Recommended abilities for this plan'}</span></div>${homebuildingPanel(r)}<div class="worker-grid">${workerCards(r)}</div><div class="section-head"><h2>Climate, Light & Power Setup ${helpButton('climate')}</h2><span>Needed environment: ${climateProfile(r)||'None'}${r.eModeActive?` · Crackle ${fmt(r.powerDraw||0)}/${fmt(r.generatorPower||600)}`:''}</span></div>${climateDiagram(r)}${powerNetworkSummary(r)}<div class="section-head"><h2>Upgrade Byproducts</h2><span>Produced alongside this plan</span></div><div class="material-cards"><div>${icon(byId.get('wood_block'))}<span><b>${fmt(r.byproducts.wood_block*hours,1)} Wood Blocks</b><small>over ${periodHeader}</small></span></div><div>${icon(byId.get('mineral_sand'))}<span><b>${fmt(r.byproducts.mineral_sand*hours,1)} Mineral Sand</b><small>over ${periodHeader}</small></span></div></div>`;
  renderPlanQuickNav();
+ if(r.climatePlacementFallback){const badge=$('#content .page-title .badge'),metrics=$('#content .metrics');if(badge)badge.textContent='Next climate-placeable plan';if(metrics){const notice=document.createElement('div');notice.className='note';notice.textContent='The highest-ranked plan could not fit all climate-dependent facilities. This is the next placeable plan.';metrics.before(notice)}}
  evaluateHomebuildingImpact(r);
 }
 function renderCatalog(){const fs=[...new Set(data.items.map(i=>i.facility))];$('#content').innerHTML=title('Recipes & Items',`${data.items.length} production entries · original screenshot artwork`)+`<div class="catalog-controls"><input type="search" id="search" aria-label="Search items" placeholder="Find an item or ingredient…" value="${esc(search)}"><select id="category" aria-label="Facility filter"><option value="all">All facilities</option>${fs.map(f=>`<option data-i18n-ignore value="${esc(f)}" ${f===category?'selected':''}>${gameEsc('facility',f)}</option>`).join('')}</select><select id="scope" aria-label="Unlock filter"><option value="all">All levels</option><option value="unlocked" ${catalogScope==='unlocked'?'selected':''}>Unlocked at level ${level}</option></select></div><div id="catalog-grid" class="catalog"></div>`;filterCatalog()}

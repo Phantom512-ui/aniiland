@@ -31,18 +31,14 @@ I was jumping between bundling the code or splitting it between functions so som
 
 ## Data and methodology
 
-Aniiland’s recipe, item, and facility data comes from in-game screenshots and confirmed game data. Directly verified in-game values take priority when sources disagree.
+Aniiland uses multiple sources, with in-game screenshots taking priority where the project has directly verified a value:
 
-- **Game data** — recipe/item records, facility counts and unlocks, Aniimo traits, and official game localization.
-- **In-game screenshots** — verification of recipes, prices, workloads, energy values, event mechanics, and facility/item artwork.
-- **Aniimax** — a secondary reference used to cross-check Homeland data and production calculations and partly used as a base of the Aniiland solver: https://github.com/ae-bii/aniimax
-- **HiGHS / highs-js** — the mixed-integer optimization engine bundled with Aniiland.
+- **Aniimax** — post-release Homeland production/facility data and solver methodology: https://github.com/ae-bii/aniimax
+- **In-game screenshots supplied by the project owner** — event recipes, prices/workloads, Home Coin/Moonray Wheat artwork, facility/item artwork, energy values, and other direct game checks.
+- **Mobalytics Homeland guide** — Aniimo portrait/recommendation reference used by the UI: https://mobalytics.gg/gamebase/guides/aniimo-homeland-ability-best-aniimos
+- **HiGHS / highs-js** — mixed-integer optimization engine bundled under `vendor/highs/`.
 
-Aniiland combines these inputs with its own planning logic, interface, event tools, order handling, custom Aniimo roster, and floor planner.
-
-The app’s **Data Sources & Assumptions** page documents verification status and remaining assumptions. The production model includes two waterings per Farmland or Woodland growth cycle, each reducing the full growth timer by 1/8.
-
-Aniimax-derived climate coverage candidates remain credited separately, and the applicable license notice is included with the project.
+The embedded Aniimax-derived data snapshot is identified inside the app's Data Sources & Assumptions page. Aniiland additionally uses the newer Aniimax watering model: Farmland and Woodland receive two waterings during a grow cycle, each reducing the full growth timer by 1/8.
 
 ## Licensing
 
