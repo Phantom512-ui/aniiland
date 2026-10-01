@@ -14055,6 +14055,8 @@ const __ANIILAND_WORKER_SOURCE=[
   "      if(Number.isFinite(Number(split)))add([[1,`z${n}`]],'=',Math.max(0,Math.floor(Number(split))));",
   "      else if(Number(settings.eventReservedFarmlands)>=2)add([[1,`z${n}`]],'>=',1);",
   "      add([[1,`q${n}`],[-wateredThroughput,`zw${n}`],[-normalThroughput,`zu${n}`]],'>=',0);",
+  "      // Event plots inherit the existing watering state; they do not create another watering job.",
+  "      add([[1,`zw${n}`],[-1,`z${n}`],[-cap,'water_on']],'>=',-cap);",
   "    }",
   "    if(i.cost){objectives.push([-i.cost,`q${n}`]);coinTerms.push([-i.cost,`q${n}`])}",
   "    if(settings.strategy!=='upgrade'&&i.facility==='Woodland')objectives.push([1e8,`z${n}`]);",
@@ -15720,12 +15722,12 @@ const {renderLayoutPlanner,autoRedeployLayout,exportLayoutShareState,importLayou
 (async()=>{
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const data=__ANIILAND_DATA;
-const APP_VERSION='2.1.0';
+const APP_VERSION='2.1.1';
 const plannerHeader=document.querySelector('body>header');
 if(plannerHeader){const updatePlannerHeaderHeight=()=>document.documentElement.style.setProperty('--planner-header-height',`${plannerHeader.getBoundingClientRect().height}px`);updatePlannerHeaderHeight();new ResizeObserver(updatePlannerHeaderHeight).observe(plannerHeader);}
 
 const PLAN_MODEL_SCHEMA=18;
-const versionEl=document.querySelector('.version');if(versionEl)versionEl.innerHTML='<b>'+APP_VERSION+'</b><small>30 September</small>';
+const versionEl=document.querySelector('.version');if(versionEl)versionEl.innerHTML='<b>'+APP_VERSION+'</b><small>1 October</small>';
 const byId=new Map(data.items.map(i=>[i.id,i]));const fmt=(n,d=0)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const gameT=(kind,value,id=null)=>{if(kind==='facility'&&['Harvest Moon · Radish Farm','Harvest Moon · Pepper Farm'].includes(value)){const crop=value.includes('Radish')?'Moondew Radish':'Waxing Moon Pepper';return `${gameT('facility','Farmland')} · ${gameT('item',crop)}`}return window.AniilandI18n?.gameT?.(kind,String(value??''),id)??String(value??'')};
