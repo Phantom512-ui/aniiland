@@ -76,19 +76,19 @@ export const FACILITIES = [
     {
         name: 'Heat Furnace', slug: 'heat-furnace', defaultCount: 0, category: 'Environment', hasLevels: false,
         unlocks: { 1: 7 },
-        counts: [0, 0, 0, 0, 0, 0, 1],
+        counts: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2],
         tooltip: "Provides Warm or Scorching growing conditions for crops that need one&#10;The calculator picks whichever mode is more profitable&#10;Covers a 9x9 area around itself; how many plots fit depends on what shares it"
     },
     {
         name: 'Cooling Unit', slug: 'cooling-unit', defaultCount: 0, category: 'Environment', hasLevels: false,
         unlocks: { 1: 7 },
-        counts: [0, 0, 0, 0, 0, 0, 1],
+        counts: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2],
         tooltip: "Provides Cool or Freeze growing conditions for crops that need one&#10;The calculator picks whichever mode is more profitable&#10;Covers a 9x9 area around itself; how many plots fit depends on what shares it"
     },
     {
         name: 'Sunlamp', slug: 'sunlamp', defaultCount: 0, category: 'Environment', hasLevels: false,
         unlocks: { 1: 9 },
-        counts: [0, 0, 0, 0, 0, 0, 0, 0, 1],
+        counts: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2],
         tooltip: "Provides Adequate growing conditions for crops that need one&#10;Covers a 9x9 area around itself; how many plots fit depends on what shares it"
     },
     {
@@ -118,19 +118,19 @@ export const FACILITIES = [
     {
         name: 'Simmering Pot', slug: 'simmering-pot', defaultCount: 0, category: 'Materials Processing', hasWorker: true, ability: 'Fire', personality: 'Tenacious',
         unlocks: { 1: 5, 2: 7, 3: 9, 4: 12, 5: 15, 6: 18 },
-        counts: [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        counts: [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
         tooltip: "Lv.1: plain rice porridge&#10;Lv.2: rose concentrate&#10;Lv.3: rock candy, strawberry jam, maple candy apple jam&#10;Lv.4: chestnut puree, grape jam, ginseng porridge&#10;Lv.5: maple sugar chunk, malt sugar&#10;Lv.6: cocoa spread, cranberry jam, agave syrup"
     },
     {
         name: 'Phonolfactory Table', slug: 'phonolfactory-table', defaultCount: 0, category: 'Materials Processing', hasWorker: true, ability: 'Perfumery', personality: 'Instinctive',
         unlocks: { 1: 6, 2: 7, 3: 10, 4: 14, 5: 17, 6: 19 },
-        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
         tooltip: "Lv.1: bamboo joss stick&#10;Lv.2: rose incense, cherry incense&#10;Lv.3: lavender incense, lemon incense, advanced lemon incense&#10;Lv.4: herbal ginseng aroma&#10;Lv.5: soap, premium soap&#10;Lv.6: orange flower incense, mixed perfume, lotion, premium mixed perfume"
     },
     {
         name: 'Bouncy Brew Keg', slug: 'bouncy-brew-keg', defaultCount: 0, category: 'Materials Processing', hasWorker: true, ability: 'Water', personality: 'Energetic',
         unlocks: { 1: 6, 2: 9, 3: 13, 4: 17, 5: 19 },
-        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        counts: [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2],
         tooltip: "Lv.1: wheat tea, toasted rice green tea&#10;Lv.2: potato kvass, strawberry juice, apple juice, sugarcane juice&#10;Lv.3: grape juice, ginseng water, grape lemon drink, walnut milk&#10;Lv.4: cranberry juice, coconut cooler&#10;Lv.5: agave drink, hot cocoa, coconut cocoa, orange flower dew"
     },
     {
