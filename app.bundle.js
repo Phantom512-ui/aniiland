@@ -16869,7 +16869,7 @@ function closeDialogFromBackdrop(dialog){if(!dialog?.open)return;cleanupDialogSt
 document.addEventListener('pointerdown',e=>{const dialog=e.target instanceof HTMLDialogElement?e.target:null;if(!dialog?.open)return;const box=dialog.getBoundingClientRect();if(e.clientX>=box.left&&e.clientX<=box.right&&e.clientY>=box.top&&e.clientY<=box.bottom)return;e.preventDefault();closeDialogFromBackdrop(dialog)},true);
 document.addEventListener('cancel',e=>{if(e.target instanceof HTMLDialogElement)cleanupDialogState(e.target)},true);
 const rosterTr=s=>siteT(s);
-const rosterPersonalityNames={E:'Energetic',F:'Faithful',N:'Nimble',I:'Instinctive',J:'Judicious',P:'Playful',S:'Practical',T:'Tenacious'};
+const rosterPersonalityNames={E:'Energetic',S:'Practical',T:'Tenacious',J:'Judicious',I:'Instinctive',N:'Nimble',F:'Faithful',P:'Playful'};
 const rosterOpposites={E:'I',I:'E',F:'T',T:'F',N:'S',S:'N',J:'P',P:'J'};
 function normalizeRoster(value){return (Array.isArray(value)?value:[]).slice(0,60).map(entry=>{const id=String(typeof entry==='object'&&entry?entry.id:entry),personalities=[];for(const letter of (Array.isArray(entry?.personalities)?entry.personalities:[])){if(rosterPersonalityNames[letter]&&!personalities.includes(letter)&&!personalities.includes(rosterOpposites[letter])&&personalities.length<4)personalities.push(letter)}return{id,personalities}}).filter(entry=>aniimoNeededPets.has(entry.id))}
 let customRosterIds=normalizeRoster(initialUi.customRoster),rosterEnabled=initialUi.rosterEnabled===true;
