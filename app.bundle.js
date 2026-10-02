@@ -13936,7 +13936,7 @@ const __ANIILAND_WORKER_SOURCE=[
   "const generatorLevelForRv=level=>level<12?0:Math.min(5,1+Math.floor((level-12)/2));",
   "// Generator electricProduce values decoded from the same post-release table snapshot.",
   "const generatorPowerByLevel=[0,600,800,1000,1200,1500];const generatorBoostPowerByLevel=[0,500,660,800,1000,1200];",
-  "const eModeCycle=(item,boosted=false)=>item.workload/(baseWorkRate(item.minAbility)*(boosted?1.2:1));",
+  "const eModeCycle=(item,boosted=false,settings={})=>{const safeSettings=settings&&typeof settings==='object'?settings:{worker:'minimum',bonus:false,customRoster:[],level:1};const normal=cycle(item,safeSettings);if(!Number.isFinite(normal)||normal<=0)return item.workload/(baseWorkRate(item.minAbility)*(boosted?1.2:1));return boosted?normal/1.2:normal;};",
   "",
   "const facilityGroups=(settings,name)=>{",
   "  const f=settings.facilities?.[name];",
@@ -14175,8 +14175,8 @@ const __ANIILAND_WORKER_SOURCE=[
   "        if(!normalAllowed)add([[1,`q${j}`],[-1,`qb${j}`],[-1,`qf${j}`]],'<=',0);",
   "        // The remainder of q is Aniimo-run production on non-powered copies.",
   "        add([[normalCycle,`q${j}`],[-normalCycle,`qb${j}`],[-normalCycle,`qf${j}`],[-3600,`u${j}`],[3600,`pb${j}`],[3600,`pf${j}`]],'<=',0);",
-  "        add([[eModeCycle(i,true),`qb${j}`],[-3600,`pb${j}`]],'<=',0);",
-  "        add([[eModeCycle(i,false),`qf${j}`],[-3600,`pf${j}`]],'<=',0);",
+  "        add([[eModeCycle(i,true,settings),`qb${j}`],[-3600,`pb${j}`]],'<=',0);",
+  "        add([[eModeCycle(i,false,settings),`qf${j}`],[-3600,`pf${j}`]],'<=',0);",
   "",
   "        const boostedLevelTerms=[],fullLevelTerms=[];",
   "        for(const u of uLevelVars){",
@@ -14433,8 +14433,9 @@ const __ANIILAND_WORKER_SOURCE=[
   "    const rosterSeconds=(model.rosterTaskTimes||[]).filter(t=>t.recipeId===i.id).reduce((n,t)=>n+t.variables.reduce((sum,v)=>sum+val(v),0),0);",
   "    const residentRate=(model.rosterResidentRates||[]).filter(t=>t.recipeId===i.id).reduce((n,t)=>n+t.terms.reduce((sum,[c,v])=>sum+c*val(v),0),0);",
   "    const residentSeconds=residentRate>1e-9?Math.max(0,(Math.round(val(`u${n}`))-poweredUnits))*3600/residentRate:0;",
-  "    const effectiveSeconds=i.seconds&&batches>1e-9&&plots>0?plots*3600/batches:residentSeconds>1e-9?residentSeconds:settings.customRoster?.length&&rosterSeconds>1e-9&&normalBatches>1e-9?rosterSeconds/normalBatches:cycle(i,settings);",
-  "    const machineSeconds=i.seconds?effectiveSeconds*batches:effectiveSeconds*normalBatches+eModeCycle(i,true)*boostedBatches+eModeCycle(i,false)*fullBatches;",
+  "    const baseSeconds=i.seconds&&batches>1e-9&&plots>0?plots*3600/batches:residentSeconds>1e-9?residentSeconds:settings.customRoster?.length&&rosterSeconds>1e-9&&normalBatches>1e-9?rosterSeconds/normalBatches:cycle(i,settings);",
+  "    const effectiveSeconds=!i.seconds&&eModeEligible(i,settings)&&batches>1e-9&&(boostedBatches>1e-7||fullBatches>1e-7)?(baseSeconds*normalBatches+eModeCycle(i,true,settings)*boostedBatches+eModeCycle(i,false,settings)*fullBatches)/batches:baseSeconds;",
+  "    const machineSeconds=i.seconds?baseSeconds*batches:effectiveSeconds*batches;",
   "    return {id:i.id,facility:i.facility,batches,produced:batches*i.yield,plots,wateredPlots,unwateredPlots,units:i.seconds?null:Math.round(val(`u${n}`)),assignedLevels,shared:false,powered:poweredUnits>0,poweredUnits,poweredLevels,poweredBatches:boostedBatches+fullBatches,powerDraw,powerMode:boostedBatches>1e-7?'120%':fullBatches>1e-7?'100%':'',seconds:effectiveSeconds,machineHours:machineSeconds/3600};",
   "  }).filter(r=>r.batches>1e-7);",
   "",
@@ -14601,7 +14602,7 @@ const workerLevelFor=(settings,ability,required)=>{
 };
 const generatorLevelForRv=level=>level<12?0:Math.min(5,1+Math.floor((level-12)/2));
 const generatorPowerByLevel=[0,600,800,1000,1200,1500];const generatorBoostPowerByLevel=[0,500,660,800,1000,1200];
-const eModeCycle=(item,boosted=false)=>item.workload/(baseWorkRate(item.minAbility)*(boosted?1.2:1));
+const eModeCycle=(item,boosted=false,settings={})=>{const safeSettings=settings&&typeof settings==='object'?settings:{worker:'minimum',bonus:false,customRoster:[],level:1};const normal=cycle(item,safeSettings);if(!Number.isFinite(normal)||normal<=0)return item.workload/(baseWorkRate(item.minAbility)*(boosted?1.2:1));return boosted?normal/1.2:normal;};
 
 const facilityGroups=(settings,name)=>{
   const f=settings.facilities?.[name];
@@ -14774,8 +14775,8 @@ function buildModel(data,settings){
         const normalAllowed=settings.worker==='minimum'||i.minAbility<=workerLevelFor(settings,i.ability,i.minAbility);
         if(!normalAllowed)add([[1,`q${j}`],[-1,`qb${j}`],[-1,`qf${j}`]],'<=',0);
         add([[normalCycle,`q${j}`],[-normalCycle,`qb${j}`],[-normalCycle,`qf${j}`],[-3600,`u${j}`],[3600,`pb${j}`],[3600,`pf${j}`]],'<=',0);
-        add([[eModeCycle(i,true),`qb${j}`],[-3600,`pb${j}`]],'<=',0);
-        add([[eModeCycle(i,false),`qf${j}`],[-3600,`pf${j}`]],'<=',0);
+        add([[eModeCycle(i,true,settings),`qb${j}`],[-3600,`pb${j}`]],'<=',0);
+        add([[eModeCycle(i,false,settings),`qf${j}`],[-3600,`pf${j}`]],'<=',0);
         const draw=eModePowerDraw(i);
         powerVars.push({j,unitCap,draw});
         powerUnitTerms.push([1,`pb${j}`],[1,`pf${j}`]);
@@ -14949,14 +14950,18 @@ function decode(model,result){
   const {items,products,facilities,staffList,settings,aniimoCap,baseAniimoCap,foodProducts,upgradeCost,generatorLevel,generatorPower}=model;
   const rows=items.map((i,n)=>{
     const batches=val(`q${n}`),boostedBatches=eModeEligible(i,settings)?val(`qb${n}`):0,fullBatches=eModeEligible(i,settings)?val(`qf${n}`):0;
-    const poweredUnits=eModeEligible(i,settings)?Math.round(val(`pb${n}`)+val(`pf${n}`)):0;
-    const powerDraw=poweredUnits*eModePowerDraw(i),normalBatches=Math.max(0,batches-boostedBatches-fullBatches);
-    const machineSeconds=i.seconds?cycle(i,settings)*batches:cycle(i,settings)*normalBatches+eModeCycle(i,true)*boostedBatches+eModeCycle(i,false)*fullBatches;
+    const assignedLevels=i.seconds?[]:facilityLevelCounts(settings,i.facility).filter(g=>g.level>=i.facilityLevel).map(g=>({level:g.level,units:Math.round(val(`u${n}l${g.level}`))})).filter(g=>g.units>0);
+    const poweredLevels=eModeEligible(i,settings)?facilityLevelCounts(settings,i.facility).filter(g=>g.level>=i.facilityLevel).map(g=>{const boosted=Math.round(val(`pb${n}l${g.level}`)),full=Math.round(val(`pf${n}l${g.level}`)),units=boosted+full,watts=eModePowerDraw(i.facility,g.level);return{level:g.level,units,boosted,full,watts,power:units*watts}}).filter(g=>g.units>0):[];
+    const poweredUnits=poweredLevels.reduce((a,g)=>a+g.units,0),powerDraw=poweredLevels.reduce((a,g)=>a+g.power,0),normalBatches=Math.max(0,batches-boostedBatches-fullBatches);
+    const plots=i.seconds?Math.round(val(`z${n}`)):null,wateredPlots=i.seconds?Math.round(val(`zw${n}`)):0,unwateredPlots=i.seconds?Math.round(val(`zu${n}`)):0;
+    const rosterSeconds=(model.rosterTaskTimes||[]).filter(t=>t.recipeId===i.id).reduce((n,t)=>n+t.variables.reduce((sum,v)=>sum+val(v),0),0);
+    const residentRate=(model.rosterResidentRates||[]).filter(t=>t.recipeId===i.id).reduce((n,t)=>n+t.terms.reduce((sum,[c,v])=>sum+c*val(v),0),0);
+    const residentSeconds=residentRate>1e-9?Math.max(0,(Math.round(val(`u${n}`))-poweredUnits))*3600/residentRate:0;
+    const baseSeconds=i.seconds&&batches>1e-9&&plots>0?plots*3600/batches:residentSeconds>1e-9?residentSeconds:settings.customRoster?.length&&rosterSeconds>1e-9&&normalBatches>1e-9?rosterSeconds/normalBatches:cycle(i,settings);
+    const effectiveSeconds=!i.seconds&&eModeEligible(i,settings)&&batches>1e-9&&(boostedBatches>1e-7||fullBatches>1e-7)?(baseSeconds*normalBatches+eModeCycle(i,true,settings)*boostedBatches+eModeCycle(i,false,settings)*fullBatches)/batches:baseSeconds;
+    const machineSeconds=i.seconds?baseSeconds*batches:effectiveSeconds*batches;
     return {
-      id:i.id,facility:i.facility,batches,produced:batches*i.yield,
-      plots:i.seconds?Math.round(val(`z${n}`)):null,units:i.seconds?null:Math.round(val(`u${n}`)),shared:false,
-      powered:poweredUnits>0,poweredUnits,poweredBatches:boostedBatches+fullBatches,powerDraw,
-      powerMode:boostedBatches>1e-7?'120%':fullBatches>1e-7?'100%':'',seconds:cycle(i,settings),machineHours:machineSeconds/3600
+      id:i.id,facility:i.facility,batches,produced:batches*i.yield,plots,wateredPlots,unwateredPlots,units:i.seconds?null:Math.round(val(`u${n}`)),assignedLevels,shared:false,powered:poweredUnits>0,poweredUnits,poweredLevels,poweredBatches:boostedBatches+fullBatches,powerDraw,powerMode:boostedBatches>1e-7?'120%':fullBatches>1e-7?'100%':'',seconds:effectiveSeconds,machineHours:machineSeconds/3600
     };
   }).filter(r=>r.batches>1e-7);
 
