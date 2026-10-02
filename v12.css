@@ -7499,6 +7499,42 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
   gap:14px
 }
 
+.owned-home-coins {
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#101d27;
+  padding:13px
+}
+
+.owned-home-coins h3 {
+  margin:0 0 10px;
+  color:#dff4ff;
+  font-size:13px
+}
+
+.owned-home-coins .owned-material-row {
+  border-top:0;
+  padding-top:0
+}
+
+.owned-home-coins {
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#101d27;
+  padding:13px
+}
+
+.owned-home-coins h3 {
+  margin:0 0 10px;
+  color:#dff4ff;
+  font-size:13px
+}
+
+.owned-home-coins .owned-material-row {
+  border-top:0;
+  padding-top:0
+}
+
 .owned-material-chain {
   border:1px solid var(--line);
   border-radius:12px;
