@@ -11,7 +11,7 @@
 <title>Aniiland — Aniimo Homeland Planner</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="v2.css">
-<link rel="stylesheet" href="v12.css?v=2.1.1-home-coins">
+<link rel="stylesheet" href="v12.css?v=2.1.4-goal-header-dom-selection-fix">
 <link rel="stylesheet" href="v204.css?v=2.1.1">
 <script>document.documentElement.classList.toggle("aniiland-phone",window.matchMedia("(max-width:760px), (max-width:960px) and (pointer:coarse)").matches);</script>
 </head>
@@ -43,7 +43,7 @@
 <button type="button" class="mobile-settings-toggle" data-mobile-settings-toggle aria-expanded="false">
 <span class="mobile-settings-summary">
 <small>PLANNER SETTINGS</small>
-<b data-mobile-settings-summary>RV 1 · Most Coins</b>
+<b data-mobile-settings-summary>RV 1 · Coins</b>
 </span>
 <span class="mobile-settings-action">
 <span>Adjust</span>
@@ -62,19 +62,26 @@
 <button type="button" data-setup-mode="advanced">Custom Setup</button>
 </div>
 <details class="planner-settings-disclosure" id="goal-settings-menu" data-mobile-expand>
-<summary><span class="disclosure-summary-copy"><span>Homeland Goals</span><small data-settings-choice="goal">Most Coins</small></span></summary>
+<summary><span class="disclosure-summary-copy"><span>Homeland Goals</span><small data-settings-choice="goal">Coins</small></span></summary>
 <label for="strategy">Your Homeland Goal</label>
+<p class="goal-prompt">Pick any combination of these 3, or choose Simplest RV Upgrade.</p>
 <div id="strategy-grid" class="goal-grid">
-<button type="button" class="goal-btn active" data-strategy-btn="profit">Most Coins</button>
-<button type="button" class="goal-btn" data-strategy-btn="upgrade">Simplest RV Upgrade</button>
-<button type="button" class="goal-btn" data-strategy-btn="xp">Coins &amp; AniiEXP</button>
-<button type="button" class="goal-btn" data-strategy-btn="xp_aniipod">Coins &amp; AniiEXP &amp; Aniipods</button>
+<div class="goal-toggle-row">
+<button type="button" class="goal-btn active" data-strategy-btn="coins" data-goal-toggle aria-pressed="true">Coins</button>
+<button type="button" class="goal-btn" data-strategy-btn="aniiexp" data-goal-toggle aria-pressed="false">AniiExp</button>
+<button type="button" class="goal-btn" data-strategy-btn="aniipods" data-goal-toggle aria-pressed="false">AniiPods</button>
 </div>
-<p class="goal-shared-note">Most Coins, Coins &amp; AniiEXP, and Coins &amp; AniiEXP &amp; Aniipods keep the normal RV-upgrade timing. Simplest RV Upgrade pushes upgrade materials continuously and keeps extra Home Coins ready for the next level.</p>
+<button type="button" class="goal-btn goal-upgrade-btn" data-strategy-btn="upgrade" aria-pressed="false">Simplest RV Upgrade</button>
+</div>
+<p class="goal-shared-note">All options reach the next RV level in roughly the same time (within 1–2%). The difference is focus and complexity.</p>
 <select id="strategy" class="strategy-select-hidden">
-<option value="profit" selected>Most Coins</option>
-<option value="xp">Coins &amp; AniiEXP</option>
-<option value="xp_aniipod">Coins &amp; AniiEXP &amp; Aniipods</option>
+<option value="coins" selected>Coins</option>
+<option value="aniiexp">AniiExp</option>
+<option value="aniipods">AniiPods</option>
+<option value="coins_aniiexp">Coins + AniiExp</option>
+<option value="coins_aniipods">Coins + AniiPods</option>
+<option value="aniiexp_aniipods">AniiExp + Aniipods</option>
+<option value="all">Coins + AniiExp + Aniipods</option>
 <option value="upgrade">Simplest RV Upgrade</option>
 </select>
 </details>
@@ -262,7 +269,7 @@
 </script>
 <script src="aniimo-needed-data.js">
 </script>
-<script src="app.bundle.js?v=2.1.1-layout-legend-recipe-colors" onerror="document.getElementById('content').textContent='The app file could not load. Extract the entire ZIP into one folder and open index.html. Make sure app.bundle.js stays next to index.html.'">
+<script src="app.bundle.js?v=2.1.4-goal-header-dom-selection-fix" onerror="document.getElementById('content').textContent='The app file could not load. Extract the entire ZIP into one folder and open index.html. Make sure app.bundle.js stays next to index.html.'">
 </script>
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "976f5e3e73af433895fc3ea06e8ae128"}'>
 </script>
