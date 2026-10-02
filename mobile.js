@@ -25,7 +25,7 @@
     if(workerChoice)workerChoice.textContent=getWorkerSummary();
   };
   const updateSummary=()=>{
-    const rv=document.querySelector('#level-value')?.textContent?.trim()||document.querySelector('#level')?.value||'—';
+    const rv=document.querySelector('#level-value')?.value||document.querySelector('#level-value')?.textContent?.trim()||document.querySelector('#level')?.value||'—';
     summary.textContent=`RV ${rv} · ${getGoal()}`;
     updateSettingsChoices();
   };
@@ -74,6 +74,8 @@
   sidebar.addEventListener('change',e=>{
     if(e.target.matches('#bonus,#climate,#light-climate,#emode'))updateSettingsChoices();
   });
+  sidebar.addEventListener('input',e=>{if(e.target.matches('#level,#level-value'))updateSummary()});
+  sidebar.addEventListener('change',e=>{if(e.target.matches('#level,#level-value'))updateSummary()});
   updateSettingsChoices();
 
   // Mobile Production Plan quick tree: reuse the desktop navigator, but make it
