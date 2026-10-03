@@ -9129,7 +9129,7 @@ th {
 
 /* Mobile custom-setup scroll fix: keep the header, category bar and actions fixed while the full facility list scrolls. */
 @media (max-width:760px), (max-width:960px) and (pointer:coarse) {
-  #advanced-setup-dialog.advanced-setup-dialog {
+  #advanced-setup-dialog.advanced-setup-dialog[open] {
     display:flex!important;
     flex-direction:column!important;
     height:calc(100dvh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))!important;
