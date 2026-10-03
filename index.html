@@ -13,7 +13,8 @@
 <link rel="stylesheet" href="v2.css">
 <link rel="stylesheet" href="v12.css?v=2.1.4-mobile-setup-dialog-close-fix">
 <link rel="stylesheet" href="v204.css?v=2.1.1">
-<script>document.documentElement.classList.toggle("aniiland-phone",window.matchMedia("(max-width:760px), (max-width:960px) and (pointer:coarse)").matches);</script>
+<link rel="stylesheet" href="mobile.css?v=3.0.1">
+<script>(function(){var phone=window.matchMedia("(max-width:760px), (max-width:960px) and (pointer:coarse)").matches;document.documentElement.classList.toggle("aniiland-phone",phone);if(phone){try{if(localStorage.getItem("aniiland-quick-nav-collapsed")===null)localStorage.setItem("aniiland-quick-nav-collapsed","true")}catch(e){}}})();</script>
 </head>
 <body>
 <header>
@@ -273,7 +274,7 @@
 </script>
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "976f5e3e73af433895fc3ea06e8ae128"}'>
 </script>
-<script src="mobile.js">
+<script src="mobile.js?v=3.0.1">
 </script>
 <script src="guide.js">
 </script>

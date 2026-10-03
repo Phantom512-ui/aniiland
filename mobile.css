@@ -1,0 +1,919 @@
+/* ==========================================================================
+   Aniiland — phone experience
+   Loaded last. Everything is scoped to html.aniiland-phone, which is set
+   before first paint (index.html) and kept in sync by mobile.js using:
+     (max-width:760px), (max-width:960px) and (pointer:coarse)
+   Desktop is untouched.
+   ========================================================================== */
+
+html.aniiland-phone {
+  --m-bg: #0d1620;
+  --m-panel: #14212c;
+  --m-raised: #1a2a37;
+  --m-line: #2a3b4a;
+  --m-line-soft: #ffffff12;
+  --m-text: #eaf2f8;
+  --m-muted: #97aaba;
+  --m-accent: #6c3baa;
+  --m-accent-hi: #8a5ec7;
+  --m-accent-soft: #b88ce8;
+  --m-gold: #f4d18b;
+  --m-mint: #a3e5c1;
+  --m-nav-h: 62px;
+  --m-safe-b: env(safe-area-inset-bottom, 0px);
+  --m-safe-t: env(safe-area-inset-top, 0px);
+  --m-radius: 16px;
+  --m-sheet-radius: 22px;
+  --m-ease: cubic-bezier(.2, .8, .2, 1);
+  scroll-padding-top: calc(var(--m-header-h, 56px) + 64px);
+  -webkit-text-size-adjust: 100%;
+}
+
+@keyframes m-sheet-up {
+  from { transform: translateY(28px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes m-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Never show phone-only chrome on desktop */
+.m-tabbar, .m-footer-extra { display: none; }
+
+/* --------------------------------------------------------------------------
+   Page frame
+   -------------------------------------------------------------------------- */
+html.aniiland-phone body {
+  background: var(--m-bg);
+  overflow-x: hidden;
+  padding-bottom: calc(var(--m-nav-h) + var(--m-safe-b) + 18px) !important;
+  -webkit-tap-highlight-color: transparent;
+}
+html.aniiland-phone.m-sheet-open,
+html.aniiland-phone.m-sheet-open body { overflow: hidden; }
+
+html.aniiland-phone button,
+html.aniiland-phone a,
+html.aniiland-phone summary,
+html.aniiland-phone select { touch-action: manipulation; }
+
+/* iOS Safari zooms the page when an input under 16px gets focus */
+html.aniiland-phone input,
+html.aniiland-phone select,
+html.aniiland-phone textarea { font-size: 16px !important; }
+
+html.aniiland-phone .shell { display: block !important; width: 100%; max-width: none; }
+html.aniiland-phone main#content { padding: 14px 14px 28px !important; min-width: 0; }
+
+/* --------------------------------------------------------------------------
+   App bar (header)
+   -------------------------------------------------------------------------- */
+html.aniiland-phone header {
+  position: sticky !important;
+  top: 0;
+  z-index: 1100;
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 0 !important;
+  padding: calc(var(--m-safe-t) + 8px) 12px 8px !important;
+  background: rgba(13, 22, 32, .92) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  border-bottom: 1px solid var(--m-line) !important;
+}
+
+html.aniiland-phone header .brand {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 9px;
+  font-size: 17px !important;
+  line-height: 1.05;
+  letter-spacing: 1.4px !important;
+}
+html.aniiland-phone header .brand > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html.aniiland-phone header .brand-site-icon { width: 36px; height: 36px; flex: none; border-radius: 10px; }
+html.aniiland-phone header .brand small {
+  margin-top: 3px;
+  font-size: 8.5px !important;
+  letter-spacing: 1.5px !important;
+  color: var(--m-muted);
+}
+
+/* Harvest Moon → compact pill */
+html.aniiland-phone header .event-center-btn {
+  flex: 0 0 auto;
+  order: 2;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 40px !important;
+  height: 40px;
+  margin: 0 !important;
+  padding: 0 11px 0 5px !important;
+  gap: 6px !important;
+  border-radius: 999px !important;
+}
+html.aniiland-phone header .event-center-btn > span { display: none !important; }
+html.aniiland-phone header .event-center-btn > img { width: 28px !important; height: 28px !important; margin: 0 !important; }
+html.aniiland-phone header .event-center-btn > strong {
+  margin: 0 !important;
+  padding: 3px 7px !important;
+  font-size: 11px !important;
+  line-height: 1.2;
+}
+
+/* "How to use" → round ? button */
+html.aniiland-phone header .guide-open-btn {
+  flex: 0 0 auto;
+  order: 3;
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  justify-content: center;
+}
+html.aniiland-phone header .guide-open-btn > span:not(.guide-q) { display: none !important; }
+html.aniiland-phone header .guide-open-btn .guide-q { margin: 0 !important; }
+
+/* nav now only carries the language controls */
+html.aniiland-phone header nav {
+  flex: 0 0 auto;
+  order: 4;
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  overflow: visible !important;
+}
+html.aniiland-phone header nav > [data-tab] { display: none !important; }
+html.aniiland-phone header nav .language-trigger {
+  position: static !important;
+  inset: auto !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 40px !important;
+  height: 40px;
+  margin: 0 !important;
+  padding: 0 9px !important;
+  border-radius: 12px !important;
+}
+html.aniiland-phone header nav .language-trigger img { width: 26px !important; height: auto; margin: 0 !important; }
+html.aniiland-phone header nav .language-trigger i,
+html.aniiland-phone header nav .language-trigger span { display: none !important; }
+html.aniiland-phone header nav .translation-note-trigger {
+  width: 34px !important; height: 34px !important; min-height: 34px !important; padding: 0 !important; border-radius: 50% !important;
+}
+html.aniiland-phone header .kofi-button,
+html.aniiland-phone header .version { display: none !important; }
+
+@media (max-width: 350px) {
+  html.aniiland-phone header .brand small { display: none; }
+  html.aniiland-phone header .brand { font-size: 15px !important; }
+}
+
+/* --------------------------------------------------------------------------
+   Bottom tab bar
+   -------------------------------------------------------------------------- */
+html.aniiland-phone .m-tabbar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1100;
+  margin: 0 !important;
+  padding: 6px 8px calc(6px + var(--m-safe-b)) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--m-line) !important;
+  border-radius: 0 !important;
+  background: rgba(13, 22, 32, .94) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 -10px 30px #0006;
+}
+html.aniiland-phone .m-tabbar button {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+  min-width: 0;
+  min-height: 50px !important;
+  margin: 0;
+  padding: 7px 2px 5px !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+  color: #8fa3b3 !important;
+  box-shadow: none !important;
+  font-size: 10.5px !important;
+  font-weight: 650;
+  line-height: 1.12;
+  white-space: normal !important;
+  letter-spacing: .01em;
+  transition: color .15s, background .15s;
+}
+html.aniiland-phone .m-tabbar button svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .2s var(--m-ease);
+}
+html.aniiland-phone .m-tabbar button span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+html.aniiland-phone .m-tabbar button.active {
+  color: #fff !important;
+  background: linear-gradient(180deg, #7851a94d, #7851a91a) !important;
+}
+html.aniiland-phone .m-tabbar button.active svg { stroke: #d9c1f5; transform: translateY(-1px); }
+html.aniiland-phone .m-tabbar button.active::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 22px;
+  height: 3px;
+  margin-left: -11px;
+  border-radius: 0 0 3px 3px;
+  background: var(--m-accent-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Planner settings: sticky summary bar  →  bottom sheet
+   -------------------------------------------------------------------------- */
+html.aniiland-phone .planner-sidebar {
+  position: sticky;
+  top: var(--m-header-h, 56px);
+  z-index: 1000;
+  width: 100%;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #3b2d4c !important;
+  background: #121b24;
+  box-shadow: 0 8px 20px #0006;
+}
+html.aniiland-phone .mobile-planner-bar { display: block !important; position: relative; z-index: 3; background: linear-gradient(100deg, #21172d, #141e28); }
+html.aniiland-phone .mobile-settings-toggle { min-height: 52px !important; padding: 6px 14px !important; }
+html.aniiland-phone .mobile-settings-summary b { font-size: 14px; }
+html.aniiland-phone .mobile-settings-action {
+  padding: 8px 11px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+html.aniiland-phone .planner-sidebar:not(.mobile-settings-open) > :not(.mobile-planner-bar):not(#planner-update) { display: none !important; }
+html.aniiland-phone .planner-sidebar:not(.mobile-settings-open) > #planner-update:not([hidden]) {
+  display: flex !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* open = sheet */
+html.aniiland-phone .planner-sidebar.mobile-settings-open {
+  position: fixed !important;
+  top: calc(var(--m-safe-t) + 34px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1300;
+  display: flex !important;
+  flex-direction: column;
+  max-height: none !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 0 !important;
+  border: 1px solid #34485a !important;
+  border-bottom: 0 !important;
+  border-radius: var(--m-sheet-radius) var(--m-sheet-radius) 0 0;
+  background: #111c27;
+  box-shadow: 0 0 0 100vmax rgba(4, 8, 13, .64), 0 -18px 50px #000a;
+  animation: m-sheet-up .3s var(--m-ease);
+}
+html.aniiland-phone .planner-sidebar.mobile-settings-open > * { flex: none; }
+/* chevron keeps pointing down: it dismisses a sheet rather than folding a panel */
+html.aniiland-phone .planner-sidebar.mobile-settings-open .mobile-settings-action i { transform: none !important; }
+html.aniiland-phone .planner-sidebar.mobile-settings-open > .mobile-planner-bar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  margin: 0 -16px 12px !important;
+  border-radius: var(--m-sheet-radius) var(--m-sheet-radius) 0 0;
+  background: linear-gradient(100deg, #26193a, #16222e);
+  border-bottom: 1px solid #ffffff12;
+}
+html.aniiland-phone .planner-sidebar.mobile-settings-open > .mobile-planner-bar::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 38px;
+  height: 4px;
+  margin-left: -19px;
+  border-radius: 4px;
+  background: #ffffff33;
+}
+html.aniiland-phone .planner-sidebar.mobile-settings-open .mobile-settings-toggle { padding-top: 12px !important; }
+
+/* Calculate stays reachable at the bottom of the sheet */
+html.aniiland-phone .planner-sidebar.mobile-settings-open > #optimize {
+  order: 90;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: 14px 0 0 !important;
+  min-height: 52px;
+  border-bottom: var(--m-safe-b) solid transparent;
+  box-shadow: 0 0 0 12px #111c27, 0 -18px 22px 12px #111c27, 0 10px 22px #6c3baa55;
+}
+html.aniiland-phone .planner-sidebar.mobile-settings-open > #planner-update { order: 80; }
+html.aniiland-phone .planner-sidebar.mobile-settings-open > details:not([data-mobile-expand]) { order: 50; }
+html.aniiland-phone .planner-sidebar.mobile-settings-open > details:not([data-mobile-expand]):last-of-type { margin-bottom: 4px; }
+
+/* --------------------------------------------------------------------------
+   Floating Orders button + Sections drawer
+   -------------------------------------------------------------------------- */
+html.aniiland-phone .order-dock {
+  right: 10px !important;
+  bottom: calc(var(--m-nav-h) + var(--m-safe-b) + 10px) !important;
+  z-index: 1180;
+}
+html.aniiland-phone .order-fab {
+  min-height: 44px !important;
+  padding: 8px 13px 8px 16px !important;
+  font-size: 14px;
+  box-shadow: 0 10px 28px #000a !important;
+}
+html.aniiland-phone .order-quick-icons { max-width: calc(100vw - 262px) !important; }
+
+html.aniiland-phone .order-panel {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1400;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: min(86dvh, 760px) !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px 16px calc(18px + var(--m-safe-b)) !important;
+  border-radius: var(--m-sheet-radius) var(--m-sheet-radius) 0 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: 0 0 0 100vmax rgba(4, 8, 13, .64), 0 -18px 50px #000a !important;
+  animation: m-sheet-up .3s var(--m-ease);
+}
+html.aniiland-phone .order-panel[hidden] { display: none !important; }
+html.aniiland-phone .order-panel::before {
+  content: "";
+  display: block;
+  width: 38px;
+  height: 4px;
+  margin: -8px auto 12px;
+  border-radius: 4px;
+  background: #ffffff33;
+}
+
+/* Sections drawer → bottom-left pill that opens a card */
+html.aniiland-phone .plan-quick-nav:not([hidden]) {
+  display: block !important;
+  position: fixed !important;
+  left: 10px !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: calc(var(--m-nav-h) + var(--m-safe-b) + 10px) !important;
+  transform: none !important;
+  z-index: 1170 !important;
+  filter: none !important;
+  transition: none;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+html.aniiland-phone .plan-quick-nav.collapsed { transform: none !important; }
+html.aniiland-phone .plan-quick-nav-toggle {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 15px 0 12px !important;
+  border: 1px solid #5d4380 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #2a1d3a, #1d1629) !important;
+  color: #e6d6f8 !important;
+  box-shadow: 0 10px 28px #000a;
+  transform: none !important;
+  writing-mode: horizontal-tb !important;
+}
+html.aniiland-phone .plan-quick-nav-toggle .plan-quick-nav-toggle-icon {
+  display: inline-block;
+  font-size: 0;
+  width: 18px;
+  height: 14px;
+  transform: none !important;
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 6px / 70% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 12px / 100% 2px no-repeat;
+  border-radius: 2px;
+}
+/* icon-only circle when closed so it covers less of the page */
+html.aniiland-phone .plan-quick-nav.collapsed .plan-quick-nav-toggle {
+  width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  justify-content: center;
+}
+html.aniiland-phone .plan-quick-nav.collapsed .plan-quick-nav-toggle small {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+html.aniiland-phone .plan-quick-nav-toggle small {
+  font-size: 13px !important;
+  font-weight: 700;
+  writing-mode: horizontal-tb !important;
+  transform: none !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+html.aniiland-phone .plan-quick-nav-inner {
+  position: absolute;
+  left: 0;
+  bottom: 54px;
+  width: min(86vw, 320px) !important;
+  max-height: min(58dvh, 440px) !important;
+  padding: 12px 12px 10px !important;
+  border: 1px solid #4a3a63 !important;
+  border-radius: 18px !important;
+  background: linear-gradient(160deg, #261b36, #151f2b) !important;
+  box-shadow: 0 18px 50px #000c;
+  animation: m-sheet-up .22s var(--m-ease);
+}
+html.aniiland-phone .plan-quick-nav.collapsed .plan-quick-nav-inner { display: none !important; }
+html.aniiland-phone .plan-quick-nav-links button {
+  min-height: 44px !important;
+  padding: 8px 10px 8px 4px !important;
+  font-size: 13.5px !important;
+  border-radius: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Dialogs → sheets
+   -------------------------------------------------------------------------- */
+html.aniiland-phone dialog {
+  margin: auto 0 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: min(92dvh, calc(100dvh - var(--m-safe-t) - 16px)) !important;
+  border-radius: var(--m-sheet-radius) var(--m-sheet-radius) 0 0 !important;
+  border-bottom: 0 !important;
+  overscroll-behavior: contain;
+  padding-bottom: calc(16px + var(--m-safe-b));
+}
+html.aniiland-phone dialog[open] { animation: m-sheet-up .3s var(--m-ease); }
+html.aniiland-phone dialog::backdrop {
+  background: rgba(4, 8, 13, .68);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: m-fade-in .25s ease;
+}
+
+/* --------------------------------------------------------------------------
+   Language picker → sheet
+   -------------------------------------------------------------------------- */
+html.aniiland-phone .language-menu:not([hidden]) {
+  position: fixed !important;
+  top: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: min(82dvh, 720px) !important;
+  z-index: 1500 !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(14px + var(--m-safe-b)) !important;
+  border-radius: var(--m-sheet-radius) var(--m-sheet-radius) 0 0 !important;
+  box-shadow: 0 0 0 100vmax rgba(4, 8, 13, .64), 0 -18px 50px #000a !important;
+  animation: m-sheet-up .3s var(--m-ease);
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+html.aniiland-phone .site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 16px 8px !important;
+  text-align: center;
+  font-size: 12px;
+  color: var(--m-muted);
+}
+html.aniiland-phone .site-footer .m-footer-extra {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  order: -1;
+}
+html.aniiland-phone .site-footer .m-footer-extra .kofi-button { display: inline-flex !important; position: static; }
+html.aniiland-phone .site-footer .m-footer-extra .version { display: flex !important; align-items: center; flex-direction: row; gap: 6px; opacity: .8; }
+html.aniiland-phone .site-footer .m-footer-extra .version small::before { content: "· "; }
+
+/* --------------------------------------------------------------------------
+   Content polish
+   -------------------------------------------------------------------------- */
+
+/* "?" help buttons: real circles instead of stretched ovals (tap area kept at 44px) */
+html.aniiland-phone .inline-help-btn,
+html.aniiland-phone .translation-note-trigger {
+  position: relative;
+  flex: none;
+  align-self: center;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  font-size: 13px !important;
+  line-height: 1;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+html.aniiland-phone .inline-help-btn::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+/* Page titles */
+html.aniiland-phone .page-title { margin: 0 0 14px !important; gap: 10px; align-items: flex-start; }
+html.aniiland-phone .page-title h1 { margin: 2px 0 6px !important; font-size: 28px !important; line-height: 1.1; }
+html.aniiland-phone .page-title .subtitle,
+html.aniiland-phone .page-title p { margin: 0 !important; font-size: 14px; line-height: 1.45; }
+html.aniiland-phone .section-head { margin: 26px 0 12px !important; }
+html.aniiland-phone .section-head h2 { font-size: 21px !important; line-height: 1.2; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+
+/* Summary metrics: hero card + two compact tiles */
+html.aniiland-phone .metrics { gap: 10px !important; }
+html.aniiland-phone .metric { padding: 14px 15px !important; border-radius: var(--m-radius) !important; }
+html.aniiland-phone .metric strong { font-size: 26px !important; }
+html.aniiland-phone .metric label { font-size: 10.5px !important; letter-spacing: .08em; }
+
+/* Cards in general: calmer padding */
+html.aniiland-phone .production-card,
+html.aniiland-phone .flow-card,
+html.aniiland-phone .upgrade-card,
+html.aniiland-phone .worker-card,
+html.aniiland-phone .source-block { border-radius: var(--m-radius) !important; }
+html.aniiland-phone .upgrade-card { padding: 16px !important; }
+
+/* Recipes & Items: compact 2-column grid with horizontal cards */
+html.aniiland-phone .catalog-controls {
+  position: sticky;
+  top: calc(var(--m-header-h, 56px) + 8px);
+  z-index: 30;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px !important;
+  margin: 0 -14px 12px !important;
+  padding: 8px 14px 10px !important;
+  background: rgba(13, 22, 32, .94);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--m-line);
+}
+html.aniiland-phone .catalog-controls input { grid-column: 1 / -1; }
+html.aniiland-phone .catalog-controls select { min-width: 0; text-overflow: ellipsis; }
+html.aniiland-phone #catalog-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+html.aniiland-phone #catalog-grid .item-card {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 10px 11px !important;
+  text-align: left;
+  border-radius: 14px !important;
+}
+html.aniiland-phone #catalog-grid .item-card > img:first-child {
+  width: 44px !important;
+  height: 44px !important;
+  margin: 0 0 4px !important;
+  object-fit: contain;
+}
+html.aniiland-phone #catalog-grid .item-card b { font-size: 13px; line-height: 1.25; }
+html.aniiland-phone #catalog-grid .item-card small { font-size: 11px; line-height: 1.3; }
+html.aniiland-phone #catalog-grid .item-card > span { font-size: 12px; margin-top: 2px; }
+
+/* Wide tables scroll inside their own box instead of the page */
+html.aniiland-phone .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+
+/* Long strings never push the page sideways */
+html.aniiland-phone main#content * { overflow-wrap: anywhere; }
+html.aniiland-phone main#content img,
+html.aniiland-phone main#content svg { max-width: 100%; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html.aniiland-phone *, html.aniiland-phone *::before, html.aniiland-phone *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Small phones */
+@media (max-width: 350px) {
+  html.aniiland-phone main#content { padding: 12px 10px 24px !important; }
+  html.aniiland-phone .m-tabbar button { font-size: 9.5px !important; }
+  html.aniiland-phone .page-title h1 { font-size: 24px !important; }
+  html.aniiland-phone .catalog-controls { margin: 0 -10px 12px !important; padding-inline: 10px !important; }
+}
+
+/* Large phones / small tablets in portrait: room for 3 columns */
+@media (min-width: 560px) and (max-width: 760px) {
+  html.aniiland-phone #catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+
+/* keep the app's own hidden state for the translation note (shown only for non-English) */
+html.aniiland-phone .translation-note-trigger[hidden] { display: none !important; }
+html.aniiland-phone header nav .translation-note-trigger:not([hidden]) { margin-left: 0 !important; }
+
+/* Translation note moves to the footer on phones (it squeezed the app bar in non-English) */
+html.aniiland-phone header nav .translation-note-trigger { display: none !important; }
+html.aniiland-phone .m-footer-extra .m-translation-note {
+  appearance: none;
+  min-height: 36px !important;
+  padding: 6px 12px;
+  border: 1px solid #ffffff1f;
+  border-radius: 999px;
+  background: #ffffff0d;
+  color: var(--m-text);
+  font-size: 12px;
+}
+html.aniiland-phone .m-footer-extra .m-translation-note[hidden] { display: none !important; }
+
+/* Tab labels: never break inside a word, shrink slightly on narrow screens */
+html.aniiland-phone .m-tabbar button { padding-inline: 1px !important; font-size: clamp(9px, 2.7vw, 10.5px) !important; }
+html.aniiland-phone .m-tabbar button span { overflow-wrap: normal !important; word-break: normal; hyphens: manual; }
+
+/* Metrics: one wide hero tile, two tiles beneath, at every phone width */
+html.aniiland-phone .metrics { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+html.aniiland-phone .metrics > .metric:first-child { grid-column: 1 / -1; }
+html.aniiland-phone .metrics > .metric:not(:first-child) { padding: 12px 13px !important; }
+html.aniiland-phone .metrics > .metric:not(:first-child) strong { font-size: 22px !important; }
+html.aniiland-phone main#content .metrics > .metric:first-child { grid-column: 1 / -1 !important; }
+html.aniiland-phone main#content .metrics > .metric:nth-child(n+2) { grid-column: auto !important; }
+
+/* Custom Setup / data dialogs: tabs scroll sideways instead of breaking words */
+html.aniiland-phone .advanced-setup-tabs {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+html.aniiland-phone .advanced-setup-tabs::-webkit-scrollbar { display: none; }
+html.aniiland-phone .advanced-setup-tabs > button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 10px 14px !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: manual;
+}
+html.aniiland-phone dialog button,
+html.aniiland-phone dialog .advanced-setup-footer button {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+html.aniiland-phone .advanced-setup-footer button { display: flex; align-items: center; justify-content: center; text-align: center; }
+html.aniiland-phone .advanced-setup-footer { padding-bottom: calc(12px + var(--m-safe-b)) !important; }
+
+/* --------------------------------------------------------------------------
+   Production Plan cards
+   -------------------------------------------------------------------------- */
+
+/* Grow & Gather: tighter, scannable rows */
+html.aniiland-phone .production-grid { gap: 12px !important; }
+html.aniiland-phone .production-card h3 { padding: 12px 14px !important; font-size: 16px; }
+html.aniiland-phone .production-card h3 small { font-size: 12px; }
+html.aniiland-phone .production-card .facility-card-title { gap: 10px; }
+html.aniiland-phone .production-card .facility-mini-icon { width: 34px !important; height: 34px !important; object-fit: contain; }
+html.aniiland-phone .product-row {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  gap: 4px 12px !important;
+  align-items: start;
+  padding: 14px !important;
+}
+html.aniiland-phone .product-row + .product-row { border-top: 1px solid #ffffff12; }
+html.aniiland-phone .product-row > img { width: 44px !important; height: 44px !important; object-fit: contain; margin: 0 !important; }
+html.aniiland-phone .product-row > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+html.aniiland-phone .product-row > div > b { font-size: 15px; line-height: 1.3; }
+html.aniiland-phone .product-row > div > p { margin: 0 !important; font-size: 12.5px; line-height: 1.45; color: var(--m-muted); }
+html.aniiland-phone .product-row .qty { font-size: 14px; font-weight: 700; margin: 0 !important; }
+html.aniiland-phone .production-use-tag {
+  display: inline-flex !important;
+  align-self: flex-start;
+  width: auto !important;
+  max-width: 100%;
+  margin: 2px 0 0 !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+}
+html.aniiland-phone .recipe-module-note {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px !important;
+  margin: 2px 0 0 !important;
+}
+html.aniiland-phone .recipe-module-note > span { padding: 3px 9px !important; font-size: 11px !important; border-radius: 999px !important; }
+html.aniiland-phone .recipe-lock-btn {
+  min-height: 30px !important;
+  width: auto !important;
+  padding: 4px 11px !important;
+  font-size: 11px !important;
+  font-weight: 600;
+  border-radius: 999px !important;
+}
+
+/* Needed: Aniimo callout inside rows */
+html.aniiland-phone .product-row [class*="needed"] { padding: 8px 11px !important; border-radius: 10px !important; font-size: 13px; }
+
+/* What to Produce: each recipe is a card with a ingredient block + stat tiles.
+   The old phone layout hid batches and assigned/busy; they are shown again. */
+html.aniiland-phone .mobile-production-table {
+  border: 1px solid var(--m-line);
+  border-radius: var(--m-radius);
+  background: var(--m-panel);
+  overflow: hidden;
+}
+html.aniiland-phone .mobile-production-table tbody > tr {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 14px !important;
+  border-bottom: 1px solid #ffffff14;
+}
+html.aniiland-phone .mobile-production-table tbody > tr > td { text-align: left !important; }
+html.aniiland-phone .mobile-production-table tbody > tr > td:first-child { grid-column: 1 / -1; }
+html.aniiland-phone .mobile-production-table tbody > tr > td:nth-child(2) {
+  grid-column: 1 / -1;
+  padding: 9px 12px !important;
+  border-radius: 10px;
+  background: #ffffff09;
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+}
+html.aniiland-phone .mobile-production-table tbody > tr > td:nth-child(n+3) {
+  display: block !important;
+  padding: 8px 10px !important;
+  border-radius: 10px;
+  background: #ffffff09;
+  font-size: 14px !important;
+  font-weight: 700;
+  line-height: 1.3 !important;
+}
+html.aniiland-phone .mobile-production-table tbody > tr > td[data-label]::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--m-muted);
+  overflow-wrap: normal;
+}
+html.aniiland-phone .mobile-production-table .craft-product-facility {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  align-items: center;
+  column-gap: 12px !important;
+  min-height: 0 !important;
+}
+html.aniiland-phone .mobile-production-table .craft-product-info { gap: 3px !important; text-align: left; }
+html.aniiland-phone .mobile-production-table .craft-product-title { justify-content: flex-start !important; align-items: center; text-align: left; font-size: 15px; }
+html.aniiland-phone .mobile-production-table .craft-product-title > img { flex: none; }
+html.aniiland-phone .mobile-production-table .craft-facility-name { text-align: left !important; color: var(--m-muted); font-weight: 600; }
+html.aniiland-phone .mobile-production-table .production-use-tag { display: inline-flex !important; margin: 10px 0 0 !important; }
+html.aniiland-phone .mobile-production-table .craft-product-title .item-link {
+  flex: 1 1 auto;
+  width: auto !important;
+  min-width: 0;
+  padding: 0 !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  background: none !important;
+  border: 0 !important;
+}
+html.aniiland-phone .mobile-production-table .craft-product-top { text-align: left !important; }
+
+/* Aniimo Needed: let names wrap to two lines instead of "Flam…" */
+html.aniiland-phone .aniimo-needed-pet small {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal !important;
+  overflow: hidden;
+  text-overflow: clip !important;
+  max-width: 100%;
+  font-size: 9.5px !important;
+  line-height: 1.15 !important;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+html.aniiland-phone .aniimo-needed-pet { height: auto !important; min-height: 0; padding-bottom: 5px; }
+
+/* Climate map legend: stack so the details have room */
+html.aniiland-phone .climate-key { display: flex !important; flex-direction: column; gap: 8px; }
+html.aniiland-phone .climate-key > * { width: 100% !important; min-width: 0; }
+html.aniiland-phone .climate-key-row { align-items: center; }
+html.aniiland-phone .climate-key-row > * { min-width: 0; }
+html.aniiland-phone .climate-map figcaption { padding: 12px 4px 4px; }
+html.aniiland-phone .climate-map figcaption b { font-size: 15px; line-height: 1.3; }
+html.aniiland-phone .climate-preview-scroll { max-width: 100%; overflow: auto; -webkit-overflow-scrolling: touch; }
+
+/* Sell / Restock tables: tidy columns inside their own scroll box */
+html.aniiland-phone .flow-card h3 { padding: 12px 14px !important; font-size: 16px; }
+html.aniiland-phone .compact-flow table { min-width: 0; width: 100%; }
+html.aniiland-phone .compact-flow th { font-size: 10px; letter-spacing: .05em; text-transform: uppercase; }
+html.aniiland-phone .compact-flow td, html.aniiland-phone .compact-flow th { padding: 9px 8px !important; }
+html.aniiland-phone .flow-item-cell { gap: 8px; min-width: 0; }
+html.aniiland-phone .flow-item-cell img { width: 28px !important; height: 28px !important; flex: none; }
+
+/* Ingredient block: less dead space */
+html.aniiland-phone .mobile-production-table tbody > tr > td:nth-child(2) { padding: 8px 12px 9px !important; line-height: 1.5 !important; }
+html.aniiland-phone .climate-key-row small .game-localized-name,
+html.aniiland-phone .climate-key-row small span { display: inline !important; }
+html.aniiland-phone .climate-key-row small { display: block; line-height: 1.35; }
+
+/* Order Solver inputs: match the rest of the dark UI (were browser-default gray) */
+html.aniiland-phone .order-add input,
+html.aniiland-phone .order-search-wrap input {
+  background: #0e1923 !important;
+  color: var(--m-text);
+  border: 1px solid var(--m-line) !important;
+  border-radius: 12px !important;
+  padding: 0 14px;
+}
+html.aniiland-phone .order-add input::placeholder { color: #7d909f; }
+html.aniiland-phone .order-add input:focus { outline: 2px solid var(--m-accent-soft); outline-offset: 1px; }
+html.aniiland-phone .order-panel > header { padding: 0 0 12px !important; margin: 0 0 12px !important; }
